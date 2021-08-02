@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Genius.Atom.UI.Forms</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Infrastructure\Atom.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" />
+    <PackageReference Include="WpfAnimatedGif" />
+    <PackageReference Include="DotNetProjects.WpfToolkit.Input" />
+  </ItemGroup>
+
+</Project>

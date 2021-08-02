@@ -1,0 +1,1 @@
+☐ refine dependencies in Dicrecotry.Build.targets

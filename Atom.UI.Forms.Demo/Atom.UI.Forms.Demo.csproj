@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Genius.Atom.UI.Forms.Demo</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\*.png" />
+    <Resource Include="Assets\*.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Infrastructure\Atom.Infrastructure.csproj" />
+    <ProjectReference Include="..\Atom.UI.Forms\Atom.UI.Forms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" />
+    <PackageReference Include="ReactiveUI" />
+    <PackageReference Include="ReactiveUI.WPF" />
+    <PackageReference Include="ReactiveUI.Events.WPF" />
+    <PackageReference Include="Humanizer.Core" />
+    <PackageReference Include="MahApps.Metro" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+</Project>
