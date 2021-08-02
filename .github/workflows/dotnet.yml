@@ -25,9 +25,11 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: Publish
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: Atom.UI.Forms/Atom.UI.Forms.csproj
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        VERSION_FILE_PATH: Directory.Build.targets
+    - name: Pack Infrastructure
+      run: dotnet pack Atom.Infrastructure/Atom.Infrastructure.csproj --output nuget-packages --configuration Release
+    - name: Pack UI.Forms
+      run: dotnet pack Atom.UI.Forms/Atom.UI.Forms.csproj --output nuget-packages --configuration Release
+    - name: Publish packages to nuget.org
+      run: dotnet nuget push **/*.nupkg -k $NUGET_AUTH_TOKEN --skip-duplicate --source https://api.nuget.org/v3/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
