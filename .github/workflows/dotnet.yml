@@ -30,6 +30,6 @@ jobs:
     - name: Pack UI.Forms
       run: dotnet pack Atom.UI.Forms/Atom.UI.Forms.csproj --output nuget-packages --configuration Release
     - name: Publish packages to nuget.org
-      run: dotnet nuget push **/*.nupkg -k $NUGET_AUTH_TOKEN --skip-duplicate --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push **/*.nupkg --api-key ${NUGET_AUTH_TOKEN} --skip-duplicate --source https://api.nuget.org/v3/index.json
       env:
         NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
