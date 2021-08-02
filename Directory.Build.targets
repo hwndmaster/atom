@@ -4,6 +4,7 @@
     <Version>0.0.2</Version>
     <Authors>Dima Kravtsov</Authors>
     <Description>Simple framework for personal pet projects</Description>
+    <RepositoryUrl>https://github.com/hwndmaster/atom</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
