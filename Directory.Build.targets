@@ -1,4 +1,9 @@
 <Project>
+
+  <PropertyGroup>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- Microsoft common dependencies -->
     <PackageReference Update="System.Reactive" Version="5.0.0" />

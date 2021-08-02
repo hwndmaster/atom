@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atom.Infrastructure", "Atom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atom.UI.Forms", "Atom.UI.Forms\Atom.UI.Forms.csproj", "{2C35F696-B2C9-4A0C-93A1-DC71FF149331}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atom.UI.Forms.Demo", "Atom.UI.Forms.Demo\Atom.UI.Forms.Demo.csproj", "{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{2C35F696-B2C9-4A0C-93A1-DC71FF149331}.Release|x64.Build.0 = Release|Any CPU
 		{2C35F696-B2C9-4A0C-93A1-DC71FF149331}.Release|x86.ActiveCfg = Release|Any CPU
 		{2C35F696-B2C9-4A0C-93A1-DC71FF149331}.Release|x86.Build.0 = Release|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Debug|x64.Build.0 = Debug|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Debug|x86.Build.0 = Debug|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Release|x64.ActiveCfg = Release|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Release|x64.Build.0 = Release|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Release|x86.ActiveCfg = Release|Any CPU
+		{F423EE87-3DAA-46FD-A1FC-7AD280D3CF24}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
