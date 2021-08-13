@@ -6,7 +6,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:input="clr-namespace:System.Windows.Controls;assembly=DotNetProjects.Input.Toolkit"
-        xmlns:dp="clr-namespace:Genius.Atom.UI.Forms.DependencyProperties"
         xmlns:vc="clr-namespace:Genius.Atom.UI.Forms.ValueConverters"
         mc:Ignorable="d">
     <Grid>
