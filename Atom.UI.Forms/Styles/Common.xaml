@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="FormPanelCaption" TargetType="{x:Type Label}">
+        <Setter Property="Width" Value="140" />
+    </Style>
+
+    <Style x:Key="FormPanel" TargetType="{x:Type StackPanel}">
+        <Setter Property="Orientation" Value="Vertical"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Style.Resources>
+            <Style TargetType="{x:Type DockPanel}">
+                <Setter Property="HorizontalAlignment"
+                        Value="Stretch" />
+                <Setter Property="Margin"
+                        Value="5" />
+                <Setter Property="LastChildFill"
+                        Value="True" />
+                <Style.Resources>
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource FormPanelCaption}" />
+                </Style.Resources>
+            </Style>
+            <Style TargetType="{x:Type StackPanel}">
+                <Setter Property="Margin"
+                        Value="5" />
+                <Style.Resources>
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource FormPanelCaption}" />
+                </Style.Resources>
+            </Style>
+        </Style.Resources>
+    </Style>
+
+    <Style x:Key="ValidatableTextCellElementStyle" TargetType="TextBlock" BasedOn="{StaticResource MahApps.Styles.TextBlock.DataGrid}">
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="true">
+                <Setter Property="ToolTip"
+                        Value="{Binding RelativeSource={RelativeSource Self},
+                        Path=(Validation.Errors)[0].ErrorContent}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ValidatableCheckboxCellElementStyle" TargetType="CheckBox" BasedOn="{StaticResource MahApps.Styles.CheckBox.DataGrid}">
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="true">
+                <Setter Property="ToolTip"
+                        Value="{Binding RelativeSource={RelativeSource Self},
+                        Path=(Validation.Errors)[0].ErrorContent}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource baseStyle}">
+    </Style>
+    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource baseStyle}">
+    </Style> -->
+
+</ResourceDictionary>

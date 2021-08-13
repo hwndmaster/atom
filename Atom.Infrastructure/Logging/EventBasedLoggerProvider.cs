@@ -8,8 +8,7 @@ namespace Genius.Atom.Infrastructure.Logging
     {
         private readonly IEventBus _eventBus;
 
-        private readonly ConcurrentDictionary<string, EventBasedLogger> _loggers =
-            new ConcurrentDictionary<string, EventBasedLogger>();
+        private readonly ConcurrentDictionary<string, EventBasedLogger> _loggers = new();
 
         public EventBasedLoggerProvider(IEventBus eventBus)
         {

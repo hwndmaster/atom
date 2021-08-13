@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -21,18 +20,26 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
         static AttachingBehavior()
         {
             _columnBehaviors = new IAutoGridColumnBehavior[] {
-                new ColumnReadOnlyBehavior(),
-                new ColumnDisplayIndexBehavior(),
+                // Column type changers:
+                new ColumnTagEditorBehavior(),
                 new ColumnButtonBehavior(),
                 new ColumnWithImageBehavior(),
                 new ColumnComboboxBehavior(),
-                new ColumnValidationBehavior(),
+
+                // Binding changers:
                 new ColumnConverterBehavior(),
                 new ColumnFormattingBehavior(),
+                new ColumnNullableBehavior(),
+
+                // Style changers:
                 new ColumnTooltipBehavior(),
                 new ColumnStylingBehavior(),
+                new ColumnValidationBehavior(),
+
+                // Misc:
                 new ColumnHeaderNameBehavior(),
-                new ColumnNullableBehavior()
+                new ColumnReadOnlyBehavior(),
+                new ColumnDisplayIndexBehavior()
             };
         }
 
@@ -95,17 +102,12 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
 
         private bool IsBrowsable(AutoGridColumnContext context)
         {
-            _showOnlyBrowsable = _showOnlyBrowsable ?? context.Property.ComponentType.GetCustomAttributes(false)
+            _showOnlyBrowsable ??= context.Property.ComponentType.GetCustomAttributes(false)
                 .Any(x => x is ShowOnlyBrowsableAttribute b && b.OnlyBrowsable);
 
             var browsable = context.GetAttribute<BrowsableAttribute>();
-            if ((_showOnlyBrowsable.Value && browsable?.Browsable != true)
-                || (!_showOnlyBrowsable.Value && browsable?.Browsable == false))
-            {
-                return false;
-            }
-
-            return true;
+            return (!_showOnlyBrowsable.Value || browsable?.Browsable == true)
+                && (_showOnlyBrowsable.Value || browsable?.Browsable != false);
         }
 
         private void BindIsSelected()

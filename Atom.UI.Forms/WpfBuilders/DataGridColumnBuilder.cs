@@ -7,7 +7,7 @@ using WpfAnimatedGif;
 
 namespace Genius.Atom.UI.Forms.WpfBuilders
 {
-    public class DataGridColumnBuilder
+    internal sealed class DataGridColumnBuilder
     {
         private readonly string _valuePath;
         private IValueConverter _converter;
@@ -69,7 +69,7 @@ namespace Genius.Atom.UI.Forms.WpfBuilders
             return column;
         }
 
-        private DataTemplate CreateTextTemplate(Binding bindToValue)
+        private static DataTemplate CreateTextTemplate(Binding bindToValue)
         {
             var textFactory = new FrameworkElementFactory(typeof(TextBlock));
             textFactory.SetBinding(TextBlock.TextProperty, bindToValue);

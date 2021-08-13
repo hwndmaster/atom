@@ -47,8 +47,10 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
             }
             else
             {
-                var collectionViewSource = new CollectionViewSource();
-                collectionViewSource.Source = e.NewValue;
+                var collectionViewSource = new CollectionViewSource
+                {
+                    Source = e.NewValue
+                };
 
                 SetupGrouping(groupByProps, collectionViewSource);
                 SetupFiltering(d, filterByProps, collectionViewSource);
@@ -68,9 +70,8 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
         private static void SetupFiltering(DependencyObject d, List<PropertyInfo> filterByProps,
             CollectionViewSource collectionViewSource)
         {
-            var vm = ((FrameworkElement)d).DataContext as ViewModelBase;
-            if (vm == null)
-                throw new InvalidCastException($"Cannot cast DataContext to {nameof(ViewModelBase)}");
+            var vm = ((FrameworkElement)d).DataContext as ViewModelBase
+                ?? throw new InvalidCastException($"Cannot cast DataContext to {nameof(ViewModelBase)}");
 
             var filterContext = vm.GetType().GetProperties()
                 .FirstOrDefault(x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any());

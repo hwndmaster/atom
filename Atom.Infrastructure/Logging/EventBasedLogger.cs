@@ -36,7 +36,7 @@ namespace Genius.Atom.Infrastructure.Logging
             _eventBus.Publish(new LogEvent(logLevel, _shortName, message));
         }
 
-        private string CreateShortNameFrom(string name)
+        private static string CreateShortNameFrom(string name)
         {
             if (name.StartsWith("Genius."))
             {

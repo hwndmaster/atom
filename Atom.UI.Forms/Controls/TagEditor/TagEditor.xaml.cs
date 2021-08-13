@@ -7,11 +7,9 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
     [ExcludeFromCodeCoverage]
     public partial class TagEditor
     {
-        public TagEditor(TagEditorViewModel viewModel)
+        public TagEditor()
         {
             InitializeComponent();
-
-            DataContext = viewModel;
         }
 
         public TagEditorViewModel ViewModel => (TagEditorViewModel) DataContext;

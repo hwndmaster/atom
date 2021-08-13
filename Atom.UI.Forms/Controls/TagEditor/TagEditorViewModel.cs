@@ -18,6 +18,11 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
             return new ObservableCollection<TagItemViewModel>(items);
         }
 
+        public void AddSelected(TagItemViewModel tagVm)
+        {
+            AddSelected(tagVm, tagVm.Tag);
+        }
+
         public void AddSelected(TagItemViewModel tagVm, string text)
         {
             if (tagVm == null)
@@ -27,11 +32,10 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
                 tagVm = new TagItemViewModel(text.Trim(), AllTags.Count);
                 AllTags.Add(tagVm);
             }
-            SelectedTags.Add(new TagItemViewModel(tagVm) {
-                Delete = new ActionCommand(_ => {
-                    SelectedTags.Remove(tagVm);
-                })
-            });
+
+            var selectedVm = new TagItemViewModel(tagVm);
+            selectedVm.Delete = new ActionCommand(_ => SelectedTags.Remove(selectedVm));
+            SelectedTags.Add(selectedVm);
         }
 
         public ObservableCollection<TagItemViewModel> AllTags { get; }

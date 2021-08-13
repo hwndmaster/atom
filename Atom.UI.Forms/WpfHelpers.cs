@@ -7,6 +7,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using Genius.Atom.UI.Forms.Controls.TagEditor;
 using MahApps.Metro.Controls;
 
 namespace Genius.Atom.UI.Forms
@@ -32,10 +33,10 @@ namespace Genius.Atom.UI.Forms
                 //: TypeDescriptor.GetProperties(owner.DataContext).Find(sourcePath, false).GetValue(owner.DataContext);
             }
             BindingOperations.SetBinding(child, Flyout.IsOpenProperty, new Binding(isOpenBindingPath) { Source = owner.DataContext });
-            (flyout as IAddChild).AddChild(child);
+            ((IAddChild) flyout).AddChild(child);
         }
 
-        public static DataGridTemplateColumn CreateButtonColumn(string commandPath, string iconName)
+        internal static DataGridTemplateColumn CreateButtonColumn(string commandPath, string iconName)
         {
             var caption = Helpers.MakeCaptionFromPropertyName(commandPath.Replace("Command", ""));
 
@@ -54,39 +55,63 @@ namespace Genius.Atom.UI.Forms
                 buttonFactory.SetValue(Button.ContentProperty, caption);
             }
 
-            var column = new DataGridTemplateColumn();
-            column.CellTemplate = new DataTemplate { VisualTree = buttonFactory };
+            return new DataGridTemplateColumn
+            {
+                CellTemplate = new DataTemplate { VisualTree = buttonFactory }
+            };
+        }
+
+        internal static DataGridTemplateColumn CreateTagEditorColumn(string headerName, string valuePath)
+        {
+            var column = new DataGridTemplateColumn {
+                Header = headerName
+            };
+
+            var bindToValue = new Binding(valuePath);
+
+            var tagEditorFactory = new FrameworkElementFactory(typeof(TagEditor));
+            tagEditorFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
+            tagEditorFactory.SetValue(ControlsHelper.IsReadOnlyProperty, true);
+            var template = new DataTemplate { VisualTree = tagEditorFactory };
+
+            column.CellTemplate = template;
+
+            tagEditorFactory = new FrameworkElementFactory(typeof(TagEditor));
+            tagEditorFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
+            template = new DataTemplate { VisualTree = tagEditorFactory };
+
+            column.CellEditingTemplate = template;
+
             return column;
         }
 
-        public static DataGridComboBoxColumn CreateComboboxColumnWithStaticItemsSource(IEnumerable itemsSource, string valuePath)
+        internal static DataGridComboBoxColumn CreateComboboxColumnWithStaticItemsSource(IEnumerable itemsSource, string valuePath)
         {
-            var column = new DataGridComboBoxColumn();
-            column.Header = valuePath;
-            column.ItemsSource = itemsSource;
-            column.SelectedValueBinding = new Binding(valuePath);
-            return column;
+            return new DataGridComboBoxColumn
+            {
+                Header = valuePath,
+                ItemsSource = itemsSource,
+                SelectedValueBinding = new Binding(valuePath)
+            };
         }
 
-        public static void EnableSingleClickEditMode(DataGridColumn column)
+        internal static void EnableSingleClickEditMode(DataGridColumn column)
         {
-            MouseButtonEventHandler del1 = (object sender, MouseButtonEventArgs e) =>
-                {
-                    var cell = sender as DataGridCell;
-                    GridColumnFastEdit(cell, e);
-                };
-            TextCompositionEventHandler del2 = (object sender, TextCompositionEventArgs e) =>
-                {
-                    var cell = sender as DataGridCell;
-                    GridColumnFastEdit(cell, e);
-                };
+            MouseButtonEventHandler del1 = (object sender, MouseButtonEventArgs e) => {
+                var cell = sender as DataGridCell;
+                GridColumnFastEdit(cell, e);
+            };
+            TextCompositionEventHandler del2 = (object sender, TextCompositionEventArgs e) => {
+                var cell = sender as DataGridCell;
+                GridColumnFastEdit(cell, e);
+            };
 
             EnsureDefaultCellStyle(column);
             column.CellStyle.Setters.Add(new EventSetter(UIElement.PreviewMouseLeftButtonDownEvent, del1));
             column.CellStyle.Setters.Add(new EventSetter(UIElement.PreviewTextInputEvent, del2));
         }
 
-        public static Style EnsureDefaultCellStyle(DataGridColumn column)
+        internal static Style EnsureDefaultCellStyle(DataGridColumn column)
         {
             if (column.CellStyle == null)
             {
@@ -99,14 +124,14 @@ namespace Genius.Atom.UI.Forms
             return column.CellStyle;
         }
 
-        public static void SetCellHorizontalAlignment(DataGridColumn column, HorizontalAlignment alignment)
+        internal static void SetCellHorizontalAlignment(DataGridColumn column, HorizontalAlignment alignment)
         {
             EnsureDefaultCellStyle(column);
 
             column.CellStyle.Setters.Add(new Setter(DataGridCell.HorizontalAlignmentProperty, alignment));
         }
 
-        public static Color ChangeColorBrightness(Color color, float correctionFactor)
+        internal static Color ChangeColorBrightness(Color color, float correctionFactor)
         {
             float red = (float)color.R;
             float green = (float)color.G;

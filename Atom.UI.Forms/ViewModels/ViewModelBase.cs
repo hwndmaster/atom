@@ -24,7 +24,7 @@ namespace Genius.Atom.UI.Forms.ViewModels
         private readonly Dictionary<string, List<string>> _errors = new();
         private bool _suspendDirtySet = false;
 
-        public ViewModelBase()
+        protected ViewModelBase()
         {
             DetectValidationRules();
         }
@@ -61,7 +61,7 @@ namespace Genius.Atom.UI.Forms.ViewModels
             }
         }
 
-        protected T GetOrDefault<T>(T defaultValue = default(T), [CallerMemberName] string name = null)
+        protected T GetOrDefault<T>(T defaultValue = default, [CallerMemberName] string name = null)
         {
             if (name == null)
             {
@@ -105,10 +105,7 @@ namespace Genius.Atom.UI.Forms.ViewModels
 
             ValidateProperty(name, value);
 
-            if (valueChangedHandler != null)
-            {
-                valueChangedHandler(isInitial ? value : (T)oldValue, value);
-            }
+            valueChangedHandler?.Invoke(isInitial ? value : (T)oldValue, value);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

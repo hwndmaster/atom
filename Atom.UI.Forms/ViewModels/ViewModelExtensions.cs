@@ -20,7 +20,7 @@ namespace Genius.Atom.UI.Forms.ViewModels
 
         public static IDisposable WhenChanged<TProperty>(this IViewModel viewModel, string propertyName, Action<TProperty> handler)
         {
-            PropertyChangedEventHandler fn = (_, args) =>
+            void fn(object _, PropertyChangedEventArgs args)
             {
                 if (args.PropertyName != propertyName)
                     return;
@@ -29,7 +29,7 @@ namespace Genius.Atom.UI.Forms.ViewModels
                     return;
 
                 handler((TProperty) value);
-            };
+            }
 
             viewModel.PropertyChanged += fn;
 
@@ -43,7 +43,7 @@ namespace Genius.Atom.UI.Forms.ViewModels
             var propNames = propertyAccessors.Select(x => ExpressionHelpers.GetPropertyName(x)).ToArray();
 
             return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
-                h => viewModel.PropertyChanged += h, h => viewModel.PropertyChanged -= h)
+                    h => viewModel.PropertyChanged += h, h => viewModel.PropertyChanged -= h)
                 .Where(x => propNames.Contains(x.EventArgs.PropertyName))
                 .Select(_ => Unit.Default);
         }

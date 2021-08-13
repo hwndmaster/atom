@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>Genius.Atom.Infrastructure</AssemblyName>
     <RootNamespace>Genius.Atom.Infrastructure</RootNamespace>
     <PackageId>Genius.Atom.Infrastructure</PackageId>
   </PropertyGroup>
