@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <!-- Automated Testing components -->
-  <ItemGroup Condition="$(ProjectName.EndsWith('.Tests'))">
+  <ItemGroup Condition="$(ProjectName.EndsWith('.Tests')) Or $(ProjectName.EndsWith('.TestingUtil'))">
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
