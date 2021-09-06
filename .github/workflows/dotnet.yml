@@ -32,6 +32,8 @@ jobs:
       run: dotnet pack Atom.Infrastructure/Atom.Infrastructure.csproj --configuration Release
     - name: Pack UI.Forms
       run: dotnet pack Atom.UI.Forms/Atom.UI.Forms.csproj --configuration Release
+    - name: Pack UI.Forms.TestingUtil
+      run: dotnet pack Atom.UI.Forms.TestingUtil/Atom.UI.Forms.TestingUtil.csproj --configuration Release
     - name: Publish packages to GPR
       run: dotnet nuget push **/*.nupkg --skip-duplicate
       #run: dotnet nuget push **/*.nupkg --api-key ${NUGET_AUTH_TOKEN} --skip-duplicate --source https://api.nuget.org/v3/index.json
