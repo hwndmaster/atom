@@ -1,10 +1,9 @@
 using System;
 using System.Windows.Data;
-using Genius.Atom.UI.Forms.Attributes;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnConverterBehavior : IAutoGridColumnBehavior
+    internal class ColumnConverterBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

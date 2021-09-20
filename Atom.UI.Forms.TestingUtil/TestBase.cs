@@ -6,7 +6,6 @@ using System.Windows.Threading;
 using AutoFixture;
 using Genius.Atom.Infrastructure;
 using Genius.Atom.Infrastructure.Events;
-using Genius.Atom.UI.Forms.ViewModels;
 using Moq;
 
 namespace Genius.Atom.UI.Forms.TestingUtil

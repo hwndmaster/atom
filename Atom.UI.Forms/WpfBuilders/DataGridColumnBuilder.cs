@@ -2,7 +2,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using Genius.Atom.UI.Forms.ValueConverters;
 using WpfAnimatedGif;
 
 namespace Genius.Atom.UI.Forms.WpfBuilders

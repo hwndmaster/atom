@@ -1,9 +1,8 @@
 using System.Text.RegularExpressions;
-using Genius.Atom.UI.Forms.Attributes;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnHeaderNameBehavior : IAutoGridColumnBehavior
+    internal class ColumnHeaderNameBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

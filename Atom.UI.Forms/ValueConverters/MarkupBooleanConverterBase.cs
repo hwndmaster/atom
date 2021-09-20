@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace Genius.Atom.UI.Forms.ValueConverters
+namespace Genius.Atom.UI.Forms
 {
     public abstract class MarkupBooleanConverterBase<T> : MarkupExtension, IValueConverter
     {

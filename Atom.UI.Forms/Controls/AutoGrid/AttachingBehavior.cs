@@ -4,9 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Genius.Atom.UI.Forms.Attributes;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
-using Genius.Atom.UI.Forms.ViewModels;
 using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid

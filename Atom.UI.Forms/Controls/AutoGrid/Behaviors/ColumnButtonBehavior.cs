@@ -1,9 +1,8 @@
 using System.Windows.Input;
-using Genius.Atom.UI.Forms.Attributes;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnButtonBehavior : IAutoGridColumnBehavior
+    internal class ColumnButtonBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

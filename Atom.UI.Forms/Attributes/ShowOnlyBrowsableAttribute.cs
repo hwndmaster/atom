@@ -1,6 +1,6 @@
 using System;
 
-namespace Genius.Atom.UI.Forms.Attributes
+namespace Genius.Atom.UI.Forms
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public sealed class ShowOnlyBrowsableAttribute : Attribute

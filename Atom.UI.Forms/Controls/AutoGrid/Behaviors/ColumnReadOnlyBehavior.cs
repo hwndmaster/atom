@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnReadOnlyBehavior : IAutoGridColumnBehavior
+    internal class ColumnReadOnlyBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

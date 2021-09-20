@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Data;
 
-namespace Genius.Atom.UI.Forms.ValueConverters
+namespace Genius.Atom.UI.Forms
 {
     public class PropertyValueStringConverter : IValueConverter
     {

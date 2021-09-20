@@ -6,7 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Genius.Atom.Infrastructure;
 
-namespace Genius.Atom.UI.Forms.ViewModels
+namespace Genius.Atom.UI.Forms
 {
     public static class ViewModelExtensions
     {

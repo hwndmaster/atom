@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnValidationBehavior : IAutoGridColumnBehavior
+    internal class ColumnValidationBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

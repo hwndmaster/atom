@@ -12,7 +12,7 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
             InitializeComponent();
         }
 
-        public TagEditorViewModel ViewModel => (TagEditorViewModel) DataContext;
+        public ITagEditorViewModel ViewModel => (ITagEditorViewModel) DataContext;
 
         private void AutoCompleteBox_KeyUp(object sender, KeyEventArgs e)
         {

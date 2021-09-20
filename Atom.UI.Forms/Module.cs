@@ -11,7 +11,7 @@ namespace Genius.Atom.UI.Forms
     {
         public static void Configure(IServiceCollection services)
         {
-            // Empty
+            services.AddTransient<IViewModelFactory, ViewModelFactory>();
         }
 
         public static void Initialize(IServiceProvider serviceProvider)

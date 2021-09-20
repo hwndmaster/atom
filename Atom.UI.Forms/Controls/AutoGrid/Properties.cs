@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Genius.Atom.UI.Forms.Attributes;
-using Genius.Atom.UI.Forms.ViewModels;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Media;
 
-namespace Genius.Atom.UI.Forms.ViewModels
+namespace Genius.Atom.UI.Forms
 {
     public interface ITitledItemViewModel : IViewModel
     {

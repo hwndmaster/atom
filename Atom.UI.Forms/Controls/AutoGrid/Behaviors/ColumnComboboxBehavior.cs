@@ -1,10 +1,8 @@
 using System.Collections;
-using Genius.Atom.UI.Forms.Attributes;
-using Genius.Atom.UI.Forms.ViewModels;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnComboboxBehavior : IAutoGridColumnBehavior
+    internal class ColumnComboboxBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

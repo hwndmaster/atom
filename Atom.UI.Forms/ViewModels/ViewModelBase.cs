@@ -8,9 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
-using Genius.Atom.UI.Forms.Attributes;
 
-namespace Genius.Atom.UI.Forms.ViewModels
+namespace Genius.Atom.UI.Forms
 {
     public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {

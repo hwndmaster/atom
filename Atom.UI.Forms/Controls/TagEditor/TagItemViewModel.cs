@@ -1,11 +1,20 @@
 using System.Windows.Media;
-using Genius.Atom.UI.Forms.ViewModels;
+using Genius.Atom.UI.Forms;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor
 {
-    public class TagItemViewModel : ViewModelBase
+    public interface ITagItemViewModel
     {
-        private readonly System.Windows.Media.Color[] _refColors = new [] {
+        string Tag { get; set; }
+        Brush Color { get; set; }
+        Brush AltColor { get; set; }
+
+        IActionCommand Delete { get; set; }
+    }
+
+    public class TagItemViewModel : ViewModelBase, ITagItemViewModel
+    {
+        private readonly Color[] _refColors = new [] {
             System.Windows.Media.Color.FromRgb(82, 107, 64),
             System.Windows.Media.Color.FromRgb(56, 82, 75),
             System.Windows.Media.Color.FromRgb(183, 158, 43),
@@ -27,7 +36,7 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
             AltColor = new SolidColorBrush(WpfHelpers.ChangeColorBrightness(color, -0.5f));
         }
 
-        public TagItemViewModel(TagItemViewModel reference)
+        public TagItemViewModel(ITagItemViewModel reference)
         {
             Tag = reference.Tag;
             Color = reference.Color;

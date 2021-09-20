@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Genius.Atom.UI.Forms.ViewModels
+namespace Genius.Atom.UI.Forms
 {
     public interface ITabViewModel : IViewModel
     {

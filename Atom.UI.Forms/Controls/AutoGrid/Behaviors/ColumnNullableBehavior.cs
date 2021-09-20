@@ -2,7 +2,7 @@ using System;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
 {
-    public class ColumnNullableBehavior : IAutoGridColumnBehavior
+    internal class ColumnNullableBehavior : IAutoGridColumnBehavior
     {
         public void Attach(AutoGridColumnContext context)
         {

@@ -1,7 +1,7 @@
 using System;
 using System.Windows;
 
-namespace Genius.Atom.UI.Forms.Attributes
+namespace Genius.Atom.UI.Forms
 {
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class StyleAttribute : Attribute

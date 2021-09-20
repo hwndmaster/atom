@@ -1,29 +1,29 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Genius.Atom.UI.Forms.ViewModels;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor
 {
-    public class TagEditorViewModel : ViewModelBase
+    public interface ITagEditorViewModel
     {
-        public TagEditorViewModel(ObservableCollection<TagItemViewModel> allTags)
+        void AddSelected(ITagItemViewModel tagVm);
+        void AddSelected(ITagItemViewModel tagVm, string text);
+
+        ObservableCollection<ITagItemViewModel> AllTags { get; }
+        ObservableCollection<ITagItemViewModel> SelectedTags { get; }
+    }
+
+    internal class TagEditorViewModel : ViewModelBase, ITagEditorViewModel
+    {
+        public TagEditorViewModel(ObservableCollection<ITagItemViewModel> allTags)
         {
             AllTags = allTags;
         }
 
-        public static ObservableCollection<TagItemViewModel> CreateTagItemViewModels(IEnumerable<string> tags)
-        {
-            var items = tags.Select((tag, i) => new TagItemViewModel(tag, i));
-            return new ObservableCollection<TagItemViewModel>(items);
-        }
-
-        public void AddSelected(TagItemViewModel tagVm)
+        public void AddSelected(ITagItemViewModel tagVm)
         {
             AddSelected(tagVm, tagVm.Tag);
         }
 
-        public void AddSelected(TagItemViewModel tagVm, string text)
+        public void AddSelected(ITagItemViewModel tagVm, string text)
         {
             if (tagVm == null)
             {
@@ -38,7 +38,7 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
             SelectedTags.Add(selectedVm);
         }
 
-        public ObservableCollection<TagItemViewModel> AllTags { get; }
-        public ObservableCollection<TagItemViewModel> SelectedTags { get; } = new();
+        public ObservableCollection<ITagItemViewModel> AllTags { get; }
+        public ObservableCollection<ITagItemViewModel> SelectedTags { get; } = new();
     }
 }
