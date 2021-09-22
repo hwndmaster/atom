@@ -16,10 +16,10 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
     {
         private readonly Color[] _refColors = new [] {
             System.Windows.Media.Color.FromRgb(82, 107, 64),
-            System.Windows.Media.Color.FromRgb(56, 82, 75),
             System.Windows.Media.Color.FromRgb(183, 158, 43),
             System.Windows.Media.Color.FromRgb(99, 89, 66),
             System.Windows.Media.Color.FromRgb(177, 119, 37),
+            System.Windows.Media.Color.FromRgb(56, 82, 75),
             System.Windows.Media.Color.FromRgb(82, 66, 65),
             System.Windows.Media.Color.FromRgb(132, 89, 50),
             System.Windows.Media.Color.FromRgb(119, 129, 64),

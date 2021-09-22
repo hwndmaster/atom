@@ -20,7 +20,6 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
         public DataGrid DataGrid { get; }
         public DataGridAutoGeneratingColumnEventArgs Args { get; }
         public PropertyDescriptor Property { get; }
-        public HashSet<string> Flags { get; } = new ();
 
         public T GetAttribute<T>() where T: Attribute
             => Property.Attributes.OfType<T>().FirstOrDefault();
