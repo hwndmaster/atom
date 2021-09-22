@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
@@ -122,6 +123,24 @@ namespace Genius.Atom.UI.Forms
             }
 
             return column.CellStyle;
+        }
+
+        internal static IEnumerable<T> FindVisualChildren<T>(DependencyObject dependencyObject) where T : DependencyObject
+        {
+            if (dependencyObject == null)
+                yield break;
+
+            if (dependencyObject is T t)
+                yield return t;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
+                foreach (T childOfChild in FindVisualChildren<T>(child))
+                {
+                    yield return childOfChild;
+                }
+            }
         }
 
         internal static void SetCellHorizontalAlignment(DataGridColumn column, HorizontalAlignment alignment)

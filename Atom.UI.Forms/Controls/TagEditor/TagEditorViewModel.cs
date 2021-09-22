@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor
 {
@@ -25,12 +26,24 @@ namespace Genius.Atom.UI.Forms.Controls.TagEditor
 
         public void AddSelected(ITagItemViewModel tagVm, string text)
         {
+            text = text.Trim();
+
             if (tagVm == null)
             {
                 if (string.IsNullOrEmpty(text))
+                {
                     return;
-                tagVm = new TagItemViewModel(text.Trim(), AllTags.Count);
-                AllTags.Add(tagVm);
+                }
+                if (!AllTags.Any(x => x.Tag == text))
+                {
+                    tagVm = new TagItemViewModel(text.Trim(), AllTags.Count);
+                    AllTags.Add(tagVm);
+                }
+            }
+
+            if (SelectedTags.Any(x => x.Tag == text))
+            {
+                return;
             }
 
             var selectedVm = new TagItemViewModel(tagVm);

@@ -11,10 +11,7 @@ namespace Genius.Atom.UI.Forms.Demo.ViewModels
         public MainViewModel(IViewModelFactory vmFactory)
         {
             _vmFactory = vmFactory;
-        }
 
-        public MainViewModel()
-        {
             var tagsObservables = new ObservableCollection<ITagItemViewModel>();
             string[] tags = new [] { "adipiscing", "aliquam", "amet", "consectetur", "consequat", "cursus", "dignissim", "dolor", "dui", "eget", "elit", "enim", "est", "et", "euismod", "fusce", "ipsum", "lectus", "ligula", "lobortis", "lorem", "mauris", "maximus", "nisi", "odio", "pellentesque", "potenti", "quis", "rutrum", "sed", "sem", "sit", "suscipit", "suspendisse", "tempus", "tincidunt", "tortor", "tristique", "turpis", "vel", "venenatis", "vivamus", "volutpat" };
             for (var i = 0; i < tags.Length; i++)
