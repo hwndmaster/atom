@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,6 +15,7 @@ namespace Genius.Atom.UI.Forms.WpfBuilders
         private string _imageSource;
         private double _imageSize;
         private bool _hideText;
+        private Type _viewType;
 
         private DataGridColumnBuilder(string valuePath)
         {
@@ -47,6 +49,12 @@ namespace Genius.Atom.UI.Forms.WpfBuilders
             return this;
         }
 
+        public DataGridColumnBuilder WithViewContent(Type viewType)
+        {
+            _viewType = viewType;
+            return this;
+        }
+
         public DataGridTemplateColumn Build()
         {
             var column = new DataGridTemplateColumn {
@@ -58,12 +66,21 @@ namespace Genius.Atom.UI.Forms.WpfBuilders
             if (_converter != null || _itemsSourcePath != null)
                 bindToValue.Converter = _converter ?? new PropertyValueStringConverter();
 
-            column.CellTemplate = _imageSource == null
-                ? CreateTextTemplate(bindToValue)
-                : CreateTextWithImageTemplate(bindToValue, hideText: _hideText);
+            if (_viewType != null)
+            {
+                var viewContentFactory = new FrameworkElementFactory(_viewType);
+                viewContentFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
+                column.CellTemplate = new DataTemplate { VisualTree = viewContentFactory };
+            }
+            else
+            {
+                column.CellTemplate = _imageSource == null
+                    ? CreateTextTemplate(bindToValue)
+                    : CreateTextWithImageTemplate(bindToValue, hideText: _hideText);
 
-            if (_itemsSourcePath != null)
-                column.CellEditingTemplate = CreateComboEditor(bindToValue);
+                if (_itemsSourcePath != null)
+                    column.CellEditingTemplate = CreateComboEditor(bindToValue);
+            }
 
             return column;
         }

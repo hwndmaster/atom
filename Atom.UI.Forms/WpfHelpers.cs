@@ -70,18 +70,8 @@ namespace Genius.Atom.UI.Forms
 
             var bindToValue = new Binding(valuePath);
 
-            var tagEditorFactory = new FrameworkElementFactory(typeof(TagEditor));
-            tagEditorFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
-            tagEditorFactory.SetValue(ControlsHelper.IsReadOnlyProperty, true);
-            var template = new DataTemplate { VisualTree = tagEditorFactory };
-
-            column.CellTemplate = template;
-
-            tagEditorFactory = new FrameworkElementFactory(typeof(TagEditor));
-            tagEditorFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
-            template = new DataTemplate { VisualTree = tagEditorFactory };
-
-            column.CellEditingTemplate = template;
+            column.CellTemplate = CreateTagEditorDataTemplate(bindToValue, @readonly: true);
+            column.CellEditingTemplate = CreateTagEditorDataTemplate(bindToValue, @readonly: false);
 
             return column;
         }
@@ -94,6 +84,17 @@ namespace Genius.Atom.UI.Forms
                 ItemsSource = itemsSource,
                 SelectedValueBinding = new Binding(valuePath)
             };
+        }
+
+        private static DataTemplate CreateTagEditorDataTemplate(Binding bindToValue, bool @readonly)
+        {
+            var tagEditorFactory = new FrameworkElementFactory(typeof(TagEditor));
+            tagEditorFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
+            if (@readonly)
+            {
+                tagEditorFactory.SetValue(ControlsHelper.IsReadOnlyProperty, true);
+            }
+            return new DataTemplate { VisualTree = tagEditorFactory };
         }
 
         internal static void EnableSingleClickEditMode(DataGridColumn column)

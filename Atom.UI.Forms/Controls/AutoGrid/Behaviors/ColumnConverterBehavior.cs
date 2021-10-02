@@ -7,14 +7,22 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors
     {
         public void Attach(AutoGridColumnContext context)
         {
-            var converterAttr = context.GetAttribute<ValueConverterAttribute>();
-            if (converterAttr == null)
+            var binding = context.GetBinding();
+            if (binding == null)
             {
                 return;
             }
 
-            var binding = context.GetBinding();
-            binding.Converter = (IValueConverter)Activator.CreateInstance(converterAttr.ValueConverterType);
+            var converterAttr = context.GetAttribute<ValueConverterAttribute>();
+            if (converterAttr != null)
+            {
+                binding.Converter = (IValueConverter)Activator.CreateInstance(converterAttr.ValueConverterType);
+            }
+
+            if (binding.Converter == null)
+            {
+                binding.Converter = new PropertyValueStringConverter();
+            }
         }
     }
 }

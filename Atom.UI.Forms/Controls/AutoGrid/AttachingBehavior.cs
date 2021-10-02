@@ -23,6 +23,7 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
                 new ColumnButtonBehavior(),
                 new ColumnWithImageBehavior(),
                 new ColumnComboboxBehavior(),
+                new ColumnAttachedViewBehavior(),
 
                 // Binding changers:
                 new ColumnConverterBehavior(),
@@ -59,8 +60,9 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid
                 return;
             }
 
+            var listItemType = Helpers.GetListItemType(AssociatedObject.ItemsSource);
             if (AssociatedObject.SelectionMode == DataGridSelectionMode.Extended &&
-                typeof(ISelectable).IsAssignableFrom(Helpers.GetListItemType(AssociatedObject.ItemsSource)))
+                typeof(ISelectable).IsAssignableFrom(listItemType))
             {
                 BindIsSelected();
             }

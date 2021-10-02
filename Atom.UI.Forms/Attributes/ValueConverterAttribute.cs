@@ -2,7 +2,7 @@ using System;
 
 namespace Genius.Atom.UI.Forms
 {
-  [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class ValueConverterAttribute : Attribute
     {
         public ValueConverterAttribute(Type valueConverterType)
