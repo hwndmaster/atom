@@ -1,19 +1,18 @@
 using System;
 
-namespace Genius.Atom.Infrastructure
+namespace Genius.Atom.Infrastructure;
+
+public sealed class DisposableAction : IDisposable
 {
-    public sealed class DisposableAction : IDisposable
+    private readonly Action _disposeAction;
+
+    public DisposableAction(Action disposeAction)
     {
-        private readonly Action _disposeAction;
+        _disposeAction = disposeAction;
+    }
 
-        public DisposableAction(Action disposeAction)
-        {
-            _disposeAction = disposeAction;
-        }
-
-        public void Dispose()
-        {
-            _disposeAction();
-        }
+    public void Dispose()
+    {
+        _disposeAction();
     }
 }

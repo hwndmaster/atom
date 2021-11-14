@@ -5,56 +5,61 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Genius.Atom.Infrastructure.Commands
+namespace Genius.Atom.Infrastructure.Commands;
+
+public interface ICommandBus
 {
-    public interface ICommandBus
+    Task SendAsync(ICommandMessage command);
+    Task<TResult> SendAsync<TResult>(ICommandMessageExchange<TResult> command);
+}
+
+/// <summary>
+/// A simple implementation of a command bus
+/// </summary>
+internal sealed class CommandBus : ICommandBus
+{
+    private static readonly ConcurrentDictionary<Type, MethodInfo> _handlersMethodCache = new();
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+
+    public CommandBus(IServiceScopeFactory serviceScopeFactory)
     {
-        Task SendAsync(ICommandMessage command);
-        Task<TResult> SendAsync<TResult>(ICommandMessageExchange<TResult> command);
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
-    /// <summary>
-    /// A simple implementation of a command bus
-    /// </summary>
-    internal sealed class CommandBus : ICommandBus
+    public Task SendAsync(ICommandMessage command)
     {
-        private static readonly ConcurrentDictionary<Type, MethodInfo> _handlersMethodCache = new();
-        private readonly IServiceScopeFactory _serviceScopeFactory;
+        var handlerType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
+        return InvokeCommandHandlerProcess(command, handlerType);
+    }
 
-        public CommandBus(IServiceScopeFactory serviceScopeFactory)
+    public Task<TResult> SendAsync<TResult>(ICommandMessageExchange<TResult> command)
+    {
+        var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
+        return (Task<TResult>)InvokeCommandHandlerProcess(command, handlerType);
+    }
+
+    private Task InvokeCommandHandlerProcess(ICommandMessage command, Type handlerType)
+    {
+        using var scope = _serviceScopeFactory.CreateScope();
+        var service = scope.ServiceProvider.GetService(handlerType);
+        if (service == null)
         {
-            _serviceScopeFactory = serviceScopeFactory;
+            throw new NotSupportedException($"Command handler for {command.GetType().Name} is not implemented/mapped");
         }
 
-        public Task SendAsync(ICommandMessage command)
+        var commandType = command.GetType();
+        var method = _handlersMethodCache.GetOrAdd(commandType, key =>
         {
-            var handlerType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
-            return InvokeCommandHandlerProcess(command, handlerType);
+            return service.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .First(x => x.Name == "ProcessAsync" && x.GetParameters()[0].ParameterType == key);
+        });
+
+        var result = method.Invoke(service, new object[] { command });
+        if (result is Task taskResult)
+        {
+            return taskResult;
         }
 
-        public Task<TResult> SendAsync<TResult>(ICommandMessageExchange<TResult> command)
-        {
-            var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
-            return InvokeCommandHandlerProcess(command, handlerType) as Task<TResult>;
-        }
-
-        private Task InvokeCommandHandlerProcess(ICommandMessage command, Type handlerType)
-        {
-            using var scope = _serviceScopeFactory.CreateScope();
-            var service = scope.ServiceProvider.GetService(handlerType);
-            if (service == null)
-            {
-                throw new NotSupportedException($"Command handler for {command.GetType().Name} is not implemented/mapped");
-            }
-
-            var commandType = command.GetType();
-            var method = _handlersMethodCache.GetOrAdd(commandType, key =>
-            {
-                return service.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .FirstOrDefault(x => x.Name == "ProcessAsync" && x.GetParameters()[0].ParameterType == key);
-            });
-
-            return method.Invoke(service, new object[] { command }) as Task;
-        }
+        throw new InvalidOperationException("Command Handler process has failed due to unknown error.");
     }
 }

@@ -1,15 +1,12 @@
-using System;
+namespace Genius.Atom.UI.Forms;
 
-namespace Genius.Atom.UI.Forms
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class TooltipSourceAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class TooltipSourceAttribute : Attribute
+    public TooltipSourceAttribute(string path)
     {
-        public TooltipSourceAttribute(string path)
-        {
-            Path = path;
-        }
-
-        public string Path { get; }
+        Path = path;
     }
+
+    public string Path { get; }
 }

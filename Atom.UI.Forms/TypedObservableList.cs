@@ -1,26 +1,24 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Genius.Atom.UI.Forms
+namespace Genius.Atom.UI.Forms;
+
+public interface ITypedObservableList
 {
-    public interface ITypedObservableList
+    Type ItemType { get; }
+}
+
+public class TypedObservableList<TContract, TType> : ObservableCollection<TContract>, ITypedObservableList, ITypedList
+{
+    public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors)
     {
-        Type ItemType { get; }
+        return TypeDescriptor.GetProperties(typeof(TType));
     }
 
-    public class TypedObservableList<TContract, TType> : ObservableCollection<TContract>, ITypedObservableList, ITypedList
+    public string GetListName(PropertyDescriptor[] listAccessors)
     {
-        public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors)
-        {
-            return TypeDescriptor.GetProperties(typeof(TType));
-        }
-
-        public string GetListName(PropertyDescriptor[] listAccessors)
-        {
-            return null;
-        }
-
-        public Type ItemType => typeof(TType);
+        return string.Empty;
     }
+
+    public Type ItemType => typeof(TType);
 }

@@ -1,15 +1,12 @@
-using System;
+namespace Genius.Atom.UI.Forms;
 
-namespace Genius.Atom.UI.Forms
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class ValueConverterAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class ValueConverterAttribute : Attribute
+    public ValueConverterAttribute(Type valueConverterType)
     {
-        public ValueConverterAttribute(Type valueConverterType)
-        {
-            ValueConverterType = valueConverterType;
-        }
-
-        public Type ValueConverterType { get; }
+        ValueConverterType = valueConverterType;
     }
+
+    public Type ValueConverterType { get; }
 }

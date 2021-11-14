@@ -1,6 +1,5 @@
-namespace Genius.Atom.Infrastructure.Events
+namespace Genius.Atom.Infrastructure.Events;
+
+public interface IEventMessage
 {
-    public interface IEventMessage
-    {
-    }
 }

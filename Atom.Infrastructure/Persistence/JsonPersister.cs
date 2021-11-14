@@ -3,78 +3,77 @@ using System.Text.Json;
 using System.Threading;
 using Genius.Atom.Infrastructure.Io;
 
-namespace Genius.Atom.Infrastructure.Persistence
+namespace Genius.Atom.Infrastructure.Persistence;
+
+public interface IJsonPersister
 {
-    public interface IJsonPersister
+    T? Load<T>(string filePath);
+    T[]? LoadCollection<T>(string filePath);
+    void Store(string filePath, object data);
+}
+
+internal sealed class JsonPersister : IJsonPersister
+{
+    private readonly IFileService _io;
+    private readonly JsonSerializerOptions _jsonOptions;
+    private readonly static ReaderWriterLockSlim _locker = new();
+
+    public JsonPersister(IFileService io)
     {
-        T Load<T>(string filePath);
-        T[] LoadCollection<T>(string filePath);
-        void Store(string filePath, object data);
+        _io = io;
+        _jsonOptions = new JsonSerializerOptions {
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = true
+        };
     }
 
-    internal sealed class JsonPersister : IJsonPersister
+    public T? Load<T>(string filePath)
     {
-        private readonly IFileService _io;
-        private readonly JsonSerializerOptions _jsonOptions;
-        private readonly static ReaderWriterLockSlim _locker = new();
-
-        public JsonPersister(IFileService io)
+        _locker.EnterReadLock();
+        try
         {
-            _io = io;
-            _jsonOptions = new JsonSerializerOptions {
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true
-            };
+            if (!_io.FileExists(filePath))
+            {
+                return default;
+            }
+            var content = _io.ReadTextFromFile(filePath);
+            return JsonSerializer.Deserialize<T>(content, _jsonOptions);
         }
-
-        public T Load<T>(string filePath)
+        finally
         {
-            _locker.EnterReadLock();
-            try
-            {
-                if (!_io.FileExists(filePath))
-                {
-                    return default;
-                }
-                var content = _io.ReadTextFromFile(filePath);
-                return JsonSerializer.Deserialize<T>(content, _jsonOptions);
-            }
-            finally
-            {
-                _locker.ExitReadLock();
-            }
+            _locker.ExitReadLock();
         }
+    }
 
-        public T[] LoadCollection<T>(string filePath)
+    public T[]? LoadCollection<T>(string filePath)
+    {
+        _locker.EnterReadLock();
+        try
         {
-            _locker.EnterReadLock();
-            try
+            if (!_io.FileExists(filePath))
             {
-                if (!_io.FileExists(filePath))
-                {
-                    return Array.Empty<T>();
-                }
-                var content = _io.ReadTextFromFile(filePath);
-                return JsonSerializer.Deserialize<T[]>(content, _jsonOptions);
+                return Array.Empty<T>();
             }
-            finally
-            {
-                _locker.ExitReadLock();
-            }
+            var content = _io.ReadTextFromFile(filePath);
+            return JsonSerializer.Deserialize<T[]>(content, _jsonOptions);
         }
-
-        public void Store(string filePath, object data)
+        finally
         {
-            _locker.EnterWriteLock();
-            try
-            {
-                var json = JsonSerializer.Serialize(data, _jsonOptions);
-                _io.WriteTextToFile(filePath, json);
-            }
-            finally
-            {
-                _locker.ExitWriteLock();
-            }
+            _locker.ExitReadLock();
+        }
+    }
+
+    public void Store(string filePath, object data)
+    {
+        _locker.EnterWriteLock();
+        try
+        {
+            var json = JsonSerializer.Serialize(data, _jsonOptions);
+            _io.WriteTextToFile(filePath, json);
+        }
+        finally
+        {
+            _locker.ExitWriteLock();
         }
     }
 }

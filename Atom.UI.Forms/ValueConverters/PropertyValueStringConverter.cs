@@ -1,28 +1,26 @@
-using System;
 using System.Windows.Data;
 
-namespace Genius.Atom.UI.Forms
+namespace Genius.Atom.UI.Forms;
+
+public class PropertyValueStringConverter : IValueConverter
 {
-    public class PropertyValueStringConverter : IValueConverter
+    public object? Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (targetType == typeof(string))
         {
-            if (targetType == typeof(string))
-            {
-                return value == null ? string.Empty : value.ToString();
-            }
+            return value is null ? string.Empty : value.ToString();
+        }
 
+        return value;
+    }
+
+    public object? ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+        if (value is null)
+            return null;
+        if (targetType.IsAssignableFrom(value.GetType()))
             return value;
-        }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value == null)
-                return null;
-            if (targetType.IsAssignableFrom(value.GetType()))
-                return value;
-
-            throw new NotSupportedException();
-        }
+        throw new NotSupportedException();
     }
 }

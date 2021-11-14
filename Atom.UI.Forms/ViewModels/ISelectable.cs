@@ -1,7 +1,6 @@
-namespace Genius.Atom.UI.Forms
+namespace Genius.Atom.UI.Forms;
+
+public interface ISelectable
 {
-    public interface ISelectable
-    {
-        bool IsSelected { get; set; }
-    }
+    bool IsSelected { get; set; }
 }

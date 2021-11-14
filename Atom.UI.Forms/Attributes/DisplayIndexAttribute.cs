@@ -1,15 +1,12 @@
-using System;
+namespace Genius.Atom.UI.Forms;
 
-namespace Genius.Atom.UI.Forms
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class DisplayIndexAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class DisplayIndexAttribute : Attribute
+    public DisplayIndexAttribute(int index)
     {
-        public DisplayIndexAttribute(int index)
-        {
-            Index = index;
-        }
-
-        public int Index { get; }
+        Index = index;
     }
+
+    public int Index { get; }
 }

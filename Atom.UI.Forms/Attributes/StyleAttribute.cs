@@ -1,11 +1,9 @@
-using System;
 using System.Windows;
 
-namespace Genius.Atom.UI.Forms
+namespace Genius.Atom.UI.Forms;
+
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class StyleAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class StyleAttribute : Attribute
-    {
-        public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
-    }
+    public HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
 }

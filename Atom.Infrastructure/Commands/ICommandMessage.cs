@@ -1,6 +1,5 @@
-namespace Genius.Atom.Infrastructure.Commands
+namespace Genius.Atom.Infrastructure.Commands;
+
+public interface ICommandMessage
 {
-    public interface ICommandMessage
-    {
-    }
 }

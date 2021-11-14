@@ -1,7 +1,6 @@
-namespace Genius.Atom.UI.Forms
+namespace Genius.Atom.UI.Forms;
+
+public interface IHasDirtyFlag
 {
-    public interface IHasDirtyFlag
-    {
-        bool IsDirty { get; set; }
-    }
+    bool IsDirty { get; set; }
 }

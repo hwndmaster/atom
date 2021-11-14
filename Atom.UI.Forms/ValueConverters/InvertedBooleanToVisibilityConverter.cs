@@ -1,10 +1,9 @@
 using System.Windows;
 
-namespace Genius.Atom.UI.Forms
+namespace Genius.Atom.UI.Forms;
+
+public sealed class InvertedBooleanToVisibilityConverter : MarkupBooleanConverterBase<Visibility>
 {
-    public sealed class InvertedBooleanToVisibilityConverter : MarkupBooleanConverterBase<Visibility>
-    {
-        public InvertedBooleanToVisibilityConverter()
-            : base(Visibility.Collapsed, Visibility.Visible) { }
-    }
+    public InvertedBooleanToVisibilityConverter()
+        : base(Visibility.Collapsed, Visibility.Visible) { }
 }

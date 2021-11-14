@@ -1,15 +1,12 @@
-using System;
+namespace Genius.Atom.UI.Forms;
 
-namespace Genius.Atom.UI.Forms
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+public sealed class AttachedViewAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public sealed class AttachedViewAttribute : Attribute
+    public AttachedViewAttribute(Type attachedViewType)
     {
-        public AttachedViewAttribute(Type attachedViewType)
-        {
-            AttachedViewType = attachedViewType;
-        }
-
-        public Type AttachedViewType { get; }
+        AttachedViewType = attachedViewType;
     }
+
+    public Type AttachedViewType { get; }
 }

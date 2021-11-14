@@ -6,18 +6,17 @@ using Genius.Atom.Infrastructure.Net;
 using Genius.Atom.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Genius.Atom.Infrastructure
+namespace Genius.Atom.Infrastructure;
+
+[ExcludeFromCodeCoverage]
+public static class Module
 {
-    [ExcludeFromCodeCoverage]
-    public static class Module
+    public static void Configure(IServiceCollection services)
     {
-        public static void Configure(IServiceCollection services)
-        {
-            services.AddSingleton<ICommandBus, CommandBus>();
-            services.AddSingleton<IEventBus, EventBus>();
-            services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<IJsonPersister, JsonPersister>();
-            services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
-        }
+        services.AddSingleton<ICommandBus, CommandBus>();
+        services.AddSingleton<IEventBus, EventBus>();
+        services.AddSingleton<IFileService, FileService>();
+        services.AddSingleton<IJsonPersister, JsonPersister>();
+        services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
     }
 }

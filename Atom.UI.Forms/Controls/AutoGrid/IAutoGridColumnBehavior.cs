@@ -1,7 +1,6 @@
-namespace Genius.Atom.UI.Forms.Controls.AutoGrid
+namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
+
+public interface IAutoGridColumnBehavior
 {
-    public interface IAutoGridColumnBehavior
-    {
-        void Attach(AutoGridColumnContext context);
-    }
+    void Attach(AutoGridColumnContext context);
 }

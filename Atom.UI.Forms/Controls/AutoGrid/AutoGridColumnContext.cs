@@ -1,30 +1,27 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Genius.Atom.UI.Forms.Controls.AutoGrid
+namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
+
+public class AutoGridColumnContext
 {
-    public class AutoGridColumnContext
+    public AutoGridColumnContext(DataGrid dataGrid, DataGridAutoGeneratingColumnEventArgs args,
+        PropertyDescriptor property)
     {
-        public AutoGridColumnContext(DataGrid dataGrid, DataGridAutoGeneratingColumnEventArgs args,
-            PropertyDescriptor property)
-        {
-            DataGrid = dataGrid;
-            Args = args;
-            Property = property;
-        }
-
-        public DataGrid DataGrid { get; }
-        public DataGridAutoGeneratingColumnEventArgs Args { get; }
-        public PropertyDescriptor Property { get; }
-
-        public T GetAttribute<T>() where T: Attribute
-            => Property.Attributes.OfType<T>().FirstOrDefault();
-
-        public Binding GetBinding()
-            => (Args.Column as DataGridBoundColumn)?.Binding as Binding;
+        DataGrid = dataGrid;
+        Args = args;
+        Property = property;
     }
+
+    public DataGrid DataGrid { get; }
+    public DataGridAutoGeneratingColumnEventArgs Args { get; }
+    public PropertyDescriptor Property { get; }
+
+    public T? GetAttribute<T>() where T: Attribute
+        => Property.Attributes.OfType<T>().FirstOrDefault();
+
+    public Binding? GetBinding()
+        => (Args.Column as DataGridBoundColumn)?.Binding as Binding;
 }

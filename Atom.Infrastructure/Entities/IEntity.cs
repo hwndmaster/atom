@@ -1,9 +1,8 @@
 using System;
 
-namespace Genius.Atom.Infrastructure.Entities
+namespace Genius.Atom.Infrastructure.Entities;
+
+public interface IEntity
 {
-    public interface IEntity
-    {
-        Guid Id { get; }
-    }
+    Guid Id { get; }
 }
