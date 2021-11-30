@@ -1,9 +1,8 @@
-using System;
 using System.Text.Json;
 using System.Threading;
 using Genius.Atom.Infrastructure.Io;
 
-namespace Genius.Atom.Infrastructure.Persistence;
+namespace Genius.Atom.Data.Persistence;
 
 public interface IJsonPersister
 {

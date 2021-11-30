@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Genius.Atom.Infrastructure;
 using Genius.Atom.Infrastructure.Entities;
 using Genius.Atom.Infrastructure.Events;
 using Microsoft.Extensions.Logging;
 
-namespace Genius.Atom.Infrastructure.Persistence;
+namespace Genius.Atom.Data.Persistence;
 
 public interface IRepository<TEntity>
     where TEntity: EntityBase
@@ -15,7 +13,7 @@ public interface IRepository<TEntity>
     void Store(params TEntity[] entities);
 }
 
-public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IEntityQueryService<TEntity>
+public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
     where TEntity: EntityBase
 {
     protected readonly IEventBus _eventBus;
@@ -41,17 +39,17 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IEntityQue
         }
 
         _entities = _persister.LoadCollection<TEntity>(FILENAME).NotNull().ToList();
-        FillupRelations();
+        FillUpRelations();
     }
 
-    public IEnumerable<TEntity> GetAll()
+    protected IEnumerable<TEntity> GetAll()
     {
         EnsureInitialization();
 
         return _entities!;
     }
 
-    public TEntity? FindById(Guid entityId)
+    protected TEntity? FindById(Guid entityId)
     {
         EnsureInitialization();
 
@@ -78,7 +76,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IEntityQue
 
         _persister.Store(fileName, _entities);
 
-        _eventBus.Publish(new EntitiesDeletedEvent(typeof(TEntity), new [] { entityId }));
+        _eventBus.Publish(new EntitiesDeletedEvent(typeof(TEntity).Name, new [] { entityId }));
     }
 
     public void Overwrite(params TEntity[] entities)
@@ -95,8 +93,8 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IEntityQue
     {
         EnsureInitialization();
 
-        var addedEntities = new List<EntityBase>();
-        var updatedEntities = new List<EntityBase>();
+        var addedEntities = new List<Guid>();
+        var updatedEntities = new List<Guid>();
 
         foreach (var entity in entities)
         {
@@ -105,18 +103,18 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IEntityQue
                 entity.Id = Guid.NewGuid();
             }
 
-            FillupRelations(entity);
+            FillUpRelations(entity);
 
             var index = _entities!.FindIndex(x => x.Id == entity.Id);
             if (index == -1)
             {
-                addedEntities.Add(entity);
+                addedEntities.Add(entity.Id);
                 _entities.Add(entity);
-                _logger.LogTrace($"New entity '{entity}' with id '{entity.Id}' added");
+                _logger.LogTrace("New entity '{entity}' with id '{entityId}' added", entity, entity.Id);
             }
             else
             {
-                updatedEntities.Add(entity);
+                updatedEntities.Add(entity.Id);
                 _entities[index] = entity;
             }
         }
@@ -137,20 +135,20 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IEntityQue
         if (updatedEntities.Any())
             _eventBus.Publish(new EntitiesUpdatedEvent(updatedEntities));
         if (deletedEntities?.Any() == true)
-            _eventBus.Publish(new EntitiesDeletedEvent(typeof(TEntity), deletedEntities));
+            _eventBus.Publish(new EntitiesDeletedEvent(typeof(TEntity).Name, deletedEntities));
 
         _logger.LogInformation("Entities of type {typeName} updated.", typeof(TEntity).Name);
     }
 
-    protected void FillupRelations()
+    protected void FillUpRelations()
     {
         foreach (var entity in _entities!)
         {
-            FillupRelations(entity);
+            FillUpRelations(entity);
         }
     }
 
-    protected virtual void FillupRelations(TEntity entity)
+    protected virtual void FillUpRelations(TEntity entity)
     {
     }
 }

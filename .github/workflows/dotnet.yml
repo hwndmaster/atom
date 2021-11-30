@@ -28,6 +28,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Pack Data
+      run: dotnet pack Atom.Data/Atom.Data.csproj --configuration Release
     - name: Pack Infrastructure
       run: dotnet pack Atom.Infrastructure/Atom.Infrastructure.csproj --configuration Release
     - name: Pack UI.Forms
@@ -36,6 +38,3 @@ jobs:
       run: dotnet pack Atom.UI.Forms.TestingUtil/Atom.UI.Forms.TestingUtil.csproj --configuration Release
     - name: Publish packages to GPR
       run: dotnet nuget push **/*.nupkg --skip-duplicate
-      #run: dotnet nuget push **/*.nupkg --api-key ${NUGET_AUTH_TOKEN} --skip-duplicate --source https://api.nuget.org/v3/index.json
-      #env:
-      #  NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}

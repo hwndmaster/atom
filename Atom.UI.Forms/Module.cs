@@ -1,4 +1,4 @@
-global using System;
+global using System.Windows;
 global using Genius.Atom.Infrastructure;
 
 using System.Diagnostics.CodeAnalysis;
@@ -14,6 +14,7 @@ public static class Module
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient<IViewModelFactory, ViewModelFactory>();
+        services.AddTransient<IUserInteraction, UserInteraction>();
     }
 
     public static void Initialize(IServiceProvider serviceProvider)

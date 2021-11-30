@@ -1,13 +1,21 @@
 <Project>
 
   <PropertyGroup>
-    <Version>0.0.6</Version>
+    <Version>0.0.7</Version>
     <Authors>Dima Kravtsov</Authors>
     <Description>Simple framework for personal pet projects</Description>
     <RepositoryUrl>https://github.com/hwndmaster/atom</RepositoryUrl>
 
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Microsoft common dependencies -->

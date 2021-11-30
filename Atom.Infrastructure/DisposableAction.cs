@@ -1,5 +1,3 @@
-using System;
-
 namespace Genius.Atom.Infrastructure;
 
 public sealed class DisposableAction : IDisposable

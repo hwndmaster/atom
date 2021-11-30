@@ -1,5 +1,3 @@
-using System.Windows;
-
 namespace Genius.Atom.UI.Forms;
 
 public sealed class InvertedBooleanToVisibilityConverter : MarkupBooleanConverterBase<Visibility>

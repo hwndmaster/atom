@@ -28,7 +28,11 @@ public class MainViewModel
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[0]);
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[4]);
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[8]);
-        GridItems.Add(new SampleData { Tags = _vmFactory.CreateTagEditorViewModel(tagsObservables) });
+        GridItems.Add(new SampleData {
+            Name = "Very very very very very very very very very very very very very long name",
+            Tags = _vmFactory.CreateTagEditorViewModel(tagsObservables),
+            DateTime = DateTime.Now.AddDays(100)
+        });
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[2]);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[6]);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[9]);
@@ -37,37 +41,4 @@ public class MainViewModel
     public ITagEditorViewModel TagsForControl1 { get; }
 
     public ObservableCollection<SampleData> GridItems { get; } = new();
-}
-
-public class SampleData : ViewModelBase
-{
-    public string Name
-    {
-        get => GetOrDefault<string>();
-        set => RaiseAndSetIfChanged(value);
-    }
-
-    public int Number
-    {
-        get => GetOrDefault<int>();
-        set => RaiseAndSetIfChanged(value);
-    }
-
-    public DateTime DateTime
-    {
-        get => GetOrDefault<DateTime>();
-        set => RaiseAndSetIfChanged(value);
-    }
-
-    public bool Flag
-    {
-        get => GetOrDefault<bool>();
-        set => RaiseAndSetIfChanged(value);
-    }
-
-    public ITagEditorViewModel Tags
-    {
-        get => GetOrDefault<ITagEditorViewModel>();
-        set => RaiseAndSetIfChanged(value);
-    }
 }

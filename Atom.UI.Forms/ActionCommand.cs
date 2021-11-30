@@ -1,7 +1,5 @@
 ﻿using System.Reactive;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Genius.Atom.UI.Forms;

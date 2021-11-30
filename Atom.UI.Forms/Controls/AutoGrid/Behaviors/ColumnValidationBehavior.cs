@@ -1,4 +1,3 @@
-using System.Windows;
 using System.Windows.Controls;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;

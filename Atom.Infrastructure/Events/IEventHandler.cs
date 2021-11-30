@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Genius.Atom.Infrastructure.Events;
 
 public interface IEventHandler

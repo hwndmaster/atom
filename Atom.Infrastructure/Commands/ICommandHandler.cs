@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Genius.Atom.Infrastructure.Commands;
 
 public interface ICommandHandler

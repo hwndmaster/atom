@@ -1,5 +1,3 @@
-using System;
-
 namespace Genius.Atom.Infrastructure.Entities;
 
 public abstract class EntityBase : IEntity

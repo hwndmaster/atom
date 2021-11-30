@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using Genius.Atom.UI.Forms.Demo.ViewModels;
 using Genius.Atom.UI.Forms.Demo.Views;
 using Microsoft.Extensions.DependencyInjection;

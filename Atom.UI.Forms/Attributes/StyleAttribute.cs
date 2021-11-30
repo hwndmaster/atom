@@ -1,5 +1,3 @@
-using System.Windows;
-
 namespace Genius.Atom.UI.Forms;
 
 [AttributeUsage(AttributeTargets.Property)]

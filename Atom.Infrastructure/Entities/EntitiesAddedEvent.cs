@@ -1,16 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Genius.Atom.Infrastructure.Events;
 
 namespace Genius.Atom.Infrastructure.Entities;
 
 public sealed class EntitiesAddedEvent : IEventMessage
 {
-    public EntitiesAddedEvent(IEnumerable<EntityBase> entities)
+    public EntitiesAddedEvent(IEnumerable<Guid> entities)
     {
-        Entities = entities.ToDictionary(x => x.Id);
+        Entities = entities.ToList();
     }
 
-    public Dictionary<Guid, EntityBase> Entities { get; }
+    public IReadOnlyCollection<Guid> Entities { get; }
 }

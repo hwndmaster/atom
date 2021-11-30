@@ -1,6 +1,4 @@
 using System.ComponentModel;
-using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
@@ -97,6 +95,8 @@ public class AttachingBehavior : Behavior<DataGrid>
         }
 
         WpfHelpers.EnableSingleClickEditMode(e.Column);
+
+        //e.Column.MaxWidth = 300;
     }
 
     private bool IsBrowsable(AutoGridColumnContext context)

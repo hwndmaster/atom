@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Infrastructure.Net;

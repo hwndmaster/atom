@@ -1,5 +1,3 @@
-using System;
-
 namespace Genius.Atom.Infrastructure.Events;
 
 internal sealed class EventPublishedArgs : EventArgs
