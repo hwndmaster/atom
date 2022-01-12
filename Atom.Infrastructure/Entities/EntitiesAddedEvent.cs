@@ -6,6 +6,8 @@ public sealed class EntitiesAddedEvent : IEventMessage
 {
     public EntitiesAddedEvent(IEnumerable<Guid> entities)
     {
+        Guard.NotNull(entities);
+
         Entities = entities.ToList();
     }
 

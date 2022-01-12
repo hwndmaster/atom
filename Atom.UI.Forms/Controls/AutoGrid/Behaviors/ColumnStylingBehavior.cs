@@ -1,6 +1,6 @@
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnStylingBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnStylingBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

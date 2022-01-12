@@ -28,6 +28,11 @@ internal sealed class JsonPersister : IJsonPersister
 
     public T? Load<T>(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return default;
+        }
+
         _locker.EnterReadLock();
         try
         {
@@ -46,6 +51,11 @@ internal sealed class JsonPersister : IJsonPersister
 
     public T[]? LoadCollection<T>(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return default;
+        }
+
         _locker.EnterReadLock();
         try
         {
@@ -64,6 +74,12 @@ internal sealed class JsonPersister : IJsonPersister
 
     public void Store(string filePath, object data)
     {
+        if (string.IsNullOrWhiteSpace(filePath)
+            || data is null)
+        {
+            return;
+        }
+
         _locker.EnterWriteLock();
         try
         {

@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor;
 
@@ -15,7 +13,7 @@ public interface ITagEditorViewModel
     ObservableCollection<ITagItemViewModel> SelectedTags { get; }
 }
 
-internal class TagEditorViewModel : ViewModelBase, ITagEditorViewModel, IHasDirtyFlag
+internal sealed class TagEditorViewModel : ViewModelBase, ITagEditorViewModel, IHasDirtyFlag
 {
     private bool _dirtyPaused = false;
 

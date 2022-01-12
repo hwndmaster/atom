@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnComboboxBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnComboboxBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
@@ -20,9 +20,9 @@ internal class ColumnComboboxBehavior : IAutoGridColumnBehavior
         if (selectFromListAttr.FromOwnerContext)
         {
             var prop = context.DataGrid.DataContext.GetType().GetProperty(selectFromListAttr.CollectionPropertyName).NotNull();
-            var value = prop.GetValue(context.DataGrid.DataContext) as IEnumerable;
+            var value = (IEnumerable)prop.GetValue(context.DataGrid.DataContext).NotNull();
             context.Args.Column = WpfHelpers.CreateComboboxColumnWithStaticItemsSource(
-                value.NotNull(), context.Property.Name);
+                value, context.Property.Name);
         }
         else
         {

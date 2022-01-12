@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnHeaderNameBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnHeaderNameBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

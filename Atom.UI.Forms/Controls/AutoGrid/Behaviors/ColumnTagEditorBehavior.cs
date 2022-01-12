@@ -4,7 +4,7 @@ using Genius.Atom.UI.Forms.Controls.TagEditor;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnTagEditorBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnTagEditorBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

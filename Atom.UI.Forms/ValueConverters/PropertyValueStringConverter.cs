@@ -2,7 +2,7 @@ using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms;
 
-public class PropertyValueStringConverter : IValueConverter
+public sealed class PropertyValueStringConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {

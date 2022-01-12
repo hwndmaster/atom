@@ -4,8 +4,10 @@ using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
-public class AutoGridColumnContext
+public sealed class AutoGridColumnContext
 {
+    private readonly List<Action> _postProcessing = new();
+
     public AutoGridColumnContext(DataGrid dataGrid, DataGridAutoGeneratingColumnEventArgs args,
         PropertyDescriptor property)
     {
@@ -23,4 +25,11 @@ public class AutoGridColumnContext
 
     public Binding? GetBinding()
         => (Args.Column as DataGridBoundColumn)?.Binding as Binding;
+
+    public void AddPostProcessing(Action action)
+    {
+        _postProcessing.Add(action);
+    }
+
+    public IEnumerable<Action> GetPostProcessingActions() => _postProcessing;
 }

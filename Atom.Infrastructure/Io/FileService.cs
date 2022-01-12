@@ -1,13 +1,19 @@
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 
 namespace Genius.Atom.Infrastructure.Io;
 
 public interface IFileService
 {
+    /// <inheritdoc cref="File.FileExists(string)"/>
     bool FileExists(string path);
+
+    /// <inheritdoc cref="File.ReadAllBytes(string)"/>
     byte[] ReadBytesFromFile(string path);
+
+    /// <inheritdoc cref="File.ReadAllText(string)"/>
     string ReadTextFromFile(string path);
+
+    /// <inheritdoc cref="File.WriteAllText(string, string, System.Text.Encoding)"/>
     void WriteTextToFile(string path, string content);
 }
 

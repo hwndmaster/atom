@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using Genius.Atom.UI.Forms.Controls.TagEditor;
 
@@ -6,9 +5,9 @@ namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
 public class MainViewModel
 {
-    private readonly IViewModelFactory _vmFactory;
+    private readonly IAtomViewModelFactory _vmFactory;
 
-    public MainViewModel(IViewModelFactory vmFactory)
+    public MainViewModel(IAtomViewModelFactory vmFactory)
     {
         _vmFactory = vmFactory;
 

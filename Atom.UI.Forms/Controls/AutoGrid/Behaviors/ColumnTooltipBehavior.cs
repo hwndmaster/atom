@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnTooltipBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnTooltipBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

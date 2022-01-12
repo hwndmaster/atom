@@ -1,6 +1,6 @@
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnNullableBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnNullableBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

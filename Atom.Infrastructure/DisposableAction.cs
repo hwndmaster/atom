@@ -6,6 +6,8 @@ public sealed class DisposableAction : IDisposable
 
     public DisposableAction(Action disposeAction)
     {
+        Guard.NotNull(disposeAction);
+
         _disposeAction = disposeAction;
     }
 

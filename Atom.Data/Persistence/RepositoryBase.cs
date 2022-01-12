@@ -91,6 +91,11 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
 
     private void StoreInternal(bool overwrite, params TEntity[] entities)
     {
+        if (entities is null)
+        {
+            return;
+        }
+
         EnsureInitialization();
 
         var addedEntities = new List<Guid>();

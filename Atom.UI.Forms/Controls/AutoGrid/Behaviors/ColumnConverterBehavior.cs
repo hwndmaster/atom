@@ -2,7 +2,7 @@ using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnConverterBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnConverterBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

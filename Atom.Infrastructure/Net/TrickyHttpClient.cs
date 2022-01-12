@@ -24,6 +24,8 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
 
     public async Task<string?> DownloadContent(string url, CancellationToken cancel)
     {
+        Guard.NotNull(url);
+
         var uri = new Uri(url);
 
         var locker = _lockers.GetOrAdd(uri.Host, (_) => new SemaphoreSlim(1));

@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
@@ -62,7 +60,7 @@ public abstract class ViewModelBase : IViewModel
 
     protected T GetOrDefault<T>([AllowNull] T defaultValue = default, [CallerMemberName] string? name = null)
     {
-        Guard.AgainstNull(name, nameof(name));
+        Guard.NotNull(name, nameof(name));
 
         var result = _propertyBag.GetOrAdd(name, _ => defaultValue);
 
@@ -71,7 +69,7 @@ public abstract class ViewModelBase : IViewModel
 
     protected void RaiseAndSetIfChanged<T>(T value, Action<T, T>? valueChangedHandler = null, [CallerMemberName] string? name = null)
     {
-        Guard.AgainstNull(name, nameof(name));
+        Guard.NotNull(name, nameof(name));
 
         var isInitial = !_propertyBag.TryGetValue(name, out object? oldValue);
 

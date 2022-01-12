@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Genius.Atom.UI;
+namespace Genius.Atom.UI.Forms;
 
 public interface IUserInteraction
 {
@@ -26,7 +26,7 @@ public interface IUserInteraction
 }
 
 [ExcludeFromCodeCoverage]
-public class UserInteraction : IUserInteraction
+internal sealed class UserInteraction : IUserInteraction
 {
     public bool AskForConfirmation(string message, string title)
     {

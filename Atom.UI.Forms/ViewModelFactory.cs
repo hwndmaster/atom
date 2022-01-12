@@ -3,7 +3,7 @@ using Genius.Atom.UI.Forms.Controls.TagEditor;
 
 namespace Genius.Atom.UI.Forms;
 
-public interface IViewModelFactory
+public interface IAtomViewModelFactory
 {
     ITagEditorViewModel CreateTagEditorViewModel(ObservableCollection<ITagItemViewModel> allTags);
     ITagItemViewModel CreateTagItemViewModel(string tag, int index);
@@ -11,7 +11,7 @@ public interface IViewModelFactory
     ObservableCollection<ITagItemViewModel> CreateTagItemViewModels(IEnumerable<string> tags);
 }
 
-internal class ViewModelFactory : IViewModelFactory
+internal sealed class ViewModelFactory : IAtomViewModelFactory
 {
     public ITagEditorViewModel CreateTagEditorViewModel(ObservableCollection<ITagItemViewModel> allTags)
     {

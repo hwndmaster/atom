@@ -2,7 +2,7 @@ using System.Windows.Input;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnButtonBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnButtonBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

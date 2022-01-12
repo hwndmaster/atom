@@ -6,6 +6,8 @@ public static class ExpressionHelpers
 {
     public static string GetPropertyName<TContainer, TProp>(Expression<Func<TContainer, TProp>> propertyLambda)
     {
+        Guard.NotNull(propertyLambda);
+
         if (propertyLambda.Body is not MemberExpression body)
         {
             var ubody = (UnaryExpression)propertyLambda.Body;

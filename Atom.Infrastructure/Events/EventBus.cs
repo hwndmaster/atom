@@ -32,6 +32,8 @@ internal sealed class EventBus : IEventBus
 
     public void Publish(IEventMessage message)
     {
+        Guard.NotNull(message);
+
         EventAdded?.Invoke(this, new EventPublishedArgs(message));
     }
 

@@ -1,5 +1,8 @@
 namespace Genius.Atom.UI.Forms;
 
+/// <summary>
+///   Defines a validation rule for a property.
+/// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public sealed class ValidationRuleAttribute : Attribute
 {

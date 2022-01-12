@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -81,6 +82,21 @@ public static class WpfHelpers
             ItemsSource = itemsSource,
             SelectedValueBinding = new Binding(valuePath)
         };
+    }
+
+    // TODO: Not used yet
+    internal static void AutoFitColumn(DataGridColumn column, IEnumerable items)
+    {
+        var childControl = column.FindChild<Control>();
+        var maxWidth = column.MinWidth;
+        foreach (var item in items)
+        {
+            if (item is null)
+                continue;
+            maxWidth = Math.Max(maxWidth, MeasureString(item.ToString(), childControl).Width);
+        }
+
+        column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
     }
 
     private static DataTemplate CreateTagEditorDataTemplate(Binding bindToValue, bool @readonly)
@@ -169,6 +185,22 @@ public static class WpfHelpers
         }
 
         return Color.FromArgb(color.A, (byte)red, (byte)green, (byte)blue);
+    }
+
+    // TODO: Not used yet
+    internal static Size MeasureString(string candidate, Control refElement)
+    {
+        var formattedText = new FormattedText(
+            candidate,
+            CultureInfo.CurrentCulture,
+            FlowDirection.LeftToRight,
+            new Typeface(refElement.FontFamily, refElement.FontStyle, refElement.FontWeight, refElement.FontStretch),
+            refElement.FontSize,
+            Brushes.Black,
+            new NumberSubstitution(),
+            1);
+
+        return new Size(formattedText.Width, formattedText.Height);
     }
 
     private static void GridColumnFastEdit(DataGridCell? cell, RoutedEventArgs e)

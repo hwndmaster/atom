@@ -13,7 +13,7 @@ public static class Module
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddTransient<IViewModelFactory, ViewModelFactory>();
+        services.AddTransient<IAtomViewModelFactory, ViewModelFactory>();
         services.AddTransient<IUserInteraction, UserInteraction>();
     }
 

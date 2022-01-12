@@ -1,14 +1,15 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms;
 
-public interface ITypedObservableList
+public interface ITypedObservableList : INotifyCollectionChanged
 {
     Type ItemType { get; }
 }
 
-public class TypedObservableList<TContract, TType> : ObservableCollection<TContract>, ITypedObservableList, ITypedList
+public sealed class TypedObservableList<TContract, TType> : ObservableCollection<TContract>, ITypedObservableList, ITypedList
 {
     public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors)
     {

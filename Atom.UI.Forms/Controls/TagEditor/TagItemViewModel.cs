@@ -11,7 +11,7 @@ public interface ITagItemViewModel
     IActionCommand? Delete { get; set; }
 }
 
-public class TagItemViewModel : ViewModelBase, ITagItemViewModel
+public sealed class TagItemViewModel : ViewModelBase, ITagItemViewModel
 {
     private readonly Color[] _refColors = new [] {
         System.Windows.Media.Color.FromRgb(82, 107, 64),

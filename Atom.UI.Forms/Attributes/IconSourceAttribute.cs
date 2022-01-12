@@ -1,5 +1,9 @@
 namespace Genius.Atom.UI.Forms;
 
+/// <summary>
+///   Defines the binding path to be used to render an icon in front of
+///   the cell content in an auto-generated data grid.
+/// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public sealed class IconSourceAttribute : Attribute
 {

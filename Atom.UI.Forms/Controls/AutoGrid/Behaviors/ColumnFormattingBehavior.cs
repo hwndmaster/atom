@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal class ColumnFormattingBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnFormattingBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
