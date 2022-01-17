@@ -8,9 +8,9 @@ namespace Genius.Atom.Data.Persistence;
 public interface IRepository<TEntity>
     where TEntity: EntityBase
 {
-    void Delete(Guid entityId);
-    void Overwrite(params TEntity[] entities);
-    void Store(params TEntity[] entities);
+    Task DeleteAsync(Guid entityId);
+    Task OverwriteAsync(params TEntity[] entities);
+    Task StoreAsync(params TEntity[] entities);
 }
 
 public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
@@ -31,7 +31,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         _persister = persister;
     }
 
-    private void EnsureInitialization()
+    private async Task EnsureInitializationAsync()
     {
         if (_entities is not null)
         {
@@ -39,33 +39,35 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         }
 
         _entities = _persister.LoadCollection<TEntity>(FILENAME).NotNull().ToList();
-        FillUpRelations();
+        await FillUpRelationsAsync();
     }
 
-    protected IEnumerable<TEntity> GetAll()
+    protected async Task<IEnumerable<TEntity>> GetAllAsync()
     {
-        EnsureInitialization();
+        await EnsureInitializationAsync();
 
-        return _entities!;
+        return _entities.NotNull();
     }
 
-    protected TEntity? FindById(Guid entityId)
+    protected async Task<TEntity?> FindByIdAsync(Guid entityId)
     {
-        EnsureInitialization();
+        await EnsureInitializationAsync();
 
-        return _entities!.Find(x => x.Id == entityId);
+        return _entities.NotNull().Find(x => x.Id == entityId);
     }
 
-    public void Delete(Guid entityId)
+    public async Task DeleteAsync(Guid entityId)
     {
-        EnsureInitialization();
+        await EnsureInitializationAsync();
 
         DeleteInternal(entityId, FILENAME);
     }
 
     private void DeleteInternal(Guid entityId, string fileName)
     {
-        var entity = _entities!.Find(x => x.Id == entityId);
+        Guard.NotNull(_entities);
+
+        var entity = _entities.Find(x => x.Id == entityId);
         if (entity is null)
         {
             _logger.LogWarning("Cannot find entity '{entityId}' to delete", entityId);
@@ -76,27 +78,27 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
 
         _persister.Store(fileName, _entities);
 
-        _eventBus.Publish(new EntitiesDeletedEvent(typeof(TEntity).Name, new [] { entityId }));
+        _eventBus.Publish(new EntitiesAffectedEvent(typeof(TEntity), EntityAffectedEventType.Deleted, entityId));
     }
 
-    public void Overwrite(params TEntity[] entities)
+    public Task OverwriteAsync(params TEntity[] entities)
     {
-        StoreInternal(true, entities);
+        return StoreInternalAsync(true, entities);
     }
 
-    public void Store(params TEntity[] entities)
+    public Task StoreAsync(params TEntity[] entities)
     {
-        StoreInternal(false, entities);
+        return StoreInternalAsync(false, entities);
     }
 
-    private void StoreInternal(bool overwrite, params TEntity[] entities)
+    private async Task StoreInternalAsync(bool overwrite, params TEntity[] entities)
     {
         if (entities is null)
         {
             return;
         }
 
-        EnsureInitialization();
+        await EnsureInitializationAsync();
 
         var addedEntities = new List<Guid>();
         var updatedEntities = new List<Guid>();
@@ -108,7 +110,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
                 entity.Id = Guid.NewGuid();
             }
 
-            FillUpRelations(entity);
+            await FillUpRelationsAsync(entity);
 
             var index = _entities!.FindIndex(x => x.Id == entity.Id);
             if (index == -1)
@@ -124,7 +126,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
             }
         }
 
-        Guid[]? deletedEntities = null;
+        Guid[]? deletedEntities = Array.Empty<Guid>();
         if (overwrite)
         {
             var allEntitiesId = entities.Select(x => x.Id).ToHashSet();
@@ -135,25 +137,25 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
 
         _persister.Store(FILENAME, _entities!);
 
-        if (addedEntities.Any())
-            _eventBus.Publish(new EntitiesAddedEvent(addedEntities));
-        if (updatedEntities.Any())
-            _eventBus.Publish(new EntitiesUpdatedEvent(updatedEntities));
-        if (deletedEntities?.Any() == true)
-            _eventBus.Publish(new EntitiesDeletedEvent(typeof(TEntity).Name, deletedEntities));
+        if (addedEntities.Any() || updatedEntities.Any() || deletedEntities.Any())
+        {
+            _eventBus.Publish(new EntitiesAffectedEvent(typeof(TEntity), addedEntities,
+                updatedEntities, deletedEntities));
+        }
 
         _logger.LogInformation("Entities of type {typeName} updated.", typeof(TEntity).Name);
     }
 
-    protected void FillUpRelations()
+    protected async Task FillUpRelationsAsync()
     {
         foreach (var entity in _entities!)
         {
-            FillUpRelations(entity);
+            await FillUpRelationsAsync(entity);
         }
     }
 
-    protected virtual void FillUpRelations(TEntity entity)
+    protected virtual Task FillUpRelationsAsync(TEntity entity)
     {
+        return Task.CompletedTask;
     }
 }

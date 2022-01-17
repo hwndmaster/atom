@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\*.png" />
+    <Resource Include="Assets\*.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Atom.Infrastructure\Atom.Infrastructure.csproj" />
   </ItemGroup>
 

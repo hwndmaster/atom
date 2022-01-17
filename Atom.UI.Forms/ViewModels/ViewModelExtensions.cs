@@ -35,7 +35,7 @@ public static class ViewModelExtensions
     }
 
     public static IObservable<Unit> WhenAnyChanged<TViewModel>(this TViewModel viewModel,
-        params Expression<Func<TViewModel, object>>[] propertyAccessors)
+        params Expression<Func<TViewModel, object?>>[] propertyAccessors)
         where TViewModel : IViewModel
     {
         var propNames = propertyAccessors.Select(x => ExpressionHelpers.GetPropertyName(x)).ToArray();
