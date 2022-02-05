@@ -16,6 +16,8 @@ internal sealed class ColumnTagEditorBehavior : IAutoGridColumnBehavior
         context.Args.Column = WpfHelpers.CreateTagEditorColumn(context.Property.Name,
             context.Property.Name);
 
+        context.Args.Column.SortMemberPath = context.Property.Name;
+
         context.DataGrid.CellEditEnding += (object? sender, DataGridCellEditEndingEventArgs args) => {
             if (args.Column == context.Args.Column)
             {

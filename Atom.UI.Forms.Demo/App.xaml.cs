@@ -19,6 +19,8 @@ public partial class App : Application
         serviceCollection.AddLogging();
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddTransient<MainViewModel>();
+        serviceCollection.AddSingleton<TagsContext>();
+        serviceCollection.AddTransient<ISampleDataFactory, SampleDataFactory>();
 
         Infrastructure.Module.Configure(serviceCollection);
         UI.Forms.Module.Configure(serviceCollection);

@@ -12,6 +12,8 @@ namespace Genius.Atom.UI.Forms;
 [ExcludeFromCodeCoverage]
 public static class Module
 {
+    internal static IServiceProvider ServiceProvider { get; private set; }
+
     public static void Configure(IServiceCollection services)
     {
         // View Models:
@@ -24,6 +26,8 @@ public static class Module
 
     public static void Initialize(IServiceProvider serviceProvider)
     {
+        ServiceProvider = serviceProvider;
+
         serviceProvider.GetService<Microsoft.Extensions.Logging.ILoggerFactory>()!
             .AddProvider(new EventBasedLoggerProvider(serviceProvider.GetService<IEventBus>()!));
     }

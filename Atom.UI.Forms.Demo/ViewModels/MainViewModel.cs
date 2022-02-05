@@ -7,31 +7,26 @@ public class MainViewModel
 {
     private readonly IAtomViewModelFactory _vmFactory;
 
-    public MainViewModel(IAtomViewModelFactory vmFactory)
+    public MainViewModel(IAtomViewModelFactory vmFactory, TagsContext tagsContext,
+        ISampleDataFactory sampleDataFactory)
     {
         _vmFactory = vmFactory;
 
-        var tagsObservables = new ObservableCollection<ITagItemViewModel>();
-        string[] tags = new [] { "adipiscing", "aliquam", "amet", "consectetur", "consequat", "cursus", "dignissim", "dolor", "dui", "eget", "elit", "enim", "est", "et", "euismod", "fusce", "ipsum", "lectus", "ligula", "lobortis", "lorem", "mauris", "maximus", "nisi", "odio", "pellentesque", "potenti", "quis", "rutrum", "sed", "sem", "sit", "suscipit", "suspendisse", "tempus", "tincidunt", "tortor", "tristique", "turpis", "vel", "venenatis", "vivamus", "volutpat" };
-        for (var i = 0; i < tags.Length; i++)
-        {
-            tagsObservables.Add(_vmFactory.CreateTagItemViewModel(tags[i], i));
-        }
-        TagsForControl1 = _vmFactory.CreateTagEditorViewModel(tagsObservables);
+        TagsForControl1 = _vmFactory.CreateTagEditorViewModel(tagsContext.TagsObservables);
 
-        TagsForControl1.AddSelected(tagsObservables[0]);
-        TagsForControl1.AddSelected(tagsObservables[1]);
-        TagsForControl1.AddSelected(tagsObservables[2]);
+        TagsForControl1.AddSelected(tagsContext.TagsObservables[0]);
+        TagsForControl1.AddSelected(tagsContext.TagsObservables[1]);
+        TagsForControl1.AddSelected(tagsContext.TagsObservables[2]);
 
-        GridItems.Add(new SampleData { Tags = _vmFactory.CreateTagEditorViewModel(tagsObservables) });
+        GridItems.Add(sampleDataFactory.Create());
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[0]);
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[4]);
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[8]);
-        GridItems.Add(new SampleData {
-            Name = "Very very very very very very very very very very very very very long name",
-            Tags = _vmFactory.CreateTagEditorViewModel(tagsObservables),
-            DateTime = DateTime.Now.AddDays(100)
-        });
+
+        var item2 = sampleDataFactory.Create();
+        item2.Name = "Very very very very very very very very very very very very very long name";
+        item2.DateTime = DateTime.Now.AddDays(100);
+        GridItems.Add(item2);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[2]);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[6]);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[9]);

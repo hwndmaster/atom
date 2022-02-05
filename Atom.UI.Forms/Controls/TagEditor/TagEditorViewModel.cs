@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor;
 
-public interface ITagEditorViewModel
+public interface ITagEditorViewModel : IComparable
 {
     void AddSelected(ITagItemViewModel tagVm);
     void AddSelected(ITagItemViewModel? tagVm, string text);
@@ -60,6 +60,11 @@ internal sealed class TagEditorViewModel : ViewModelBase, ITagEditorViewModel, I
         var selectedVm = new TagItemViewModel(tagVm);
         selectedVm.Delete = new ActionCommand(_ => SelectedTags.Remove(selectedVm));
         SelectedTags.Add(selectedVm);
+    }
+
+    public int CompareTo(object? obj)
+    {
+        return new TagEditorComparer().Compare(this, obj);
     }
 
     public void SetSelected(IEnumerable<string> tags, bool setDirty = true)

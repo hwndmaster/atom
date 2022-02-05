@@ -2,7 +2,7 @@ using System.Windows.Media;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor;
 
-public interface ITagItemViewModel
+public interface ITagItemViewModel : IComparable
 {
     string Tag { get; set; }
     Brush Color { get; set; }
@@ -40,6 +40,11 @@ public sealed class TagItemViewModel : ViewModelBase, ITagItemViewModel
         Tag = reference.Tag;
         Color = reference.Color;
         AltColor = reference.AltColor;
+    }
+
+    public int CompareTo(object? obj)
+    {
+        return new TagItemComparer().Compare(this, obj);
     }
 
     public string Tag
