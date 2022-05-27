@@ -1,19 +1,59 @@
 using System.ComponentModel;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Linq;
 
 namespace Genius.Atom.UI.Forms;
 
+/// <summary>
+///   This static class contains helper methods over <seealso cref="IViewModel"/> interface
+///   to facilitate communication with instances of that interface.
+/// </summary>
 public static class ViewModelExtensions
 {
-    public static IDisposable WhenChanged<TViewModel, TProperty>(this TViewModel viewModel, Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<TProperty> handler)
+    /// <summary>
+    ///   Returns a disposable object which is invoking a provided handler every time
+    ///   when the view model property defined in the <paramref name="propertyAccessor"/>
+    ///   parameter has changed in the instance of <paramref name="viewModel"/>.
+    /// </summary>
+    /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
+    /// <typeparam name="TProperty">The type of the property.</typeparam>
+    /// <param name="viewModel">The view model.</param>
+    /// <param name="propertyAccessor">An expression which points to the property.</param>
+    /// <param name="handler">A handler to An expression which points to the property.</param>
+    /// <returns>An observable.</returns>
+    public static IDisposable WhenChanged<TViewModel, TProperty>(this TViewModel viewModel,
+        Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<TProperty> handler)
         where TViewModel : IViewModel
     {
         var propName = ExpressionHelpers.GetPropertyName(propertyAccessor);
 
         return WhenChanged(viewModel, propName, handler);
+    }
+
+    /// <summary>
+    ///   Returns an observable which is triggered every time when the view model property defined
+    ///   in the <paramref name="propertyAccessor"/> parameter has changed in the instance of <paramref name="viewModel"/>.
+    /// </summary>
+    /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
+    /// <typeparam name="TProperty">The type of the property.</typeparam>
+    /// <param name="viewModel">The view model.</param>
+    /// <param name="propertyAccessor">An expression which points to the property.</param>
+    /// <returns>An observable.</returns>
+    public static IObservable<TProperty?> WhenChanged<TViewModel, TProperty>(this TViewModel viewModel,
+        Expression<Func<TViewModel, TProperty>> propertyAccessor)
+        where TViewModel : IViewModel
+    {
+        string propertyName = ExpressionHelpers.GetPropertyName(propertyAccessor);
+
+        ViewModelBase viewModelBase = (viewModel as ViewModelBase).NotNull();
+
+        return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                h => viewModel.PropertyChanged += h, h => viewModel.PropertyChanged -= h)
+            .Where(x => propertyName.Equals(x.EventArgs.PropertyName, StringComparison.Ordinal))
+            .Select(_ => viewModelBase.TryGetPropertyValue(propertyName, out object? value)
+                ? (TProperty?)value
+                : default);
     }
 
     public static IDisposable WhenChanged<TProperty>(this IViewModel viewModel, string propertyName, Action<TProperty> handler)
@@ -34,6 +74,15 @@ public static class ViewModelExtensions
         return new DisposableAction(() => viewModel.PropertyChanged -= fn);
     }
 
+    /// <summary>
+    ///   Returns an observable which is triggered every time when any of the view model properties
+    ///   defined in the <paramref name="propertyAccessors"/> parameter have changed in the instance
+    ///   of <paramref name="viewModel"/>.
+    /// </summary>
+    /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
+    /// <param name="viewModel">The view model.</param>
+    /// <param name="propertyAccessors">Expressions which point to the properties.</param>
+    /// <returns>An observable.</returns>
     public static IObservable<Unit> WhenAnyChanged<TViewModel>(this TViewModel viewModel,
         params Expression<Func<TViewModel, object?>>[] propertyAccessors)
         where TViewModel : IViewModel
@@ -42,7 +91,7 @@ public static class ViewModelExtensions
 
         return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
                 h => viewModel.PropertyChanged += h, h => viewModel.PropertyChanged -= h)
-            .Where(x => propNames.Contains(x.EventArgs.PropertyName))
+            .Where(x => propNames.Length == 0 || propNames.Contains(x.EventArgs.PropertyName))
             .Select(_ => Unit.Default);
     }
 }

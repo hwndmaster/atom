@@ -18,11 +18,15 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left">
+            <Button Content="Add row" Command="{Binding AddRowCommand}" />
+        </StackPanel>
+        <StackPanel Grid.Row="1">
             <tageditor:TagEditor DataContext="{Binding TagsForControl1}" />
         </StackPanel>
-        <DataGrid Grid.Row="1" autogrid:Properties.ItemsSource="{Binding GridItems}">
+        <DataGrid Grid.Row="2" autogrid:Properties.ItemsSource="{Binding GridItems}">
             <i:Interaction.Behaviors>
                 <autogrid:AttachingBehavior />
             </i:Interaction.Behaviors>

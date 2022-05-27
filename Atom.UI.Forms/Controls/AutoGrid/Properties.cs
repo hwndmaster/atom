@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Reflection;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
@@ -12,8 +14,18 @@ public static class Properties
         "ItemsSource",
         typeof(IEnumerable),
         typeof(Properties),
-        new PropertyMetadata(ItemsSourceChanged)
-    );
+        new PropertyMetadata(ItemsSourceChanged));
+
+    public static readonly DependencyProperty IsEditingProperty = DependencyProperty.RegisterAttached(
+        "IsEditing",
+        typeof(bool),
+        typeof(Properties),
+        new PropertyMetadata(IsEditingChanged));
+
+    public static readonly DependencyProperty IsEditingHandlingSuspendedProperty = DependencyProperty.RegisterAttached(
+        "IsEditingHandlingSuspended",
+        typeof(bool),
+        typeof(Properties));
 
     public static void SetItemsSource(DependencyObject element, IEnumerable value)
     {
@@ -23,6 +35,43 @@ public static class Properties
     public static IEnumerable GetItemsSource(DependencyObject element)
     {
         return (IEnumerable) element.GetValue(ItemsSourceProperty);
+    }
+
+    private static void IsEditingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not DataGridRow row)
+            return;
+
+        if (d.GetValue(IsEditingHandlingSuspendedProperty) is true)
+            return;
+
+        DataGridCellsPresenter? presenter = WpfHelpers.FindVisualChildren<DataGridCellsPresenter>(row)
+            .FirstOrDefault();
+        if (presenter is null)
+            return;
+
+        const int column = 0;
+        if (presenter.ItemContainerGenerator.ContainerFromIndex(column) is not DataGridCell cell)
+            return;
+
+        var grid = WpfHelpers.FindVisualParent<DataGrid>(row);
+        if (grid is null)
+            return;
+
+        if ((bool)e.NewValue)
+        {
+            grid.ScrollIntoView(row, cell.Column);
+            cell.Focus();
+
+            grid.CurrentCell = new DataGridCellInfo(cell);
+
+            Application.Current.Dispatcher.BeginInvoke(() => grid.BeginEdit(),
+                DispatcherPriority.ApplicationIdle, null);
+        }
+        else
+        {
+            grid.EndInit();
+        }
     }
 
     private static void ItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -36,7 +85,7 @@ public static class Properties
             .Where(x => x.GetCustomAttributes(false).OfType<FilterByAttribute>().Any())
             .ToList();
 
-        if (!groupByProps.Any() && !filterByProps.Any())
+        if (groupByProps.Count == 0 && filterByProps.Count == 0)
         {
             d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue);
         }
@@ -100,7 +149,7 @@ public static class Properties
         var filterContext = vm.GetType().GetProperties()
             .FirstOrDefault(x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any());
 
-        if (filterContext is null || !filterByProps.Any())
+        if (filterContext is null || filterByProps.Count == 0)
             return;
 
         string filter = string.Empty;

@@ -14,11 +14,14 @@ public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     bool TryGetPropertyValue(string propertyName, out object? value);
 }
 
+/// <summary>
+///   An abstract class for view models.
+/// </summary>
 public abstract class ViewModelBase : IViewModel
 {
-    protected readonly ConcurrentDictionary<string, object?> _propertyBag = new();
-    private readonly Dictionary<string, List<ValidationRule>> _validationRules = new();
+    private readonly ConcurrentDictionary<string, object?> _propertyBag = new();
     private readonly Dictionary<string, List<string>> _errors = new();
+    private readonly Dictionary<string, List<ValidationRule>> _validationRules = new();
     private bool _suspendDirtySet = false;
 
     protected ViewModelBase()
@@ -26,6 +29,14 @@ public abstract class ViewModelBase : IViewModel
         DetectValidationRules();
     }
 
+    /// <summary>
+    ///   Returns the validation errors for a specified property or for the entire entity.
+    /// </summary>
+    /// <param name="propertyName">
+    ///   The name of the property to retrieve validation errors for;
+    ///   or <c>null</c> or <c>String.Empty</c>, to retrieve entity-level errors.
+    /// </param>
+    /// <returns>The validation errors for the property or entity.</returns>
     public IEnumerable GetErrors(string? propertyName)
     {
         return string.IsNullOrWhiteSpace(propertyName)
@@ -39,6 +50,30 @@ public abstract class ViewModelBase : IViewModel
     {
         return _propertyBag.TryGetValue(propertyName, out value);
     }
+
+    /// <summary>
+    ///   Assigns a validation rule on a property.
+    /// </summary>
+    /// <param name="propertyName">The property name.</param>
+    /// <param name="validationRule">The validation rule.</param>
+    protected void AddValidationRule(string propertyName, ValidationRule validationRule)
+    {
+        if (!_validationRules.TryGetValue(propertyName, out List<ValidationRule>? validationRules))
+        {
+            validationRules = new List<ValidationRule>();
+            _validationRules.Add(propertyName, validationRules);
+        }
+
+        validationRules.Add(validationRule);
+    }
+
+    /// <summary>
+    ///   Returns true if the property has validation errors. Otherwise it returns false.
+    /// </summary>
+    /// <param name="propertyName">The property name.</param>
+    /// <returns>True is property has errors, otherwise false.</returns>
+    protected bool PropertyHasErrors(string propertyName)
+        => _errors.TryGetValue(propertyName, out List<string>? propertyErrors) && propertyErrors.Any();
 
     protected void InitializeProperties(Action action)
     {
@@ -58,45 +93,60 @@ public abstract class ViewModelBase : IViewModel
         }
     }
 
-    protected T GetOrDefault<T>([AllowNull] T defaultValue = default, [CallerMemberName] string? name = null)
+    /// <summary>
+    ///   Returns a property value if it exists in the property bag, otherwise it returns a default value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the property.</typeparam>
+    /// <param name="defaultValue">The default property value.</param>
+    /// <param name="propertyName">The property name. If the method is called within the property getter it hasn't to be specified.</param>
+    /// <returns>The property value from the property bag.</returns>
+    [return: NotNullIfNotNull("defaultValue")]
+    protected TValue GetOrDefault<TValue>([AllowNull] TValue defaultValue = default, [CallerMemberName] string? propertyName = null)
     {
-        Guard.NotNull(name, nameof(name));
+        Guard.NotNull(propertyName, nameof(propertyName));
 
-        var result = _propertyBag.GetOrAdd(name, _ => defaultValue);
+        var result = _propertyBag.GetOrAdd(propertyName, _ => defaultValue);
 
-        return (T) result!;
+        return (TValue)result!;
     }
 
-    protected void RaiseAndSetIfChanged<T>(T value, Action<T, T>? valueChangedHandler = null, [CallerMemberName] string? name = null)
+    /// <summary>
+    ///   Sets the value to the specified property and raises an event if value has been changed.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the property.</typeparam>
+    /// <param name="propertyValue">The property value.</param>
+    /// <param name="propertyName">The property name. If the method is called within the property getter it hasn't to be specified.</param>
+    protected void RaiseAndSetIfChanged<TValue>(TValue propertyValue, Action<TValue, TValue>? valueChangedHandler = null, [CallerMemberName] string? propertyName = null)
     {
-        Guard.NotNull(name, nameof(name));
+        Guard.NotNull(propertyName, nameof(propertyName));
 
-        var isInitial = !_propertyBag.TryGetValue(name, out object? oldValue);
+        var isInitial = !_propertyBag.TryGetValue(propertyName, out object? oldValue);
 
-        if (Equals(oldValue, value))
+        if (Equals(oldValue, propertyValue))
         {
             if (isInitial)
             {
                 // Initial validation
-                ValidateProperty(name, value);
+                ValidateProperty(propertyName, propertyValue);
             }
             return;
         }
 
-        _propertyBag.AddOrUpdate(name, _ => value, (_, __) => value);
-        OnPropertyChanged(name);
+        _propertyBag.AddOrUpdate(propertyName, _ => propertyValue, (_, __) => propertyValue);
+        OnPropertyChanged(propertyName);
 
         if (!_suspendDirtySet &&
-            this is IHasDirtyFlag hasDirtyFlag &&
-            name != nameof(IHasDirtyFlag.IsDirty) &&
-            (this is not ISelectable || name != nameof(ISelectable.IsSelected)))
+            this is IHasDirtyFlag hasDirtyFlag
+            && propertyName != nameof(IHasDirtyFlag.IsDirty)
+            && (this is not ISelectable || propertyName != nameof(ISelectable.IsSelected))
+            && (this is not IEditable || propertyName != nameof(IEditable.IsEditing)))
         {
             hasDirtyFlag.IsDirty = true;
         }
 
-        ValidateProperty(name, value);
+        ValidateProperty(propertyName, propertyValue);
 
-        valueChangedHandler?.Invoke(isInitial ? value : (T)oldValue!, value);
+        valueChangedHandler?.Invoke(isInitial ? propertyValue : (TValue)oldValue!, propertyValue);
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -139,8 +189,12 @@ public abstract class ViewModelBase : IViewModel
             _errors.Add(propertyName, errors);
         }
 
-        errors.Add(validationResult.ErrorContent.ToString()!);
-        OnErrorsChanged(propertyName);
+        var errorMessage = validationResult.ErrorContent.ToString()!;
+        if (!errors.Contains(errorMessage))
+        {
+            errors.Add(errorMessage);
+            OnErrorsChanged(propertyName);
+        }
     }
 
     private void DetectValidationRules()
@@ -168,7 +222,14 @@ public abstract class ViewModelBase : IViewModel
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    ///   Occurs when the validation errors have changed for a property or for the entire entity.
+    /// </summary>
     public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
+    /// <summary>
+    ///   Gets a value indicating whether the entity has validation errors.
+    /// </summary>
     public virtual bool HasErrors => _errors.Any();
 }

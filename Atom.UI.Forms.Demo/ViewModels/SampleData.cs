@@ -3,7 +3,7 @@ using Genius.Atom.UI.Forms.Controls.TagEditor;
 namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
 [CustomFactory(typeof(ISampleDataFactory))]
-public class SampleData : ViewModelBase
+public class SampleData : ViewModelBase, IEditable, ISelectable
 {
     public string Name
     {
@@ -32,6 +32,18 @@ public class SampleData : ViewModelBase
     public ITagEditorViewModel Tags
     {
         get => GetOrDefault<ITagEditorViewModel>();
+        set => RaiseAndSetIfChanged(value);
+    }
+
+    public bool IsEditing
+    {
+        get => GetOrDefault(false);
+        set => RaiseAndSetIfChanged(value);
+    }
+
+    public bool IsSelected
+    {
+        get => GetOrDefault(false);
         set => RaiseAndSetIfChanged(value);
     }
 }

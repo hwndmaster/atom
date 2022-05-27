@@ -93,7 +93,7 @@ public static class WpfHelpers
         {
             if (item is null)
                 continue;
-            maxWidth = Math.Max(maxWidth, MeasureString(item.ToString(), childControl).Width);
+            maxWidth = Math.Max(maxWidth, MeasureString(item.ToString().NotNull(), childControl).Width);
         }
 
         column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
@@ -155,6 +155,32 @@ public static class WpfHelpers
                 yield return childOfChild;
             }
         }
+
+        /*if (dependencyObject is ContentPresenter contentPresenter)
+        {
+            if (contentPresenter.Content is DependencyObject contentDependencyObject)
+            {
+                foreach (T childOfChild in FindVisualChildren<T>(contentDependencyObject))
+                {
+                    yield return childOfChild;
+                }
+            }
+        }*/
+    }
+
+    internal static T? FindVisualParent<T>(UIElement element) where T : UIElement
+    {
+        UIElement? parent = element;
+        while (parent is not null)
+        {
+            if (parent is T correctlyTyped)
+            {
+                return correctlyTyped;
+            }
+
+            parent = VisualTreeHelper.GetParent(parent) as UIElement;
+        }
+        return null;
     }
 
     internal static void SetCellHorizontalAlignment(DataGridColumn column, HorizontalAlignment alignment)
@@ -246,21 +272,6 @@ public static class WpfHelpers
                     }));
             }
         }
-    }
-
-    private static T? FindVisualParent<T>(UIElement element) where T : UIElement
-    {
-        UIElement? parent = element;
-        while (parent is not null)
-        {
-            if (parent is T correctlyTyped)
-            {
-                return correctlyTyped;
-            }
-
-            parent = VisualTreeHelper.GetParent(parent) as UIElement;
-        }
-        return null;
     }
 
     private static T? FindFirstChild<T>(FrameworkElement? element) where T: FrameworkElement

@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-internal sealed class ColumnComboboxBehavior : IAutoGridColumnBehavior
+internal sealed class ColumnComboBoxBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {

@@ -30,9 +30,20 @@ public class MainViewModel
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[2]);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[6]);
         GridItems[1].Tags.AddSelected(GridItems[0].Tags.AllTags[9]);
+
+        AddRowCommand = new ActionCommand(_ => {
+            var addedItem = sampleDataFactory.Create();
+            GridItems.Add(addedItem);
+            foreach (var item in GridItems)
+                item.IsSelected = false;
+            addedItem.IsSelected = true;
+            addedItem.IsEditing = true;
+        });
     }
 
     public ITagEditorViewModel TagsForControl1 { get; }
 
     public ObservableCollection<SampleData> GridItems { get; } = new();
+
+    public IActionCommand AddRowCommand { get; }
 }

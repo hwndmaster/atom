@@ -5,6 +5,7 @@ namespace Genius.Atom.Infrastructure;
 
 public static class Guard
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNull<T>([NotNull] T? value,
         [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
     {
