@@ -7,10 +7,11 @@ public static class Guard
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNull<T>([NotNull] T? value,
-        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
+        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null,
+        string? message = null)
     {
         if (value is null)
-            throw new ArgumentNullException(parameterName);
+            throw new ArgumentNullException(parameterName, message);
     }
 
     public static void NotNullOrEmpty(string value,
@@ -38,9 +39,10 @@ public static class GuardExtensions
 {
     [return: NotNull]
     public static T NotNull<T>(this T value,
-        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
+        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null,
+        string? message = null)
     {
-        Guard.NotNull(value, parameterName);
+        Guard.NotNull(value, parameterName, message);
 
         return value!;
     }

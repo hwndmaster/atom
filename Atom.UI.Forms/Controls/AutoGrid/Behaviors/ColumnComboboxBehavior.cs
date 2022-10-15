@@ -1,4 +1,5 @@
 using System.Collections;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
@@ -6,20 +7,19 @@ internal sealed class ColumnComboBoxBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        if (context.DataGrid.IsReadOnly || context.Args.Column.IsReadOnly)
+        if (context.IsReadOnly)
         {
             return;
         }
 
-        var selectFromListAttr = context.GetAttribute<SelectFromListAttribute>();
-        if (selectFromListAttr == null)
+        if (context.BuildColumn is not AutoGridBuildComboBoxColumnContext comboBoxContext)
         {
             return;
         }
 
-        if (selectFromListAttr.FromOwnerContext)
+        if (comboBoxContext.FromOwnerContext)
         {
-            var prop = context.DataGrid.DataContext.GetType().GetProperty(selectFromListAttr.CollectionPropertyName).NotNull();
+            var prop = context.DataGrid.DataContext.GetType().GetProperty(comboBoxContext.CollectionPropertyName).NotNull();
             var value = (IEnumerable)prop.GetValue(context.DataGrid.DataContext).NotNull();
             context.Args.Column = WpfHelpers.CreateComboboxColumnWithStaticItemsSource(
                 value, context.Property.Name);
@@ -28,7 +28,7 @@ internal sealed class ColumnComboBoxBehavior : IAutoGridColumnBehavior
         {
             context.Args.Column = WpfBuilders.DataGridColumnBuilder
                 .ForValuePath(context.Property.Name)
-                .WithComboEditor(selectFromListAttr.CollectionPropertyName)
+                .WithComboEditor(comboBoxContext.CollectionPropertyName)
                 .WithImageSource(
                     context.Property.PropertyType == typeof(ITitledItemWithImageViewModel)
                         ? $"{context.Property.Name}.{nameof(ITitledItemWithImageViewModel.Image)}"

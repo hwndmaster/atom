@@ -6,15 +6,15 @@ internal sealed class ColumnAttachedViewBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        var attachedViewAttr = context.GetAttribute<AttachedViewAttribute>();
-        if (attachedViewAttr is null)
+        var attachedViewType = context.BuildViewColumn?.AttachedViewType;
+        if (attachedViewType is null)
         {
             return;
         }
 
         context.Args.Column = DataGridColumnBuilder
             .ForValuePath(context.Property.Name)
-            .WithViewContent(attachedViewAttr.AttachedViewType)
+            .WithViewContent(attachedViewType)
             .Build();
     }
 }

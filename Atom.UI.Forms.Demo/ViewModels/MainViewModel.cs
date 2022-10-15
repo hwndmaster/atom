@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.Controls.TagEditor;
+using Genius.Atom.UI.Forms.Demo.AutoGridBuilders;
 
 namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
@@ -8,9 +10,10 @@ public class MainViewModel
     private readonly IAtomViewModelFactory _vmFactory;
 
     public MainViewModel(IAtomViewModelFactory vmFactory, TagsContext tagsContext,
-        ISampleDataFactory sampleDataFactory)
+        IFactory<SampleData> sampleDataFactory, SampleDataAutoGridBuilder autoGridBuilder)
     {
-        _vmFactory = vmFactory;
+        _vmFactory = vmFactory.NotNull();
+        AutoGridBuilder = autoGridBuilder.NotNull();
 
         TagsForControl1 = _vmFactory.CreateTagEditorViewModel(tagsContext.TagsObservables);
 
@@ -40,6 +43,8 @@ public class MainViewModel
             addedItem.IsEditing = true;
         });
     }
+
+    public IAutoGridBuilder AutoGridBuilder { get; }
 
     public ITagEditorViewModel TagsForControl1 { get; }
 

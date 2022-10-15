@@ -4,8 +4,8 @@ internal sealed class ColumnStylingBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        var style = context.GetAttribute<StyleAttribute>();
-        if (style == null)
+        var style = context.BuildColumn.Style;
+        if (style is null)
         {
             return;
         }

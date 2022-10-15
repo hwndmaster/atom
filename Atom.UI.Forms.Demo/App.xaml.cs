@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿global using Genius.Atom.Infrastructure;
+
+using System.Windows;
+using Genius.Atom.UI.Forms.Demo.AutoGridBuilders;
 using Genius.Atom.UI.Forms.Demo.ViewModels;
 using Genius.Atom.UI.Forms.Demo.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,14 +23,16 @@ public partial class App : Application
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddTransient<MainViewModel>();
         serviceCollection.AddSingleton<TagsContext>();
-        serviceCollection.AddTransient<ISampleDataFactory, SampleDataFactory>();
+        serviceCollection.AddTransient<SampleDataFactory>();
+        serviceCollection.AddTransient<IFactory<SampleData>, SampleDataFactory>();
+        serviceCollection.AddTransient<SampleDataAutoGridBuilder>();
 
         Infrastructure.Module.Configure(serviceCollection);
         UI.Forms.Module.Configure(serviceCollection);
 
         ServiceProvider = serviceCollection.BuildServiceProvider();
 
-        //Infrastructure.Module.Initialize(ServiceProvider);
+        Infrastructure.Module.Initialize(ServiceProvider);
         UI.Forms.Module.Initialize(ServiceProvider);
 
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();

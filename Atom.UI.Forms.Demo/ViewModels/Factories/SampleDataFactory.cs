@@ -1,11 +1,6 @@
 namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
-public interface ISampleDataFactory
-{
-    SampleData Create();
-}
-
-internal class SampleDataFactory : ISampleDataFactory
+internal class SampleDataFactory : IFactory<SampleData>
 {
     private readonly IAtomViewModelFactory _vmFactory;
     private readonly TagsContext _tagsContext;

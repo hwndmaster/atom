@@ -7,14 +7,13 @@ internal sealed class ColumnTooltipBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        var path = context.GetAttribute<TooltipSourceAttribute>()?.Path;
-        if (path == null)
+        if (context.BuildColumn.ToolTipPath is null)
         {
             return;
         }
 
         var style = WpfHelpers.EnsureDefaultCellStyle(context.Args.Column);
-        var binding = new Binding(path);
+        var binding = new Binding(context.BuildColumn.ToolTipPath);
         style.Setters.Add(new Setter(ToolTipService.ToolTipProperty, binding));
     }
 }

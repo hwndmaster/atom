@@ -10,12 +10,22 @@ namespace Genius.Atom.Infrastructure;
 [ExcludeFromCodeCoverage]
 public static class Module
 {
+    private static IServiceProvider? _serviceProvider;
+    internal static IServiceProvider ServiceProvider
+        => _serviceProvider ?? throw new ArgumentNullException("Call Genius.Atom.Infrastructure.Module.Initialize(serviceProvider) in your application initialization.");
+
     public static void Configure(IServiceCollection services)
     {
+        services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         services.AddSingleton<ICommandBus, CommandBus>();
         services.AddSingleton<IDateTime, SystemDateTime>();
         services.AddSingleton<IEventBus, EventBus>();
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
+    }
+
+    public static void Initialize(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider.NotNull();
     }
 }

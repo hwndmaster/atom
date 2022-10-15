@@ -1,5 +1,3 @@
-using System.Windows.Data;
-
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
 internal sealed class ColumnConverterBehavior : IAutoGridColumnBehavior
@@ -12,16 +10,9 @@ internal sealed class ColumnConverterBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        var converterAttr = context.GetAttribute<ValueConverterAttribute>();
-        if (converterAttr is not null)
+        if (context.BuildColumn.ValueConverter is not null)
         {
-            var instance = Activator.CreateInstance(converterAttr.ValueConverterType) as IValueConverter;
-            binding.Converter = instance.NotNull(nameof(instance));
-        }
-
-        if (binding.Converter == null && !context.Args.PropertyType.IsValueType)
-        {
-            binding.Converter = new PropertyValueStringConverter();
+            binding.Converter = context.BuildColumn.ValueConverter;
         }
     }
 }

@@ -6,7 +6,7 @@ internal sealed class ColumnValidationBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        if (context.DataGrid.IsReadOnly || context.Args.Column.IsReadOnly)
+        if (context.IsReadOnly)
         {
             return;
         }

@@ -2,7 +2,6 @@ using Genius.Atom.UI.Forms.Controls.TagEditor;
 
 namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
-[CustomFactory(typeof(ISampleDataFactory))]
 public class SampleData : ViewModelBase, IEditable, ISelectable
 {
     public string Name

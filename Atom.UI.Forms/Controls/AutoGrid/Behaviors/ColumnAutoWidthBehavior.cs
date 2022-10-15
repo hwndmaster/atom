@@ -12,8 +12,7 @@ internal sealed class ColumnAutoWidthBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        var greedyAttr = context.GetAttribute<GreedyAttribute>();
-        if (greedyAttr is not null)
+        if (context.BuildColumn.AutoWidth)
         {
             context.Args.Column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
         }

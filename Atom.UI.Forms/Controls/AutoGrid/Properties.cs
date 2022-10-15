@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Threading;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
@@ -15,6 +16,12 @@ public static class Properties
         typeof(IEnumerable),
         typeof(Properties),
         new PropertyMetadata(ItemsSourceChanged));
+
+    public static readonly DependencyProperty AutoGridBuilderProperty = DependencyProperty.RegisterAttached(
+        "AutoGridBuilder",
+        typeof(IAutoGridBuilder),
+        typeof(Properties),
+        new PropertyMetadata());
 
     public static readonly DependencyProperty IsEditingProperty = DependencyProperty.RegisterAttached(
         "IsEditing",
@@ -35,6 +42,16 @@ public static class Properties
     public static IEnumerable GetItemsSource(DependencyObject element)
     {
         return (IEnumerable) element.GetValue(ItemsSourceProperty);
+    }
+
+    public static void SetAutoGridBuilder(DependencyObject element, IAutoGridBuilder? value)
+    {
+        element.SetValue(AutoGridBuilderProperty, value);
+    }
+
+    public static IAutoGridBuilder? GetAutoGridBuilder(DependencyObject element)
+    {
+        return (IAutoGridBuilder?) element.GetValue(AutoGridBuilderProperty);
     }
 
     private static void IsEditingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -76,16 +93,20 @@ public static class Properties
 
     private static void ItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
+        var dataGrid = (DataGrid)d;
         var itemType = Helpers.GetListItemType(e.NewValue);
         var properties = itemType.GetProperties();
         var groupByProps = properties
             .Where(x => x.GetCustomAttributes(false).OfType<GroupByAttribute>().Any())
             .ToList();
-        var filterByProps = properties
-            .Where(x => x.GetCustomAttributes(false).OfType<FilterByAttribute>().Any())
-            .ToList();
 
-        if (groupByProps.Count == 0 && filterByProps.Count == 0)
+        var buildContext = AutoGridBuildContext.CreateLazy(dataGrid);
+        var filterByProps = buildContext.Value.Columns
+            .OfType<AutoGridBuildTextColumnContext>()
+            .Where(x => x.Filterable)
+            .ToArray();
+
+        if (groupByProps.Count == 0 && filterByProps.Length == 0)
         {
             d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue);
         }
@@ -141,7 +162,7 @@ public static class Properties
         }
     }
 
-    private static void SetupFiltering(DependencyObject d, List<PropertyInfo> filterByProps,
+    private static void SetupFiltering(DependencyObject d, AutoGridBuildTextColumnContext[] filterByProps,
         CollectionViewSource collectionViewSource)
     {
         var vm = GetViewModel(d);
@@ -149,7 +170,7 @@ public static class Properties
         var filterContext = vm.GetType().GetProperties()
             .FirstOrDefault(x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any());
 
-        if (filterContext is null || filterByProps.Count == 0)
+        if (filterContext is null || filterByProps.Length == 0)
             return;
 
         string filter = string.Empty;
@@ -168,7 +189,7 @@ public static class Properties
 
             foreach (var filterProp in filterByProps)
             {
-                var value = filterProp.GetValue(e.Item);
+                var value = filterProp.Property.GetValue(e.Item);
                 if (value is string stringValue)
                 {
                     if (stringValue.Contains(filter, StringComparison.InvariantCultureIgnoreCase))

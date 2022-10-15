@@ -4,15 +4,15 @@ internal sealed class ColumnWithImageBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        var iconAttr = context.GetAttribute<IconSourceAttribute>();
-        if (iconAttr == null)
+        var iconSource = context.BuildTextColumn?.IconSource;
+        if (iconSource is null)
         {
             return;
         }
 
         context.Args.Column = WpfBuilders.DataGridColumnBuilder
             .ForValuePath(context.Property.Name)
-            .WithImageSource(iconAttr.IconPropertyPath, iconAttr.FixedSize, iconAttr.HideText)
+            .WithImageSource(iconSource.IconPropertyPath, iconSource.FixedSize, iconSource.HideText)
             .Build();
     }
 }

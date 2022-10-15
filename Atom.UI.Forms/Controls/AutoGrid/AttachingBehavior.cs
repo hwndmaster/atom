@@ -2,16 +2,16 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
 public sealed class AttachingBehavior : Behavior<DataGrid>
 {
-    private readonly Queue<AutoGridColumnContext> _contextsToPostProcess = new();
-    private bool? _showOnlyBrowsable;
-
     private static readonly IAutoGridColumnBehavior[] _columnBehaviors;
+    private readonly Queue<AutoGridColumnContext> _contextsToPostProcess = new();
+    private Lazy<AutoGridBuildContext> _autoGridBuildContext = new(() => throw new InvalidOperationException("AutoGridBuilder hasn't been initialized yet."));
 
     static AttachingBehavior()
     {
@@ -36,7 +36,6 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             // Misc:
             new ColumnHeaderNameBehavior(),
             new ColumnReadOnlyBehavior(),
-            new ColumnDisplayIndexBehavior(),
             new ColumnAutoWidthBehavior()
         };
     }
@@ -52,29 +51,15 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         var dpd = DependencyPropertyDescriptor.FromProperty(DataGrid.ItemsSourceProperty, typeof(DataGrid));
         dpd?.AddValueChanged(AssociatedObject, OnItemsSourceChanged);
 
+        var dpd2 = DependencyPropertyDescriptor.FromProperty(Properties.AutoGridBuilderProperty, typeof(DataGrid));
+        dpd2?.AddValueChanged(AssociatedObject, OnAutoGridBuilderChanged);
+
         base.OnAttached();
     }
 
     private void OnAddingNewItem(object? sender, AddingNewItemEventArgs e)
     {
-        var listItemType = Helpers.GetListItemType(AssociatedObject.ItemsSource);
-        var factoryTypeAttr = listItemType.GetCustomAttributes(false)
-            .OfType<CustomFactoryAttribute>()
-            .FirstOrDefault();
-
-        if (factoryTypeAttr is null)
-        {
-            e.NewItem = Activator.CreateInstance(listItemType);
-            return;
-        }
-
-        var builder = Module.ServiceProvider.GetService(factoryTypeAttr.FactoryType);
-        if (builder is null)
-        {
-            throw new InvalidOperationException($"Cannot create instance of factory type {factoryTypeAttr.FactoryType}");
-        }
-
-        e.NewItem = builder.GetType().GetMethod(factoryTypeAttr.CreateMethod)!.Invoke(builder, Array.Empty<object>());
+        e.NewItem = _autoGridBuildContext.Value.RecordFactory.Create();
     }
 
     private void OnItemsSourceChanged(object? sender, EventArgs e)
@@ -99,15 +84,21 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         }
     }
 
+    private void OnAutoGridBuilderChanged(object? sender, EventArgs e)
+    {
+        _autoGridBuildContext = AutoGridBuildContext.CreateLazy(AssociatedObject);
+    }
+
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-        var context = new AutoGridColumnContext(AssociatedObject, e, (PropertyDescriptor) e.PropertyDescriptor);
-
-        if (!IsBrowsable(context))
+        var buildColumnContext = _autoGridBuildContext.Value.Columns.FirstOrDefault(x => x.Property.Name.Equals(e.PropertyName));
+        if (buildColumnContext is null)
         {
             e.Cancel = true;
             return;
         }
+
+        var context = new AutoGridColumnContext(AssociatedObject, e, buildColumnContext);
 
         var ignoreProperties = new [] {
             nameof(IHasDirtyFlag.IsDirty),
@@ -117,7 +108,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         };
 
         if (ignoreProperties.Contains(e.PropertyName)
-            || context.GetAttribute<GroupByAttribute>() is not null)
+            || (buildColumnContext is AutoGridBuildTextColumnContext textColumn && textColumn.IsGrouped))
             //|| typeof(ICollection).IsAssignableFrom(context.Property.PropertyType))
         {
             e.Cancel = true;
@@ -147,16 +138,6 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
                 postProcessing();
             }
         }
-    }
-
-    private bool IsBrowsable(AutoGridColumnContext context)
-    {
-        _showOnlyBrowsable ??= context.Property.ComponentType.GetCustomAttributes(false)
-            .Any(x => x is ShowOnlyBrowsableAttribute b && b.OnlyBrowsable);
-
-        var browsable = context.GetAttribute<BrowsableAttribute>();
-        return (!_showOnlyBrowsable.Value || browsable?.Browsable == true)
-            && (_showOnlyBrowsable.Value || browsable?.Browsable != false);
     }
 
     private void BindIsSelected()
