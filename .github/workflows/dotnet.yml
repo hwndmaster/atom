@@ -27,7 +27,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --verbosity normal
     - name: Pack Data
       run: dotnet pack Atom.Data/Atom.Data.csproj --configuration Release
     - name: Pack Infrastructure
