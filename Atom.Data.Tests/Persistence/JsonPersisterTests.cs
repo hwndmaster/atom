@@ -99,6 +99,33 @@ public sealed class JsonPersisterTests
     }
 
     [Fact]
+    public void StoreAndLoad_UpgradeVersionScenario_ForComplexStructures()
+    {
+        // Arrange
+        _typeDiscriminators.AddMapping<ComplexStructure>("complex-1");
+        _typeDiscriminators.AddMapping<DerivedClassA>("derived-1");
+        var file = _fixture.Create<string>();
+        var entity = _fixture.Create<ComplexStructure>();
+        var sut = CreateSystemUnderTest();
+        sut.Store(file, entity);
+
+        // Drop the previous type mapping and create another one for next version of the class.
+        _typeDiscriminators.RemoveMapping(typeof(ComplexStructure));
+        _serviceProvider.RegisterSingleton<DerivedClassAVersion1To2Upgrader>();
+        _typeDiscriminators.AddMapping<ComplexStructureWithUpgradedProperty>("complex-1");
+        _typeDiscriminators.AddMapping<DerivedClassAVersion2, DerivedClassA, DerivedClassAVersion1To2Upgrader>("derived-1", 2);
+
+        // Act
+        var result = sut.Load<ComplexStructureWithUpgradedProperty>(file);
+
+        // Verify
+        Assert.NotNull(result);
+        Assert.Equal(entity.SomeValue, result.SomeValue);
+        Assert.Equal(entity.Foo.IntValue, result.Foo.IntValue);
+        Assert.Equal(entity.Foo.AnotherValue1, result.Foo.AnotherValue3);
+    }
+
+    [Fact]
     public void Store_WhenNoTypeDiscriminatorAvailable_ThrowsException()
     {
         // Arrange
@@ -145,6 +172,18 @@ public sealed class JsonPersisterTests
     private sealed class DerivedClassB : AbstractClass
     {
         public required int AnotherValue2 { get; init; }
+    }
+
+    private sealed class ComplexStructure
+    {
+        public required string SomeValue { get; init; }
+        public required DerivedClassA Foo { get; init; }
+    }
+
+    private sealed class ComplexStructureWithUpgradedProperty
+    {
+        public required string SomeValue { get; init; }
+        public required DerivedClassAVersion2 Foo { get; init; }
     }
 
     private sealed class DerivedClassAVersion1To2Upgrader : IDataVersionUpgrader<DerivedClassA, DerivedClassAVersion2>

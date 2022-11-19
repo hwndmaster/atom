@@ -47,7 +47,18 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
         var versionUpgrader = _serviceProvider.GetRequiredService<TVersionUpgrader>();
         var versionUpgraderProxy = DataVersionUpgraderProxy.Create(versionUpgrader);
 
-        var record = new TypeDiscriminatorRecord(discriminator, typeof(T), typeof(TPreviousVersion), version, versionUpgraderProxy);
+        var previousVersionType = typeof(TPreviousVersion);
+        if (!_discriminatorsByTypeName.TryGetValue(previousVersionType.FullName.NotNull(), out var previousVersionRecord))
+        {
+            throw new InvalidOperationException($"The discriminator for type '{previousVersionType.FullName}' is not registered.");
+        }
+
+        if (previousVersionRecord.Version >= version)
+        {
+            throw new InvalidOperationException($"The previous version '{previousVersionRecord.Version}' must be less than the passing one '{version}'.");
+        }
+
+        var record = new TypeDiscriminatorRecord(discriminator, typeof(T), previousVersionType, version, versionUpgraderProxy);
         AddMapping(record);
     }
 
@@ -86,6 +97,17 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
         Guard.NotNull(type);
 
         return _discriminatorsByTypeName.Values.FirstOrDefault(x => x.PreviousVersionType == type);
+    }
+
+    /// <summary>
+    ///   Only for testing purposes. Shouldn't be used.
+    /// </summary>
+    /// <param name="type"></param>
+    internal void RemoveMapping(Type type)
+    {
+        var record = _discriminatorsByTypeName[type.FullName!];
+        _discriminatorsByTypeName.Remove(type.FullName!);
+        _discriminatorsByDiscriminatorAndVersion.Remove(CreateDiscriminatorQualifiedName(record.Discriminator, record.Version));
     }
 
     private void AddMapping(TypeDiscriminatorRecord record)
