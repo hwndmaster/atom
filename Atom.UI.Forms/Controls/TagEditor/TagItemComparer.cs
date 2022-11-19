@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Genius.Atom.UI.Forms.Controls.TagEditor;
 
-public sealed class TagItemComparer : IComparer
+internal sealed class TagItemComparer : IComparer
 {
     public int Compare(object? x, object? y)
     {

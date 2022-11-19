@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿global using Genius.Atom.Infrastructure;
+
+using System.Diagnostics.CodeAnalysis;
 using Genius.Atom.Data.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,5 +12,8 @@ public static class Module
     public static void Configure(IServiceCollection services)
     {
         services.AddSingleton<IJsonPersister, JsonPersister>();
+        services.AddSingleton<TypeDiscriminators>();
+        services.AddSingleton<ITypeDiscriminators>(x => x.GetRequiredService<TypeDiscriminators>());
+        services.AddSingleton<ITypeDiscriminatorsInternal>(x => x.GetRequiredService<TypeDiscriminators>());
     }
 }

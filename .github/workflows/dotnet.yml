@@ -32,6 +32,8 @@ jobs:
       run: dotnet pack Atom.Data/Atom.Data.csproj --configuration Release
     - name: Pack Infrastructure
       run: dotnet pack Atom.Infrastructure/Atom.Infrastructure.csproj --configuration Release
+    - name: Pack Infrastructure.TestingUtil
+      run: dotnet pack Atom.Infrastructure.TestingUtil/Atom.Infrastructure.TestingUtil.csproj --configuration Release
     - name: Pack UI.Forms
       run: dotnet pack Atom.UI.Forms/Atom.UI.Forms.csproj --configuration Release
     - name: Pack UI.Forms.TestingUtil

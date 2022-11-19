@@ -1,4 +1,3 @@
-using Genius.Atom.Infrastructure;
 using Genius.Atom.Infrastructure.Entities;
 using Genius.Atom.Infrastructure.Events;
 using Microsoft.Extensions.Logging;
@@ -31,25 +30,14 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         _persister = persister;
     }
 
-    private async Task EnsureInitializationAsync()
-    {
-        if (_entities is not null)
-        {
-            return;
-        }
-
-        _entities = _persister.LoadCollection<TEntity>(FILENAME).NotNull().ToList();
-        await FillUpRelationsAsync();
-    }
-
-    protected async Task<IEnumerable<TEntity>> GetAllAsync()
+    public async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         await EnsureInitializationAsync();
 
         return _entities.NotNull();
     }
 
-    protected async Task<TEntity?> FindByIdAsync(Guid entityId)
+    public async Task<TEntity?> FindByIdAsync(Guid entityId)
     {
         await EnsureInitializationAsync();
 
@@ -61,6 +49,40 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         await EnsureInitializationAsync();
 
         DeleteInternal(entityId, FILENAME);
+    }
+
+    public Task OverwriteAsync(params TEntity[] entities)
+    {
+        return StoreInternalAsync(true, entities);
+    }
+
+    public Task StoreAsync(params TEntity[] entities)
+    {
+        return StoreInternalAsync(false, entities);
+    }
+
+    protected async Task FillUpRelationsAsync()
+    {
+        foreach (var entity in _entities!)
+        {
+            await FillUpRelationsAsync(entity);
+        }
+    }
+
+    protected virtual Task FillUpRelationsAsync(TEntity entity)
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task EnsureInitializationAsync()
+    {
+        if (_entities is not null)
+        {
+            return;
+        }
+
+        _entities = _persister.LoadCollection<TEntity>(FILENAME).NotNull().ToList();
+        await FillUpRelationsAsync();
     }
 
     private void DeleteInternal(Guid entityId, string fileName)
@@ -79,16 +101,6 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         _persister.Store(fileName, _entities);
 
         _eventBus.Publish(new EntitiesAffectedEvent(typeof(TEntity), EntityAffectedEventType.Deleted, entityId));
-    }
-
-    public Task OverwriteAsync(params TEntity[] entities)
-    {
-        return StoreInternalAsync(true, entities);
-    }
-
-    public Task StoreAsync(params TEntity[] entities)
-    {
-        return StoreInternalAsync(false, entities);
     }
 
     private async Task StoreInternalAsync(bool overwrite, params TEntity[] entities)
@@ -144,18 +156,5 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         }
 
         _logger.LogInformation("Entities of type {typeName} updated.", typeof(TEntity).Name);
-    }
-
-    protected async Task FillUpRelationsAsync()
-    {
-        foreach (var entity in _entities!)
-        {
-            await FillUpRelationsAsync(entity);
-        }
-    }
-
-    protected virtual Task FillUpRelationsAsync(TEntity entity)
-    {
-        return Task.CompletedTask;
     }
 }

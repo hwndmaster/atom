@@ -22,6 +22,7 @@ public static class Module
         services.AddSingleton<IEventBus, EventBus>();
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
+        services.AddTransient<ISynchronousScheduler, SynchronousScheduler>();
     }
 
     public static void Initialize(IServiceProvider serviceProvider)

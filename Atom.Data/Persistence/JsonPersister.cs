@@ -1,5 +1,5 @@
 using System.Text.Json;
-using System.Threading;
+using System.Text.Json.Serialization;
 using Genius.Atom.Infrastructure.Io;
 
 namespace Genius.Atom.Data.Persistence;
@@ -17,13 +17,24 @@ internal sealed class JsonPersister : IJsonPersister
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly static ReaderWriterLockSlim _locker = new();
 
-    public JsonPersister(IFileService io)
+    public JsonPersister(IFileService io, ITypeDiscriminators typeDiscriminators, IEnumerable<IJsonConverter> converters)
     {
-        _io = io;
+        _io = io.NotNull();
         _jsonOptions = new JsonSerializerOptions {
             PropertyNameCaseInsensitive = true,
-            WriteIndented = true
+            WriteIndented = true,
+            Converters = { new DiscriminatedTypeConverterFactory(typeDiscriminators) },
         };
+
+        foreach (var converter in converters)
+        {
+            if (converter is not JsonConverter jsonConverter)
+            {
+                throw new NotSupportedException("The provided converter is not a JsonConverter");
+            }
+
+            _jsonOptions.Converters.Add(jsonConverter);
+        }
     }
 
     public T? Load<T>(string filePath)

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <AssemblyName>Genius.Atom.Data.Tests</AssemblyName>
+    <RootNamespace>Genius.Atom.Data.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Data\Atom.Data.csproj" />
+    <ProjectReference Include="..\Atom.Infrastructure.TestingUtil\Atom.Infrastructure.TestingUtil.csproj" />
+  </ItemGroup>
+
+</Project>
