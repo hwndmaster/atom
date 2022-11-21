@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>Genius.Atom.Infrastructure.TestingUtil</RootNamespace>
-    <AssemblyName>Genius.Atom.Infrastructure.TestingUtil</AssemblyName>
-    <PackageId>Genius.Atom.Infrastructure.TestingUtil</PackageId>
+    <PackageId>Genius.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

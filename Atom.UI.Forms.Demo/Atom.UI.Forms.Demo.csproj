@@ -2,10 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <RootNamespace>Genius.Atom.UI.Forms.Demo</RootNamespace>
-    <AssemblyName>Genius.Atom.UI.Forms.Demo</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

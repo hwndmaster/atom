@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <RootNamespace>Genius.Atom.UI.Forms.TestingUtil</RootNamespace>
-    <AssemblyName>Genius.Atom.UI.Forms.TestingUtil</AssemblyName>
-    <PackageId>Genius.Atom.UI.Forms.TestingUtil</PackageId>
+    <PackageId>Genius.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

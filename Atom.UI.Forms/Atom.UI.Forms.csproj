@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <PackageId>Genius.$(AssemblyName)</PackageId>
+
+    <!-- Temporarily adding these two lines, 'coz WPF cannot handle it yet -->
     <AssemblyName>Genius.Atom.UI.Forms</AssemblyName>
     <RootNamespace>Genius.Atom.UI.Forms</RootNamespace>
-    <PackageId>Genius.Atom.UI.Forms</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <AssemblyName>Genius.Atom.Data</AssemblyName>
-    <RootNamespace>Genius.Atom.Data</RootNamespace>
-    <PackageId>Genius.Atom.Data</PackageId>
+    <PackageId>Genius.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

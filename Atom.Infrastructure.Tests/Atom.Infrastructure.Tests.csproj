@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <AssemblyName>Genius.Atom.Infrastructure.Tests</AssemblyName>
-    <RootNamespace>Genius.Atom.Infrastructure.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
