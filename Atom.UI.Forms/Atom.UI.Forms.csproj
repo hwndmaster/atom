@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <UseWPF>true</UseWPF>
-    <PackageId>Genius.$(AssemblyName)</PackageId>
+    <PackageId>$(AssemblyName)</PackageId>
 
     <!-- Temporarily adding these two lines, 'coz WPF cannot handle it yet -->
     <AssemblyName>Genius.Atom.UI.Forms</AssemblyName>

@@ -31,8 +31,7 @@ internal sealed class DiscriminatedTypeConverterFactory : JsonConverterFactory
             return false;
         }
 
-        return typeToConvert.IsAbstract || typeToConvert.IsInterface
-            || _typeDiscriminators.HasMapping(typeToConvert);
+        return _typeDiscriminators.HasMapping(typeToConvert);
     }
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)

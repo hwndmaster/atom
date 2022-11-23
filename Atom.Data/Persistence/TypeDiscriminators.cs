@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Data.Persistence;
 
@@ -24,13 +25,16 @@ internal record TypeDiscriminatorRecord(string Discriminator, Type Type, Type? P
 internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminatorsInternal
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<TypeDiscriminators> _logger;
 
     private readonly Dictionary<string, TypeDiscriminatorRecord> _discriminatorsByDiscriminatorAndVersion = new();
     private readonly Dictionary<string, TypeDiscriminatorRecord> _discriminatorsByTypeName = new();
+    private readonly Dictionary<string, List<TypeDiscriminatorRecord>> _discriminatorsByBaseTypeName = new();
 
-    public TypeDiscriminators(IServiceProvider serviceProvider)
+    public TypeDiscriminators(IServiceProvider serviceProvider, ILogger<TypeDiscriminators> logger)
     {
         _serviceProvider = serviceProvider.NotNull();
+        _logger = logger.NotNull();
     }
 
     public void AddMapping<T>(string discriminator, int version = 1)
@@ -64,7 +68,9 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
 
     public bool HasMapping(Type type)
     {
-        return _discriminatorsByTypeName.ContainsKey(type.FullName.NotNull());
+        var typeName = type.FullName.NotNull();
+        return _discriminatorsByTypeName.ContainsKey(typeName)
+            || _discriminatorsByBaseTypeName.ContainsKey(typeName);
     }
 
     public TypeDiscriminatorRecord GetDiscriminator(Type type)
@@ -112,8 +118,53 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
 
     private void AddMapping(TypeDiscriminatorRecord record)
     {
+        _logger.LogTrace("Adding mapping: '{type}' as '{discriminator}' version '{version}'",
+            record.Type.FullName, record.Discriminator, record.Version);
+
         _discriminatorsByDiscriminatorAndVersion.Add(CreateDiscriminatorQualifiedName(record.Discriminator, record.Version), record);
         _discriminatorsByTypeName.Add(record.Type.FullName.NotNull(), record);
+
+        // Retrieve all the base types
+        var baseType = record.Type.BaseType;
+        while (baseType is not null)
+        {
+            if (baseType == typeof(object))
+            {
+                break;
+            }
+
+            RegisterType(baseType);
+
+            baseType = baseType.BaseType;
+        }
+
+        // Retrieve interfaces
+        var interfaces = record.Type.GetInterfaces().NotNull();
+        foreach (var @interface in interfaces)
+        {
+            if (@interface.Namespace?.StartsWith("System.") == true)
+            {
+                continue;
+            }
+
+            RegisterType(@interface);
+        }
+
+        void RegisterType(Type registerType)
+        {
+            if (registerType.FullName is null)
+            {
+                return;
+            }
+
+            if (!_discriminatorsByBaseTypeName.TryGetValue(registerType.FullName, out var records))
+            {
+                records = new List<TypeDiscriminatorRecord>();
+                _discriminatorsByBaseTypeName.Add(registerType.FullName, records);
+            }
+
+            records.Add(record);
+        }
     }
 
     private static string CreateDiscriminatorQualifiedName(string discriminator, int version)

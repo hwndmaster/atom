@@ -119,7 +119,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         {
             if (entity.Id == Guid.Empty)
             {
-                entity.Id = Guid.NewGuid();
+                entity.SetId(Guid.NewGuid());
             }
 
             await FillUpRelationsAsync(entity);

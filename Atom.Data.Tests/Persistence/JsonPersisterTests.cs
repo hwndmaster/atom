@@ -1,6 +1,7 @@
 using Genius.Atom.Data.Persistence;
 using Genius.Atom.Infrastructure.TestingUtil;
 using Genius.Atom.Infrastructure.TestingUtil.Io;
+using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Infrastructure.Tests.Persistence;
 
@@ -12,7 +13,7 @@ public sealed class JsonPersisterTests
 
     public JsonPersisterTests()
     {
-        _typeDiscriminators = new(_serviceProvider);
+        _typeDiscriminators = new(_serviceProvider, Mock.Of<ILogger<TypeDiscriminators>>());
     }
 
     [Fact]
@@ -123,6 +124,12 @@ public sealed class JsonPersisterTests
         Assert.Equal(entity.SomeValue, result.SomeValue);
         Assert.Equal(entity.Foo.IntValue, result.Foo.IntValue);
         Assert.Equal(entity.Foo.AnotherValue1, result.Foo.AnotherValue3);
+        Assert.Equal(entity.Bars.Count, result.Bars.Count);
+        for (var i = 0; i < result.Bars.Count; i++)
+        {
+            Assert.Equal(entity.Bars.ElementAt(i).IntValue, result.Bars.ElementAt(i).IntValue);
+            Assert.Equal(entity.Bars.ElementAt(i).AnotherValue1, result.Bars.ElementAt(i).AnotherValue3);
+        }
     }
 
     [Fact]
@@ -178,12 +185,14 @@ public sealed class JsonPersisterTests
     {
         public required string SomeValue { get; init; }
         public required DerivedClassA Foo { get; init; }
+        public required ICollection<DerivedClassA> Bars { get; init; }
     }
 
     private sealed class ComplexStructureWithUpgradedProperty
     {
         public required string SomeValue { get; init; }
         public required DerivedClassAVersion2 Foo { get; init; }
+        public required ICollection<DerivedClassAVersion2> Bars { get; init; }
     }
 
     private sealed class DerivedClassAVersion1To2Upgrader : IDataVersionUpgrader<DerivedClassA, DerivedClassAVersion2>
