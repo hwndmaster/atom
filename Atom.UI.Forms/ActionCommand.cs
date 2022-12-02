@@ -6,14 +6,14 @@ namespace Genius.Atom.UI.Forms;
 
 public interface IActionCommand : ICommand
 {
-    IObservable<Unit> Executed { get; }
+    IObservable<bool> Executed { get; }
 }
 
 public class ActionCommand : IActionCommand
 {
     private readonly Func<object?, Task> _asyncAction;
     private readonly Predicate<object?>? _canExecute;
-    private readonly Subject<Unit> _executed = new();
+    private readonly Subject<bool> _executed = new();
 
     public event EventHandler? CanExecuteChanged
     {
@@ -21,7 +21,7 @@ public class ActionCommand : IActionCommand
         remove { CommandManager.RequerySuggested -= value; }
     }
 
-    public IObservable<Unit> Executed => _executed;
+    public IObservable<bool> Executed => _executed;
 
     public ActionCommand()
         : this (_ => { }, null)
@@ -63,8 +63,16 @@ public class ActionCommand : IActionCommand
     {
         try
         {
-            await _asyncAction.Invoke(parameter);
-            _executed.OnNext(Unit.Default);
+            var task = _asyncAction.Invoke(parameter);
+            await task;
+            if (task is Task<bool> taskBool)
+            {
+                _executed.OnNext(taskBool.Result);
+            }
+            else
+            {
+                _executed.OnNext(true);
+            }
         }
         catch (Exception ex)
         {
