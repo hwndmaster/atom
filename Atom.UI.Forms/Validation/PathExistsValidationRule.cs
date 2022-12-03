@@ -1,11 +1,12 @@
 using System.Globalization;
+using System.IO;
 using System.Windows.Controls;
 
 namespace Genius.Atom.UI.Forms.Validation;
 
-public sealed class NotNullValidationRule : ValidationRule, IPropertyValidationRule
+public sealed class PathExistsValidationRule : ValidationRule, IPropertyValidationRule
 {
-    public NotNullValidationRule(string propertyName)
+    public PathExistsValidationRule(string propertyName)
     {
         PropertyName = propertyName;
     }
@@ -14,7 +15,12 @@ public sealed class NotNullValidationRule : ValidationRule, IPropertyValidationR
     {
         if (value is null)
         {
-            return new ValidationResult(false, $"{PropertyName} cannot be null.");
+            return ValidationResult.ValidResult;
+        }
+
+        if (!Path.Exists(value.ToString()))
+        {
+            return new ValidationResult(false, $"Path specified in {PropertyName} doesn't exist.");
         }
 
         return ValidationResult.ValidResult;

@@ -3,27 +3,27 @@ using System.Windows.Controls;
 
 namespace Genius.Atom.UI.Forms.Validation;
 
-public sealed class StringNotNullOrEmptyValidationRule : ValidationRule
+public sealed class StringNotNullOrEmptyValidationRule : ValidationRule, IPropertyValidationRule
 {
-    private readonly string? _propertyName;
-
-    public StringNotNullOrEmptyValidationRule(string? propertyName = null)
+    public StringNotNullOrEmptyValidationRule(string propertyName)
     {
-        _propertyName = propertyName;
+        PropertyName = propertyName;
     }
 
     public override ValidationResult Validate(object value, CultureInfo cultureInfo)
     {
         if (value is not string stringValue)
         {
-            return new ValidationResult(false, $"{_propertyName ?? "Value"} has a non-string value.");
+            return new ValidationResult(false, $"{PropertyName} is not a string value.");
         }
 
         if (string.IsNullOrEmpty(stringValue))
         {
-            return new ValidationResult(false, $"{_propertyName ?? "Value"} cannot be empty.");
+            return new ValidationResult(false, $"{PropertyName} cannot be empty.");
         }
 
         return ValidationResult.ValidResult;
     }
+
+    public string PropertyName { get; }
 }

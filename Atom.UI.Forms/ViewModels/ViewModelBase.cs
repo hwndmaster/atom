@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
+using Genius.Atom.UI.Forms.Validation;
 
 namespace Genius.Atom.UI.Forms;
 
@@ -49,6 +50,16 @@ public abstract class ViewModelBase : IViewModel
     public bool TryGetPropertyValue(string propertyName, out object? value)
     {
         return _propertyBag.TryGetValue(propertyName, out value);
+    }
+
+    /// <summary>
+    ///   Assigns a validation rule on a property, which is taken from <see cref="validationRule.PropertyName" />.
+    /// </summary>
+    /// <param name="validationRule">The validation rule.</param>
+    protected void AddValidationRule<TValidationRule>(TValidationRule validationRule)
+        where TValidationRule : ValidationRule, IPropertyValidationRule
+    {
+        AddValidationRule(validationRule.PropertyName, validationRule);
     }
 
     /// <summary>

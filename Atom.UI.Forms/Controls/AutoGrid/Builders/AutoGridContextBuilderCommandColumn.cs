@@ -31,7 +31,7 @@ internal sealed class AutoGridContextBuilderCommandColumn : AutoGridContextBuild
             IsReadOnly = _isReadOnly,
             Style = _style,
             ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter()
+            ValueConverter = DetermineValueConverter(null)
         };
     }
 

@@ -6,6 +6,8 @@ public interface IAutoGridContextBuilderTextColumn : IAutoGridContextBuilderColu
 {
     IAutoGridContextBuilderTextColumn Filterable(bool filterable = true);
     IAutoGridContextBuilderTextColumn IsGrouped(bool isGrouped = true);
+    IAutoGridContextBuilderTextColumn WithDisplayFormat(string displayFormat);
+    IAutoGridContextBuilderTextColumn WithIconSource(IconSourceRecord iconSource);
 }
 
 internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderColumn<IAutoGridContextBuilderTextColumn>, IAutoGridContextBuilderTextColumn
@@ -56,7 +58,7 @@ internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderC
             IconSource = _iconSource,
             Style = _style,
             ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter()
+            ValueConverter = DetermineValueConverter(_displayFormat)
         };
     }
 

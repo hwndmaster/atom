@@ -9,7 +9,13 @@ public interface IAutoGridContextBuilderColumn { }
 public interface IAutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn
     where TBuilder : IAutoGridContextBuilderColumn<TBuilder>
 {
+    TBuilder IsReadOnly(bool isReadOnly = true);
+    TBuilder WithAutoWidth(bool autoWidth = true);
     TBuilder WithDisplayName(string displayName);
+    TBuilder WithStyle(StylingRecord style);
+    TBuilder WithToolTipPath(string toolTipPath);
+    TBuilder WithValueConverter<TValueConverter>()
+        where TValueConverter : IValueConverter;
 }
 
 internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn<TBuilder>, IHasBuildColumnContext
@@ -73,7 +79,7 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
             ?? Regex.Replace(PropertyDescriptor.Name, "[A-Z]", " $0");
     }
 
-    protected IValueConverter? DetermineValueConverter()
+    protected IValueConverter? DetermineValueConverter(string? displayFormat)
     {
         if (_valueConverterType is not null)
         {
@@ -84,7 +90,7 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
 
         if (_valueConverterType is null && PropertyDescriptor.PropertyType.IsValueType)
         {
-            return new PropertyValueStringConverter();
+            return new PropertyValueStringConverter(displayFormat);
         }
 
         return null;

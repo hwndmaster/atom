@@ -62,7 +62,7 @@ internal sealed class DataGridColumnBuilder
 
         var bindToValue = new Binding(_valuePath);
         if (_converter is not null || _itemsSourcePath is not null)
-            bindToValue.Converter = _converter ?? new PropertyValueStringConverter();
+            bindToValue.Converter = _converter ?? new PropertyValueStringConverter(null);
 
         if (_viewType is not null)
         {

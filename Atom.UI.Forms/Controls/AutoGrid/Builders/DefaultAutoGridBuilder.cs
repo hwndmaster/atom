@@ -45,7 +45,7 @@ internal sealed class DefaultAutoGridBuilder : IAutoGridBuilder
                 IsReadOnly = DetectIsReadOnly(property),
                 Style = DetectStyle(property),
                 ToolTipPath = DetectToolTipPath(property),
-                ValueConverter = DetectValueConverter(property)
+                ValueConverter = DetectValueConverter(property, null)
             };
         }
         else if (property.Attributes.OfType<SelectFromListAttribute>().Any())
@@ -69,22 +69,23 @@ internal sealed class DefaultAutoGridBuilder : IAutoGridBuilder
         }
         else
         {
+            var displayFormat = DetectDisplayFormat(property);
             return new AutoGridBuildTextColumnContext(property, displayName)
             {
                 AutoWidth = DetectAutoWidth(property),
-                DisplayFormat = DetectDisplayFormat(property),
+                DisplayFormat = displayFormat,
                 IconSource = DetectIconSource(property),
                 IsGrouped = DetectIsGrouped(property),
                 IsReadOnly = DetectIsReadOnly(property),
                 Filterable = DetectFilterable(property),
                 Style = DetectStyle(property),
                 ToolTipPath = DetectToolTipPath(property),
-                ValueConverter = DetectValueConverter(property)
+                ValueConverter = DetectValueConverter(property, displayFormat)
             };
         }
     }
 
-    private IValueConverter? DetectValueConverter(PropertyDescriptor property)
+    private IValueConverter? DetectValueConverter(PropertyDescriptor property, string? displayFormat)
     {
         var converterAttr = property.Attributes.OfType<ValueConverterAttribute>().FirstOrDefault();
         if (converterAttr is not null)
@@ -95,7 +96,7 @@ internal sealed class DefaultAutoGridBuilder : IAutoGridBuilder
 
         if (converterAttr is null && !property.PropertyType.IsValueType)
         {
-            return new PropertyValueStringConverter();
+            return new PropertyValueStringConverter(displayFormat);
         }
 
         return null;
