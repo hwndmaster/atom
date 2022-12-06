@@ -35,6 +35,50 @@ public static class WpfHelpers
         ((IAddChild) flyout).AddChild(child);
     }
 
+    public static IEnumerable<T> FindVisualChildren<T>(DependencyObject dependencyObject) where T : DependencyObject
+    {
+        if (dependencyObject is null)
+            yield break;
+
+        if (dependencyObject is T t)
+            yield return t;
+
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
+            foreach (T childOfChild in FindVisualChildren<T>(child))
+            {
+                yield return childOfChild;
+            }
+        }
+
+        /*if (dependencyObject is ContentPresenter contentPresenter)
+        {
+            if (contentPresenter.Content is DependencyObject contentDependencyObject)
+            {
+                foreach (T childOfChild in FindVisualChildren<T>(contentDependencyObject))
+                {
+                    yield return childOfChild;
+                }
+            }
+        }*/
+    }
+
+    public static T? FindVisualParent<T>(UIElement element) where T : UIElement
+    {
+        UIElement? parent = element;
+        while (parent is not null)
+        {
+            if (parent is T correctlyTyped)
+            {
+                return correctlyTyped;
+            }
+
+            parent = VisualTreeHelper.GetParent(parent) as UIElement;
+        }
+        return null;
+    }
+
     internal static DataGridTemplateColumn CreateButtonColumn(string commandPath, string? iconName)
     {
         var caption = Helpers.MakeCaptionFromPropertyName(commandPath.Replace("Command", ""));
@@ -137,50 +181,6 @@ public static class WpfHelpers
         }
 
         return column.CellStyle;
-    }
-
-    internal static IEnumerable<T> FindVisualChildren<T>(DependencyObject dependencyObject) where T : DependencyObject
-    {
-        if (dependencyObject is null)
-            yield break;
-
-        if (dependencyObject is T t)
-            yield return t;
-
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
-        {
-            DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
-            foreach (T childOfChild in FindVisualChildren<T>(child))
-            {
-                yield return childOfChild;
-            }
-        }
-
-        /*if (dependencyObject is ContentPresenter contentPresenter)
-        {
-            if (contentPresenter.Content is DependencyObject contentDependencyObject)
-            {
-                foreach (T childOfChild in FindVisualChildren<T>(contentDependencyObject))
-                {
-                    yield return childOfChild;
-                }
-            }
-        }*/
-    }
-
-    internal static T? FindVisualParent<T>(UIElement element) where T : UIElement
-    {
-        UIElement? parent = element;
-        while (parent is not null)
-        {
-            if (parent is T correctlyTyped)
-            {
-                return correctlyTyped;
-            }
-
-            parent = VisualTreeHelper.GetParent(parent) as UIElement;
-        }
-        return null;
     }
 
     internal static void SetCellHorizontalAlignment(DataGridColumn column, HorizontalAlignment alignment)

@@ -135,6 +135,8 @@ public static class Properties
             var observableCollection = collectionViewSource.Source as ITypedObservableList;
             if (observableCollection is not null)
             {
+                // TODO: Dispose event subscription when detached
+                // TODO: Use ObservableExtensions.WhenCollectionChanged
                 observableCollection.CollectionChanged += (sender, args) => {
                     if (args.Action == NotifyCollectionChangedAction.Add)
                     {
@@ -174,11 +176,14 @@ public static class Properties
             return;
 
         string filter = string.Empty;
+        // TODO: Dispose event subscription when detached
+        // TODO: Use vm.WhenChanged() which returns IObservable<T>
         vm.WhenChanged(filterContext.Name, (string s) => {
             filter = s;
             collectionViewSource.View.Refresh();
         });
 
+        // TODO: Dispose event subscription when detached
         collectionViewSource.Filter += (object sender, FilterEventArgs e) =>
         {
             if (string.IsNullOrEmpty(filter))
