@@ -10,6 +10,6 @@ internal sealed class ColumnStylingBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        WpfHelpers.SetCellHorizontalAlignment(context.Args.Column, style.HorizontalAlignment);
+        WpfHelpers.SetCellHorizontalAlignment(context.Args.Column, style.HorizontalAlignment ?? HorizontalAlignment.Left);
     }
 }

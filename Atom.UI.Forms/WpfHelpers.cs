@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Genius.Atom.UI.Forms.Controls.TagEditor;
+using Genius.Atom.UI.Forms.WpfBuilders;
 using MahApps.Metro.Controls;
 
 namespace Genius.Atom.UI.Forms;
@@ -35,51 +36,19 @@ public static class WpfHelpers
         ((IAddChild) flyout).AddChild(child);
     }
 
+    [Obsolete("Use `WpfExtensions.FindVisualChildren<T>` extension method instead")]
     public static IEnumerable<T> FindVisualChildren<T>(DependencyObject dependencyObject) where T : DependencyObject
     {
-        if (dependencyObject is null)
-            yield break;
-
-        if (dependencyObject is T t)
-            yield return t;
-
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
-        {
-            DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
-            foreach (T childOfChild in FindVisualChildren<T>(child))
-            {
-                yield return childOfChild;
-            }
-        }
-
-        /*if (dependencyObject is ContentPresenter contentPresenter)
-        {
-            if (contentPresenter.Content is DependencyObject contentDependencyObject)
-            {
-                foreach (T childOfChild in FindVisualChildren<T>(contentDependencyObject))
-                {
-                    yield return childOfChild;
-                }
-            }
-        }*/
+        return dependencyObject.FindVisualChildren<T>();
     }
 
+    [Obsolete("Use `WpfExtensions.FindVisualParent<T>` extension method instead")]
     public static T? FindVisualParent<T>(UIElement element) where T : UIElement
     {
-        UIElement? parent = element;
-        while (parent is not null)
-        {
-            if (parent is T correctlyTyped)
-            {
-                return correctlyTyped;
-            }
-
-            parent = VisualTreeHelper.GetParent(parent) as UIElement;
-        }
-        return null;
+        return element.FindVisualParent<T>();
     }
 
-    internal static DataGridTemplateColumn CreateButtonColumn(string commandPath, string? iconName)
+    internal static DataGridTemplateColumn CreateButtonColumn(string commandPath, StylingRecord? styling, string? iconName)
     {
         var caption = Helpers.MakeCaptionFromPropertyName(commandPath.Replace("Command", ""));
 
@@ -87,6 +56,15 @@ public static class WpfHelpers
         buttonFactory.SetBinding(Button.CommandProperty, new Binding(commandPath));
         buttonFactory.SetValue(Button.ToolTipProperty, caption);
         buttonFactory.SetValue(Button.BorderThicknessProperty, new Thickness(0));
+        if (styling is not null)
+        {
+            if (styling.HorizontalAlignment is not null)
+                buttonFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, styling.HorizontalAlignment);
+            if (styling.Margin is not null)
+                buttonFactory.SetValue(FrameworkElement.MarginProperty, styling.Margin);
+            if (styling.Padding is not null)
+                buttonFactory.SetValue(Control.PaddingProperty, styling.Padding);
+        }
         if (iconName is not null)
         {
             var imageFactory = new FrameworkElementFactory(typeof(Image));
@@ -129,7 +107,7 @@ public static class WpfHelpers
     }
 
     // TODO: Not used yet
-    internal static void AutoFitColumn(DataGridColumn column, IEnumerable items)
+    /*internal static void AutoFitColumn(DataGridColumn column, IEnumerable items)
     {
         var childControl = column.FindChild<Control>();
         var maxWidth = column.MinWidth;
@@ -141,7 +119,7 @@ public static class WpfHelpers
         }
 
         column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
-    }
+    }*/
 
     private static DataTemplate CreateTagEditorDataTemplate(Binding bindToValue, bool @readonly)
     {
@@ -234,7 +212,7 @@ public static class WpfHelpers
         if (cell is null || cell.IsEditing || cell.IsReadOnly)
             return;
 
-        DataGrid? dataGrid = FindVisualParent<DataGrid>(cell);
+        DataGrid? dataGrid = cell.FindVisualParent<DataGrid>();
         if (dataGrid is null)
             return;
 
@@ -252,7 +230,7 @@ public static class WpfHelpers
             }
             else
             {
-                DataGridRow? row = FindVisualParent<DataGridRow>(cell);
+                DataGridRow? row = cell.FindVisualParent<DataGridRow>();
                 if (row is not null && !row.IsSelected)
                 {
                     row.IsSelected = true;

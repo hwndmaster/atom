@@ -145,7 +145,7 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
     /// <returns>The tree view control containing given item.</returns>
     private static TreeView GetTree(TreeViewItem item)
     {
-        return WpfHelpers.FindVisualParent<TreeView>(item).NotNull();
+        return item.FindVisualParent<TreeView>().NotNull();
     }
 
     private static void OnSelectedChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
@@ -161,10 +161,16 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
         }
 
         var isSelected = GetIsSelected(item);
+        var value = item.DataContext ?? item;
         if (isSelected)
-            msb.SelectedItems.Add(item.DataContext ?? item);
+            msb.SelectedItems.Add(value);
         else
-            msb.SelectedItems.Remove(item.DataContext ?? item);
+            msb.SelectedItems.Remove(value);
+
+        if (value is ISelectable selectableValue)
+        {
+            selectableValue.IsSelected = isSelected;
+        }
     }
 
     private void OnKeyDown(object sender, KeyEventArgs e)

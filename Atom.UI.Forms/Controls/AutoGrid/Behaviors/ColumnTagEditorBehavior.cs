@@ -40,7 +40,7 @@ internal sealed class ColumnTagEditorBehavior : IAutoGridColumnBehavior
         context.DataGrid.PreparingCellForEdit += (object? sender, DataGridPreparingCellForEditEventArgs args) => {
             if (args.Column == context.Args.Column)
             {
-                var textBox = WpfHelpers.FindVisualChildren<AutoCompleteBox>(args.EditingElement).FirstOrDefault();
+                var textBox = args.EditingElement.FindVisualChildren<AutoCompleteBox>().FirstOrDefault();
                 if (textBox != null)
                 {
                     FocusManager.SetFocusedElement(args.EditingElement, textBox);
@@ -53,7 +53,7 @@ internal sealed class ColumnTagEditorBehavior : IAutoGridColumnBehavior
                 && args.Key == Key.Enter)
             {
                 var cellContent = context.Args.Column.GetCellContent(context.DataGrid.CurrentItem);
-                var textBox = WpfHelpers.FindVisualChildren<AutoCompleteBox>(cellContent).First();
+                var textBox = cellContent.FindVisualChildren<AutoCompleteBox>().First();
                 if (textBox.Text != string.Empty)
                 {
                     args.Handled = true;

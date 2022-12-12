@@ -62,7 +62,7 @@ public static class Properties
         if (d.GetValue(IsEditingHandlingSuspendedProperty) is true)
             return;
 
-        DataGridCellsPresenter? presenter = WpfHelpers.FindVisualChildren<DataGridCellsPresenter>(row)
+        DataGridCellsPresenter? presenter = row.FindVisualChildren<DataGridCellsPresenter>()
             .FirstOrDefault();
         if (presenter is null)
             return;
@@ -71,7 +71,7 @@ public static class Properties
         if (presenter.ItemContainerGenerator.ContainerFromIndex(column) is not DataGridCell cell)
             return;
 
-        var grid = WpfHelpers.FindVisualParent<DataGrid>(row);
+        var grid = row.FindVisualParent<DataGrid>();
         if (grid is null)
             return;
 

@@ -13,6 +13,6 @@ internal sealed class ColumnButtonBehavior : IAutoGridColumnBehavior
 
         var icon = context.BuildCommandColumn?.Icon;
 
-        context.Args.Column = WpfHelpers.CreateButtonColumn(context.Property.Name, icon);
+        context.Args.Column = WpfHelpers.CreateButtonColumn(context.Property.Name, context.BuildCommandColumn?.Style, icon);
     }
 }

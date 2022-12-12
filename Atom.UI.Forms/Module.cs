@@ -16,7 +16,7 @@ public static class Module
     private static IServiceProvider? _serviceProvider;
     internal static IServiceProvider ServiceProvider => _serviceProvider!;
 
-    public static void Configure(IServiceCollection services)
+    public static void Configure(IServiceCollection services, Application application)
     {
         // View Models:
         services.AddTransient<ILogsTabViewModel, LogsTabViewModel>();
@@ -29,6 +29,7 @@ public static class Module
         // Misc:
         services.AddTransient<IAtomViewModelFactory, ViewModelFactory>();
         services.AddTransient<IUserInteraction, UserInteraction>();
+        services.AddSingleton<IUiDispatcher>(new UiDispatcher(application));
     }
 
     public static void Initialize(IServiceProvider serviceProvider)
