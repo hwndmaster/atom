@@ -6,9 +6,16 @@ namespace Genius.Atom.UI.Forms;
 public interface IUiDispatcher
 {
     /// <summary>
-    ///   Executes the specified Action synchronously on the thread that the Dispatcher was created on.
+    ///   Executes the specified action asynchronously on the thread that the Dispatcher was created on.
     /// </summary>
-    /// <param name="action">An Action delegate to invoke through the dispatcher.</param>
+    /// <param name="action">An action delegate to invoke through the dispatcher.</param>
+    /// <returns>An operation representing the queued delegate to be invoked.</returns>
+    Task BeginInvoke(Action action);
+
+    /// <summary>
+    ///   Executes the specified action synchronously on the thread that the Dispatcher was created on.
+    /// </summary>
+    /// <param name="action">An action delegate to invoke through the dispatcher.</param>
     /// <param name="cancellationToken">
     ///   A cancellation token that can be used to cancel the operation.
     ///   If the operation has not started, it will be aborted when the
@@ -18,13 +25,13 @@ public interface IUiDispatcher
     void Invoke(Action action, CancellationToken? cancellationToken = null);
 
     /// <summary>
-    ///   Executes the specified Action asynchronously on the thread that the Dispatcher was created on.
+    ///   Executes the specified action asynchronously on the thread that the Dispatcher was created on.
     /// </summary>
-    /// <param name="action">An Action delegate to invoke through the dispatcher.</param>
+    /// <param name="action">An action delegate to invoke through the dispatcher.</param>
     /// <param name="cancellationToken">
     ///     A cancellation token that can be used to cancel the operation.
     ///     If the operation has not started, it will be aborted when the
-    ///     cancellation token is canceled.  If the operation has started,
+    ///     cancellation token is canceled. If the operation has started,
     ///     the operation can cooperate with the cancellation request.
     /// </param>
     /// <returns>An operation representing the queued delegate to be invoked.</returns>
@@ -60,6 +67,12 @@ internal sealed class UiDispatcher : IUiDispatcher
     public UiDispatcher(Application application)
     {
         _application = application.NotNull();
+    }
+
+    public Task BeginInvoke(Action action)
+    {
+        var invocation = _application.Dispatcher.BeginInvoke(action);
+        return invocation.Task;
     }
 
     public void Invoke(Action action, CancellationToken? cancellationToken = null)

@@ -6,6 +6,12 @@ public class TestUiDispatcher : IUiDispatcher
     {
     }
 
+    public Task BeginInvoke(Action action)
+    {
+        action();
+        return Task.CompletedTask;
+    }
+
     public void Invoke(Action action, CancellationToken? cancellationToken = null)
     {
         action();
