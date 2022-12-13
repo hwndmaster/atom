@@ -144,6 +144,9 @@ public abstract class ViewModelBase : IViewModel
         }
 
         _propertyBag.AddOrUpdate(propertyName, _ => propertyValue, (_, __) => propertyValue);
+        ValidateProperty(propertyName, propertyValue);
+        valueChangedHandler?.Invoke(isInitial ? propertyValue : (TValue)oldValue!, propertyValue);
+
         OnPropertyChanged(propertyName);
 
         if (!_suspendDirtySet &&
@@ -154,10 +157,6 @@ public abstract class ViewModelBase : IViewModel
         {
             hasDirtyFlag.IsDirty = true;
         }
-
-        ValidateProperty(propertyName, propertyValue);
-
-        valueChangedHandler?.Invoke(isInitial ? propertyValue : (TValue)oldValue!, propertyValue);
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

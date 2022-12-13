@@ -102,9 +102,14 @@ internal sealed class DataGridColumnBuilder
         var imageFactory = new FrameworkElementFactory(typeof(Image));
 
         if (imageIsPath)
-            imageFactory.SetBinding(ImageBehavior.AnimatedSourceProperty, new Binding(_imageSource));
+        {
+            imageFactory.SetBinding(ImageBehavior.AnimatedSourceProperty, new Binding(_imageSource) { Converter = new ImageSourceConverter() });
+            imageFactory.SetBinding(UIElement.VisibilityProperty, new Binding(_imageSource) { Converter = new NotNullToVisibilityConverter() });
+        }
         else
+        {
             imageFactory.SetValue(ImageBehavior.AnimatedSourceProperty, (BitmapImage)Application.Current.FindResource(_imageSource));
+        }
 
         if (imageTooltip != null)
             imageFactory.SetValue(Image.ToolTipProperty, imageTooltip);
