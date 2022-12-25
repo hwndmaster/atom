@@ -4,55 +4,75 @@ using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms.Behaviors;
 
-public sealed class ImageConditionalSourceBehavior : Behavior<ListBox>
+public sealed class ImageConditionalSourceBehavior : Behavior<Image>
 {
-    public static readonly DependencyProperty WhenTrueProperty = DependencyProperty.RegisterAttached(
-        "WhenTrue",
+    public static readonly DependencyProperty FlagValueProperty = DependencyProperty.Register(
+        nameof(FlagValue),
+        typeof(bool),
+        typeof(ImageConditionalSourceBehavior),
+        new PropertyMetadata(null));
+
+    public static readonly DependencyProperty WhenTrueProperty = DependencyProperty.Register(
+        nameof(WhenTrue),
         typeof(object),
         typeof(ImageConditionalSourceBehavior),
-        new PropertyMetadata(OnWhenTrueChanged));
+        new PropertyMetadata(null));
 
-    public static readonly DependencyProperty WhenFalseProperty = DependencyProperty.RegisterAttached(
-        "WhenFalse",
+    public static readonly DependencyProperty WhenFalseProperty = DependencyProperty.Register(
+        nameof(WhenFalse),
         typeof(object),
         typeof(ImageConditionalSourceBehavior),
-        new PropertyMetadata(OnWhenFalseChanged));
+        new PropertyMetadata(null));
 
-    public static object GetWhenTrue(DependencyObject element) => element.GetValue(WhenTrueProperty);
-    public static void SetWhenTrue(DependencyObject element, object value) => element.SetValue(WhenTrueProperty, value);
-
-    public static object GetWhenFalse(DependencyObject element) => element.GetValue(WhenFalseProperty);
-    public static void SetWhenFalse(DependencyObject element, object value) => element.SetValue(WhenFalseProperty, value);
-
-    private static void OnWhenTrueChanged(DependencyObject element, DependencyPropertyChangedEventArgs e)
+    protected override void OnAttached()
     {
-        var image = (Image)element;
-        SetupStyleTrigger(image, true);
+        base.OnAttached();
+
+        var binding = BindingOperations.GetBindingExpression(this, FlagValueProperty);
+
+        var style = new Style(typeof(Image), AssociatedObject.Style);
+
+        var trueValueTrigger = CreateTrigger(binding.ParentBinding, true);
+        style.Triggers.Add(trueValueTrigger);
+
+        var falseValueTrigger = CreateTrigger(binding.ParentBinding, false);
+        style.Triggers.Add(falseValueTrigger);
+
+        AssociatedObject.Style = style;
     }
 
-    private static void OnWhenFalseChanged(DependencyObject element, DependencyPropertyChangedEventArgs e)
+    private DataTrigger CreateTrigger(Binding binding, bool whenValue)
     {
-        var image = (Image)element;
-        SetupStyleTrigger(image, false);
-    }
-
-    private static void SetupStyleTrigger(Image image, bool whenValue)
-    {
-        var style = new Style(typeof(Image), image.Style);
         var trigger = new DataTrigger
         {
-            Binding = new Binding("."),
+            Binding = binding,
             Value = whenValue,
         };
 
         trigger.Setters.Add(new Setter
         {
             Property = Image.SourceProperty,
-            Value = whenValue ? GetWhenTrue(image) : GetWhenFalse(image)
+            Value = whenValue ? WhenTrue : WhenFalse
         });
 
-        style.Triggers.Add(trigger);
+        return trigger;
+    }
 
-        image.Style = style;
+    public bool FlagValue
+    {
+        get { return (bool)GetValue(FlagValueProperty); }
+        set { SetValue(FlagValueProperty, value); }
+    }
+
+    public object? WhenTrue
+    {
+        get { return GetValue(WhenTrueProperty); }
+        set { SetValue(WhenTrueProperty, value); }
+    }
+
+    public object? WhenFalse
+    {
+        get { return GetValue(WhenFalseProperty); }
+        set { SetValue(WhenFalseProperty, value); }
     }
 }
