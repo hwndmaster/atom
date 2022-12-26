@@ -74,6 +74,21 @@ public static class ViewModelExtensions
         return new DisposableAction(() => viewModel.PropertyChanged -= fn);
     }
 
+    public static IDisposable WhenChanged(this IViewModel viewModel, string propertyName, Action handler)
+    {
+        void fn(object? _, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != propertyName)
+                return;
+
+            handler();
+        }
+
+        viewModel.PropertyChanged += fn;
+
+        return new DisposableAction(() => viewModel.PropertyChanged -= fn);
+    }
+
     /// <summary>
     ///   Returns an observable which is triggered every time when any of the view model properties
     ///   defined in the <paramref name="propertyAccessors"/> parameter have changed in the instance
