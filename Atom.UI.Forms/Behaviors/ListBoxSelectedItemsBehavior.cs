@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Specialized;
+using System.Reactive.Disposables;
 using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
 
@@ -10,14 +12,10 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
         nameof(SelectedItems),
         typeof(IList),
         typeof(ListBoxSelectedItemsBehavior),
-        new PropertyMetadata(OnSelectedItemsChanged));
-    private bool _isUpdating = false;
+        new PropertyMetadata(OnSelectedItemsPropertyChanged));
 
-    public IList SelectedItems
-    {
-        get { return (IList)GetValue(SelectedItemsProperty); }
-        set { SetValue(SelectedItemsProperty, value); }
-    }
+    private CompositeDisposable _subscriptions = new();
+    private bool _isUpdating = false;
 
     protected override void OnAttached()
     {
@@ -29,6 +27,9 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
     protected override void OnDetaching()
     {
         AssociatedObject.SelectionChanged -= OnListBoxSelectionChanged;
+
+        _subscriptions.Dispose();
+        _subscriptions = new();
 
         base.OnDetaching();
     }
@@ -49,7 +50,7 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
         }
     }
 
-    private static void OnSelectedItemsChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+    private static void OnSelectedItemsPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
     {
         if (args.NewValue is not IList list)
         {
@@ -57,6 +58,7 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
         }
 
         var behavior = (ListBoxSelectedItemsBehavior)obj;
+
         behavior._isUpdating = true;
         try
         {
@@ -70,5 +72,53 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
         {
             behavior._isUpdating = false;
         }
+
+        if (list is INotifyCollectionChanged observableCollection)
+        {
+            behavior.AttachToObservableCollection(observableCollection);
+        }
+    }
+
+    private void AttachToObservableCollection(INotifyCollectionChanged observableCollection)
+    {
+        _subscriptions.Add(observableCollection.WhenCollectionChanged()
+            .Subscribe(args =>
+            {
+                if (_isUpdating)
+                {
+                    return;
+                }
+
+                _isUpdating = true;
+
+                if (args.NewItems is not null)
+                {
+                    foreach (var item in args.NewItems)
+                    {
+                        AssociatedObject.SelectedItems.Add(item);
+                    }
+                }
+
+                if (args.OldItems is not null && args.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (var item in args.OldItems)
+                    {
+                        AssociatedObject.SelectedItems.Remove(item);
+                    }
+                }
+
+                if (args.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    AssociatedObject.SelectedItems.Clear();
+                }
+
+                _isUpdating = false;
+            }));
+    }
+
+    public IList SelectedItems
+    {
+        get { return (IList)GetValue(SelectedItemsProperty); }
+        set { SetValue(SelectedItemsProperty, value); }
     }
 }
