@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,6 +9,8 @@ namespace Genius.Atom.UI.Forms.Behaviors;
 
 // NOTE: This implementation was originally taken here:
 //       https://github.com/markjulmar/mvvmhelpers/blob/master/Julmar.Wpf.Helpers/Julmar.Wpf.Behaviors/Interactivity/MultiSelectTreeViewBehavior.cs
+// UPD 2022-Dec-28: Added binding between ObservableCollection<> and IsSelected property.
+// UPD 2022-Dec-28: Handling item removal from the TreeView.
 
 /// <summary>
 ///   Behavior to support multi-select in a traditional WPF TreeView control.
@@ -24,12 +27,15 @@ namespace Genius.Atom.UI.Forms.Behaviors;
 public class TreeViewMultiSelectBehavior : Behavior<TreeView>
 {
     private TreeViewItem? _anchorItem;
+    private IDisposable? _subscription;
+    private bool _updateSuspended = false;
 
     /// <summary>
     ///   Selected Items collection.
     /// </summary>
     public static readonly DependencyProperty SelectedItemsProperty =
-        DependencyProperty.Register(nameof(SelectedItems), typeof(IList), typeof(TreeViewMultiSelectBehavior), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(SelectedItems), typeof(IList), typeof(TreeViewMultiSelectBehavior),
+        new PropertyMetadata(OnSelectedItemsPropertyChanged));
 
     /// <summary>
     ///   Selected Items collection (intended to be data bound).
@@ -88,6 +94,9 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
         AssociatedObject.RemoveHandler(UIElement.KeyDownEvent, new KeyEventHandler(OnKeyDown));
         AssociatedObject.RemoveHandler(TreeViewItem.UnselectedEvent, new RoutedEventHandler(OnTreeViewItemUnselected));
         AssociatedObject.RemoveHandler(TreeViewItem.SelectedEvent, new RoutedEventHandler(OnTreeViewItemSelected));
+
+        _subscription?.Dispose();
+
         base.OnDetaching();
     }
 
@@ -138,6 +147,61 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
         }
     }
 
+    private static void OnSelectedItemsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
+    {
+        var behavior = (TreeViewMultiSelectBehavior)d;
+        behavior.SubscribeToCollectionEvents();
+    }
+
+    private void SubscribeToCollectionEvents()
+    {
+        if (SelectedItems is not INotifyCollectionChanged observableCollection)
+        {
+            return;
+        }
+
+        _subscription?.Dispose();
+        _subscription = observableCollection.WhenCollectionChanged()
+            .Subscribe(args =>
+            {
+                if (_updateSuspended)
+                {
+                    return;
+                }
+
+                _updateSuspended = true;
+
+                var treeViewItems = GetExpandedTreeViewItems().ToList();
+
+                SelectItems(args.NewItems, true);
+                SelectItems(args.OldItems, false);
+
+                if (args.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    foreach (var treeViewItem in treeViewItems)
+                    {
+                        SetIsSelected(treeViewItem, false);
+                    }
+                }
+
+                _updateSuspended = false;
+
+                void SelectItems(IList? items, bool isSelected)
+                {
+                    if (items is null) return;
+
+                    foreach (var item in items)
+                    {
+                        var treeViewItem = treeViewItems!.Find(x => x.DataContext == item);
+                        if (treeViewItem is not null)
+                        {
+                            SetIsSelected(treeViewItem, isSelected);
+                        }
+                    }
+                }
+            });
+    }
+
     /// <summary>
     ///   Locates the <see cref="TreeView"/> parent for a given <see cref="TreeViewItem"/>.
     /// </summary>
@@ -154,18 +218,28 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
         TreeView tree = GetTree(item);
         Debug.Assert(tree is not null);
 
-        var msb = Interaction.GetBehaviors(tree).OfType<TreeViewMultiSelectBehavior>().SingleOrDefault();
-        if (msb is null || msb.SelectedItems is null)
+        var behavior = Interaction.GetBehaviors(tree).OfType<TreeViewMultiSelectBehavior>().SingleOrDefault();
+        if (behavior is null || behavior.SelectedItems is null)
         {
             return;
         }
 
         var isSelected = GetIsSelected(item);
         var value = item.DataContext ?? item;
-        if (isSelected)
-            msb.SelectedItems.Add(value);
-        else
-            msb.SelectedItems.Remove(value);
+
+        if (!behavior._updateSuspended)
+        {
+            behavior._updateSuspended = true;
+            if (isSelected)
+            {
+                behavior.SelectedItems.Add(value);
+            }
+            else
+            {
+                behavior.SelectedItems.Remove(value);
+            }
+            behavior._updateSuspended = false;
+        }
 
         if (value is ISelectable selectableValue)
         {
@@ -248,8 +322,14 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
     /// </summary>
     private void SingleSelect(TreeViewItem item)
     {
-        foreach (TreeViewItem selectedItem in GetExpandedTreeViewItems().Where(ti => ti is not null))
+        foreach (TreeViewItem selectedItem in GetExpandedTreeViewItems())
             SetIsSelected(selectedItem, selectedItem == item);
+
+        while (SelectedItems.Count > 1)
+        {
+            // Handle item removed
+            SelectedItems.RemoveAt(0);
+        }
 
         _anchorItem = item;
     }

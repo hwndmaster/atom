@@ -47,9 +47,15 @@ public class DataGridSelectedItemsBehavior : Behavior<DataGrid>
     {
         _subscription?.Dispose();
         _subscription = SelectedItems.WhenCollectionChanged()
-            .Where(_ => !_updateSuspended)
             .Subscribe(args =>
             {
+                if (_updateSuspended)
+                {
+                    return;
+                }
+
+                _updateSuspended = true;
+
                 if (args.NewItems is not null)
                 {
                     foreach (var item in args.NewItems)
@@ -64,6 +70,12 @@ public class DataGridSelectedItemsBehavior : Behavior<DataGrid>
                         AssociatedObject.SelectedItems.Remove(item);
                     }
                 }
+                if (args.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    AssociatedObject.SelectedItems.Clear();
+                }
+
+                _updateSuspended = false;
             });
     }
 
