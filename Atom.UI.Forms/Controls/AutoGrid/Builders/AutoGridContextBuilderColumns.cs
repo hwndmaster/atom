@@ -8,8 +8,11 @@ public interface IAutoGridContextBuilderColumns<TViewModel>
 {
     IAutoGridContextBuilderColumns<TViewModel> AddText<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderTextColumn>? options = null);
     IAutoGridContextBuilderColumns<TViewModel> AddText(string propertyName, Action<IAutoGridContextBuilderTextColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn>? options = null)
+        where TProperty : IActionCommand;
     IAutoGridContextBuilderColumns<TViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(Expression<Func<TViewModel, bool>> propertyAccessor, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(string propertyName, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null);
     IAutoGridContextBuilderColumns<TViewModel> AddView<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderViewColumn>? options = null);
     IAutoGridContextBuilderColumns<TViewModel> AddView(string propertyName, Action<IAutoGridContextBuilderViewColumn>? options = null);
     IAutoGridContextBuilderColumns<TViewModel> AddAll();
@@ -39,10 +42,17 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
         => AddColumnInternal(pd => new AutoGridContextBuilderComboBoxColumn(pd), propertyName, options);
 
     public IAutoGridContextBuilderColumns<TViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn>? options = null)
+        where TProperty : IActionCommand
         => AddCommand(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
 
     public IAutoGridContextBuilderColumns<TViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn>? options = null)
         => AddColumnInternal(pd => new AutoGridContextBuilderCommandColumn(pd), propertyName, options);
+
+    public IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(Expression<Func<TViewModel, bool>> propertyAccessor, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null)
+        => AddToggleButton(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(string propertyName, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderToggleButtonColumn(pd), propertyName, options);
 
     public IAutoGridContextBuilderColumns<TViewModel> AddView<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderViewColumn>? options = null)
         => AddView(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
@@ -64,7 +74,12 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
     {
         return _columnBuilders
             .Cast<IHasBuildColumnContext>()
-            .Select(x => x.Build())
+            .Select((x, index) =>
+            {
+                var columnContext = x.Build();
+                columnContext.DisplayIndex = index;
+                return columnContext;
+            })
             .ToArray();
     }
 

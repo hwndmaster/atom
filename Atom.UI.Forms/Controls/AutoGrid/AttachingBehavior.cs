@@ -19,6 +19,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             // Column type changers:
             new ColumnTagEditorBehavior(),
             new ColumnButtonBehavior(),
+            new ColumnToggleButtonBehavior(),
             new ColumnWithImageBehavior(),
             new ColumnComboBoxBehavior(),
             new ColumnAttachedViewBehavior(),
@@ -36,7 +37,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             // Misc:
             new ColumnHeaderNameBehavior(),
             new ColumnReadOnlyBehavior(),
-            new ColumnAutoWidthBehavior()
+            new ColumnAutoWidthBehavior(),
+            new ColumnDisplayIndexBehavior()
         };
     }
 

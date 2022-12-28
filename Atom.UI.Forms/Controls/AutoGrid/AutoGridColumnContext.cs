@@ -22,6 +22,7 @@ public sealed class AutoGridColumnContext
     public DataGridAutoGeneratingColumnEventArgs Args { get; }
     public AutoGridBuildColumnContext BuildColumn { get; }
     public AutoGridBuildCommandColumnContext? BuildCommandColumn => BuildColumn as AutoGridBuildCommandColumnContext;
+    public AutoGridBuildToggleButtonColumnContext? BuildToggleButtonColumn => BuildColumn as AutoGridBuildToggleButtonColumnContext;
     public AutoGridBuildTextColumnContext? BuildTextColumn => BuildColumn as AutoGridBuildTextColumnContext;
     public AutoGridBuildViewColumnContext? BuildViewColumn => BuildColumn as AutoGridBuildViewColumnContext;
 

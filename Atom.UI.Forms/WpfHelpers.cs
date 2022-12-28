@@ -2,13 +2,16 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using Genius.Atom.UI.Forms.Behaviors;
 using Genius.Atom.UI.Forms.Controls.TagEditor;
 using Genius.Atom.UI.Forms.WpfBuilders;
 using MahApps.Metro.Controls;
+using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms;
 
@@ -56,15 +59,9 @@ public static class WpfHelpers
         buttonFactory.SetBinding(Button.CommandProperty, new Binding(commandPath));
         buttonFactory.SetValue(Button.ToolTipProperty, caption);
         buttonFactory.SetValue(Button.BorderThicknessProperty, new Thickness(0));
-        if (styling is not null)
-        {
-            if (styling.HorizontalAlignment is not null)
-                buttonFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, styling.HorizontalAlignment);
-            if (styling.Margin is not null)
-                buttonFactory.SetValue(FrameworkElement.MarginProperty, styling.Margin);
-            if (styling.Padding is not null)
-                buttonFactory.SetValue(Control.PaddingProperty, styling.Padding);
-        }
+
+        SetStyling(buttonFactory, styling);
+
         if (iconName is not null)
         {
             var imageFactory = new FrameworkElementFactory(typeof(Image));
@@ -79,6 +76,65 @@ public static class WpfHelpers
         return new DataGridTemplateColumn
         {
             CellTemplate = new DataTemplate { VisualTree = buttonFactory }
+        };
+    }
+
+    internal static DataGridTemplateColumn CreateToggleSwitchColumn(string propertyPath, string? iconForTrue, string? iconForFalse, StylingRecord? styling = null)
+    {
+        FrameworkElementFactory elementFactory;
+
+        if (iconForTrue is not null && iconForFalse is not null)
+        {
+            elementFactory = new FrameworkElementFactory(typeof(ToggleButton));
+            elementFactory.SetBinding(ToggleButton.IsCheckedProperty, new Binding(propertyPath)
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+            elementFactory.SetValue(ToggleButton.WidthProperty, 22d);
+            elementFactory.SetValue(ToggleButton.HeightProperty, 22d);
+            elementFactory.SetValue(Button.BorderThicknessProperty, new Thickness(0));
+
+            var iconForTrueResource = Application.Current.FindResource(iconForTrue);
+            var iconForFalseResource = Application.Current.FindResource(iconForFalse);
+
+            var imageFactory = new FrameworkElementFactory(typeof(Image));
+            imageFactory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(OnImageLoaded));
+            elementFactory.AppendChild(imageFactory);
+
+            void OnImageLoaded(object sender, RoutedEventArgs args)
+            {
+                var imageElement = (Image)sender;
+                var behavior = new ImageConditionalSourceBehavior
+                {
+                    WhenTrue = iconForTrueResource,
+                    WhenFalse = iconForFalseResource
+                };
+                BindingOperations.SetBinding(behavior, ImageConditionalSourceBehavior.FlagValueProperty, new Binding(propertyPath));
+                Interaction.GetBehaviors(imageElement).Add(behavior);
+            }
+        }
+        else
+        {
+            elementFactory = new FrameworkElementFactory(typeof(ToggleSwitch));
+            elementFactory.SetBinding(ToggleSwitch.IsOnProperty, new Binding(propertyPath)
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+            elementFactory.SetValue(ToggleSwitch.OnContentProperty, string.Empty);
+            elementFactory.SetValue(ToggleSwitch.OffContentProperty, string.Empty);
+            elementFactory.SetValue(FrameworkElement.MinWidthProperty, 22d);
+        }
+
+        var caption = Helpers.MakeCaptionFromPropertyName(propertyPath);
+        elementFactory.SetValue(FrameworkElement.ToolTipProperty, caption);
+
+        SetStyling(elementFactory, styling);
+
+        return new DataGridTemplateColumn
+        {
+            CellTemplate = new DataTemplate { VisualTree = elementFactory }
         };
     }
 
@@ -269,5 +325,17 @@ public static class WpfHelpers
         }
 
         return null;
+    }
+
+    private static void SetStyling(FrameworkElementFactory elementFactory, StylingRecord? styling)
+    {
+        if (styling is null) return;
+
+        if (styling.HorizontalAlignment is not null)
+            elementFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, styling.HorizontalAlignment);
+        if (styling.Margin is not null)
+            elementFactory.SetValue(FrameworkElement.MarginProperty, styling.Margin);
+        if (styling.Padding is not null)
+            elementFactory.SetValue(Control.PaddingProperty, styling.Padding);
     }
 }

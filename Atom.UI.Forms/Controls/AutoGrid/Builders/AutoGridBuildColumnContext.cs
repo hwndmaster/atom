@@ -16,6 +16,7 @@ public abstract class AutoGridBuildColumnContext
 
     public PropertyDescriptor Property { get; }
     public string DisplayName { get; }
+    public int? DisplayIndex { get; internal set; }
     public bool AutoWidth { get; init; }
     public bool IsReadOnly { get; init; }
     public string? ToolTipPath { get; init; }
