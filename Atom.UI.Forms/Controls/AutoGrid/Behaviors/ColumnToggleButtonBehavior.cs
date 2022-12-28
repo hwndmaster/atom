@@ -13,6 +13,6 @@ internal sealed class ColumnToggleButtonBehavior : IAutoGridColumnBehavior
         var iconForTrue = context.BuildToggleButtonColumn.IconForTrue;
         var iconForFalse = context.BuildToggleButtonColumn.IconForFalse;
 
-        context.Args.Column = WpfHelpers.CreateToggleSwitchColumn(context.Property.Name, iconForTrue, iconForFalse, context.BuildCommandColumn?.Style);
+        context.Args.Column = WpfHelpers.CreateToggleSwitchColumn(context.Property.Name, iconForTrue, iconForFalse, context.BuildColumn.Style);
     }
 }
