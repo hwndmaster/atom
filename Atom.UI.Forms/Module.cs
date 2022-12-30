@@ -6,6 +6,7 @@ using Genius.Atom.Infrastructure.Events;
 using Genius.Atom.Infrastructure.Logging;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.ViewModels;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms;
@@ -30,6 +31,9 @@ public static class Module
         services.AddTransient<IAtomViewModelFactory, ViewModelFactory>();
         services.AddTransient<IUserInteraction, UserInteraction>();
         services.AddSingleton<IUiDispatcher>(new UiDispatcher(application));
+
+        // Third-party:
+        services.AddTransient<IDialogCoordinator, DialogCoordinator>();
     }
 
     public static void Initialize(IServiceProvider serviceProvider)
