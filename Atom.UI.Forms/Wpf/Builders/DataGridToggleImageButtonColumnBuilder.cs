@@ -2,10 +2,9 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Behaviors;
-using MahApps.Metro.Controls;
 using Microsoft.Xaml.Behaviors;
 
-namespace Genius.Atom.UI.Forms.WpfBuilders;
+namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
 internal sealed class DataGridToggleImageButtonColumnBuilder : DataGridColumnBuilder
 {
@@ -51,7 +50,7 @@ internal sealed class DataGridToggleImageButtonColumnBuilder : DataGridColumnBui
             Interaction.GetBehaviors(imageElement).Add(behavior);
         }
 
-        SetStyling(elementFactory, _cellStyling);
+        StylingHelpers.SetStyling(elementFactory, _cellStyling);
 
         var caption = Helpers.MakeCaptionFromPropertyName(_valuePath);
         elementFactory.SetValue(FrameworkElement.ToolTipProperty, caption);

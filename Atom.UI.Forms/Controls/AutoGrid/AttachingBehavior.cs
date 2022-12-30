@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
+using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
@@ -180,7 +181,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             BasedOn = (Style) AssociatedObject.FindResource("MahApps.Styles.DataGridRow")
         };
 
-        WpfHelpers.CopyStyle(AssociatedObject.RowStyle, rowStyle);
+        StylingHelpers.CopyStyle(AssociatedObject.RowStyle, rowStyle);
 
         AssociatedObject.RowStyle = rowStyle;
     }

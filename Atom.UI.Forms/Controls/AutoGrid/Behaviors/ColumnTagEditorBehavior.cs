@@ -1,6 +1,8 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using Genius.Atom.UI.Forms.Controls.TagEditor;
+using Genius.Atom.UI.Forms.Wpf;
+using Genius.Atom.UI.Forms.Wpf.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
@@ -13,10 +15,9 @@ internal sealed class ColumnTagEditorBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        context.Args.Column = WpfHelpers.CreateTagEditorColumn(context.Property.Name,
-            context.Property.Name);
-
-        context.Args.Column.SortMemberPath = context.Property.Name;
+        context.Args.Column = DataGridColumnBuilder.ForValuePath(context.Property.Name)
+            .RenderAsTagEditor()
+            .Build();
 
         context.DataGrid.CellEditEnding += (object? sender, DataGridCellEditEndingEventArgs args) => {
             if (args.Column == context.Args.Column)

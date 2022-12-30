@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Data;
-using Genius.Atom.UI.Forms.WpfBuilders;
+using Genius.Atom.UI.Forms.Wpf;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 

@@ -3,7 +3,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using WpfAnimatedGif;
 
-namespace Genius.Atom.UI.Forms.WpfBuilders;
+namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
 internal sealed class DataGridTextWithImageColumnBuilder : DataGridColumnBuilder
 {

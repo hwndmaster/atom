@@ -1,5 +1,7 @@
 using System.Collections;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
+using Genius.Atom.UI.Forms.Wpf;
+using Genius.Atom.UI.Forms.Wpf.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
@@ -26,13 +28,13 @@ internal sealed class ColumnComboBoxBehavior : IAutoGridColumnBehavior
         }
         else
         {
-            var builder = WpfBuilders.DataGridColumnBuilder
+            var builder = DataGridColumnBuilder
                 .ForValuePath(context.Property.Name)
                 .WithComboEditor(comboBoxContext.CollectionPropertyName);
 
             if (context.Property.PropertyType == typeof(ITitledItemWithImageViewModel))
             {
-                builder = builder.WithImageSource($"{context.Property.Name}.{nameof(ITitledItemWithImageViewModel.Image)}");
+                builder = builder.RenderAsTextWithImage($"{context.Property.Name}.{nameof(ITitledItemWithImageViewModel.Image)}");
             }
 
             context.Args.Column = builder.Build();

@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace Genius.Atom.UI.Forms.WpfBuilders;
+namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
 internal sealed class DataGridViewContentColumnBuilder : DataGridColumnBuilder
 {

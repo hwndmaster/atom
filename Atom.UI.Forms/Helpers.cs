@@ -3,8 +3,10 @@ using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms;
 
-internal static class Helpers
+internal static partial class Helpers
 {
+    private static readonly Regex _captionFromPropertyNameRegex = CaptionFromPropertyNameRegex();
+
     public static Type GetListItemType(object value)
     {
         if (value is ListCollectionView listCollectionView)
@@ -18,6 +20,9 @@ internal static class Helpers
 
     public static string MakeCaptionFromPropertyName(string propertyName)
     {
-        return Regex.Replace(propertyName, "(?<=[^$])([A-Z])", " $1");
+        return _captionFromPropertyNameRegex.Replace(propertyName, " $1");
     }
+
+    [GeneratedRegex("(?<=[^$])([A-Z])")]
+    private static partial Regex CaptionFromPropertyNameRegex();
 }

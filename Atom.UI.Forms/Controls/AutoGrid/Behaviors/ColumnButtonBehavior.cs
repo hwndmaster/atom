@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using Genius.Atom.UI.Forms.Wpf.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
@@ -13,6 +14,9 @@ internal sealed class ColumnButtonBehavior : IAutoGridColumnBehavior
 
         var icon = context.BuildCommandColumn?.Icon;
 
-        context.Args.Column = WpfHelpers.CreateButtonColumn(context.Property.Name, context.BuildColumn.Style, icon);
+        context.Args.Column = DataGridColumnBuilder.ForValuePath(context.Property.Name)
+            .WithCellStyling(context.BuildColumn.Style)
+            .RenderAsButton(icon)
+            .Build();
     }
 }

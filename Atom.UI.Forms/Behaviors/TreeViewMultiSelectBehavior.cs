@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms.Behaviors;

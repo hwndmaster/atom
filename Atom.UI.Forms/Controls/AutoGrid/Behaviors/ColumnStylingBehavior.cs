@@ -1,3 +1,5 @@
+using Genius.Atom.UI.Forms.Wpf;
+
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
 internal sealed class ColumnStylingBehavior : IAutoGridColumnBehavior
@@ -10,6 +12,12 @@ internal sealed class ColumnStylingBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        WpfHelpers.SetCellHorizontalAlignment(context.Args.Column, style.HorizontalAlignment ?? HorizontalAlignment.Left);
+        if (style.HorizontalAlignment is null)
+        {
+            style = style with { HorizontalAlignment = HorizontalAlignment.Left };
+        }
+
+        StylingHelpers.EnsureDefaultCellStyle(context.Args.Column);
+        StylingHelpers.SetStyling(context.Args.Column.CellStyle, style);
     }
 }

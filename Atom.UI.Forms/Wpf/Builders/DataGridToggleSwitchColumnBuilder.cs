@@ -2,7 +2,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using MahApps.Metro.Controls;
 
-namespace Genius.Atom.UI.Forms.WpfBuilders;
+namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
 internal sealed class DataGridToggleSwitchColumnBuilder : DataGridColumnBuilder
 {
@@ -24,7 +24,7 @@ internal sealed class DataGridToggleSwitchColumnBuilder : DataGridColumnBuilder
         elementFactory.SetValue(ToggleSwitch.OffContentProperty, string.Empty);
         elementFactory.SetValue(FrameworkElement.MinWidthProperty, 22d);
 
-        SetStyling(elementFactory, _cellStyling);
+        StylingHelpers.SetStyling(elementFactory, _cellStyling);
 
         var caption = Helpers.MakeCaptionFromPropertyName(_valuePath);
         elementFactory.SetValue(FrameworkElement.ToolTipProperty, caption);

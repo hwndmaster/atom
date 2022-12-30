@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 
-namespace Genius.Atom.UI.Forms;
+namespace Genius.Atom.UI.Forms.Wpf;
 
 [ExcludeFromCodeCoverage]
 public static class WpfExtensions

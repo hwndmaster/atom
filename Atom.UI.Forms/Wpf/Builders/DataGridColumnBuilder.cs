@@ -1,7 +1,8 @@
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
-namespace Genius.Atom.UI.Forms.WpfBuilders;
+namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
 internal class DataGridColumnBuilder
 {
@@ -54,22 +55,32 @@ internal class DataGridColumnBuilder
         return this;
     }
 
-    public DataGridTextWithImageColumnBuilder WithImageSource(string imageSource)
+    public DataGridButtonColumnBuilder RenderAsButton(string? imagePath)
+    {
+        return new DataGridButtonColumnBuilder(this, imagePath);
+    }
+
+    public DataGridTagEditorColumnBuilder RenderAsTagEditor()
+    {
+        return new DataGridTagEditorColumnBuilder(this);
+    }
+
+    public DataGridTextWithImageColumnBuilder RenderAsTextWithImage(string imageSource)
     {
         return new DataGridTextWithImageColumnBuilder(this, imageSource);
     }
 
-    public DataGridToggleImageButtonColumnBuilder WithToggleImageButton(string imageForTrue, string imageForFalse)
+    public DataGridToggleImageButtonColumnBuilder RenderAsToggleImageButton(string imageForTrue, string imageForFalse)
     {
         return new DataGridToggleImageButtonColumnBuilder(this, imageForTrue, imageForFalse);
     }
 
-    public DataGridToggleSwitchColumnBuilder WithToggleSwitch()
+    public DataGridToggleSwitchColumnBuilder RenderAsToggleSwitch()
     {
         return new DataGridToggleSwitchColumnBuilder(this);
     }
 
-    public DataGridViewContentColumnBuilder WithViewContent(Type viewType)
+    public DataGridViewContentColumnBuilder RenderAsViewContent(Type viewType)
     {
         return new DataGridViewContentColumnBuilder(this, viewType);
     }
@@ -112,18 +123,6 @@ internal class DataGridColumnBuilder
         };
     }
 
-    protected static void SetStyling(FrameworkElementFactory elementFactory, StylingRecord? styling)
-    {
-        if (styling is null) return;
-
-        if (styling.HorizontalAlignment is not null)
-            elementFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, styling.HorizontalAlignment);
-        if (styling.Margin is not null)
-            elementFactory.SetValue(FrameworkElement.MarginProperty, styling.Margin);
-        if (styling.Padding is not null)
-            elementFactory.SetValue(Control.PaddingProperty, styling.Padding);
-    }
-
     private static DataTemplate CreateTextTemplate(Binding bindToValue)
     {
         var textFactory = new FrameworkElementFactory(typeof(TextBlock));
@@ -136,9 +135,9 @@ internal class DataGridColumnBuilder
         var bindToItemsSource = new Binding(_itemsSourcePath);
 
         var comboFactory = new FrameworkElementFactory(typeof(ComboBox));
-        comboFactory.SetValue(ComboBox.IsTextSearchEnabledProperty, true);
-        comboFactory.SetBinding(ComboBox.SelectedItemProperty, bindToValue);
-        comboFactory.SetBinding(ComboBox.ItemsSourceProperty, bindToItemsSource);
+        comboFactory.SetValue(ItemsControl.IsTextSearchEnabledProperty, true);
+        comboFactory.SetBinding(Selector.SelectedItemProperty, bindToValue);
+        comboFactory.SetBinding(ItemsControl.ItemsSourceProperty, bindToItemsSource);
 
         return new DataTemplate { VisualTree = comboFactory };
     }

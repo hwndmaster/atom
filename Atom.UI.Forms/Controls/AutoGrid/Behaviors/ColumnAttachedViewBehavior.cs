@@ -1,4 +1,4 @@
-using Genius.Atom.UI.Forms.WpfBuilders;
+using Genius.Atom.UI.Forms.Wpf.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
@@ -14,7 +14,7 @@ internal sealed class ColumnAttachedViewBehavior : IAutoGridColumnBehavior
 
         context.Args.Column = DataGridColumnBuilder
             .ForValuePath(context.Property.Name)
-            .WithViewContent(attachedViewType)
+            .RenderAsViewContent(attachedViewType)
             .Build();
     }
 }

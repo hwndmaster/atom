@@ -1,3 +1,5 @@
+using Genius.Atom.UI.Forms.Wpf.Builders;
+
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
 internal sealed class ColumnWithImageBehavior : IAutoGridColumnBehavior
@@ -10,9 +12,9 @@ internal sealed class ColumnWithImageBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        context.Args.Column = WpfBuilders.DataGridColumnBuilder
+        context.Args.Column = DataGridColumnBuilder
             .ForValuePath(context.Property.Name)
-            .WithImageSource(iconSource.IconPropertyPath)
+            .RenderAsTextWithImage(iconSource.IconPropertyPath)
             .WithImageSize(iconSource.FixedSize)
             .WithTextHidden(iconSource.HideText)
             .Build();

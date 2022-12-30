@@ -32,7 +32,7 @@ public sealed class TagItemViewModel : ViewModelBase, ITagItemViewModel
 
         var color = _refColors[index % _refColors.Length];
         Color = new SolidColorBrush(color);
-        AltColor = new SolidColorBrush(WpfHelpers.ChangeColorBrightness(color, -0.5f));
+        AltColor = new SolidColorBrush(ColorHelpers.ChangeColorBrightness(color, -0.5f));
     }
 
     public TagItemViewModel(ITagItemViewModel reference)
