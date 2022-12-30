@@ -12,6 +12,11 @@ public sealed class TestFileService : IFileService
         _files.Add(path, content);
     }
 
+    public void EnsureDirectory(string? path)
+    {
+        // Do nothing.
+    }
+
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern, EnumerationOptions options)
     {
         return _files

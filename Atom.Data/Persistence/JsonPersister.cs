@@ -94,6 +94,7 @@ internal sealed class JsonPersister : IJsonPersister
         _locker.EnterWriteLock();
         try
         {
+            _io.EnsureDirectory(Path.GetDirectoryName(filePath));
             var json = JsonSerializer.Serialize(data, _jsonOptions);
             _io.WriteTextToFile(filePath, json);
         }

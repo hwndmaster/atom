@@ -4,6 +4,12 @@ namespace Genius.Atom.Infrastructure.Io;
 
 public interface IFileService
 {
+    /// <summary>
+    ///   Creates a directory at the specified <paramref name="path"/> if it was not exist.
+    /// </summary>
+    /// <param name="path">The directory path to check existence and create.</param>
+    void EnsureDirectory(string? path);
+
     /// <inheritdoc cref="Directory.EnumerateFiles(string, string, EnumerationOptions)"/>
     IEnumerable<string> EnumerateFiles(string path, string searchPattern, EnumerationOptions options);
 
@@ -29,6 +35,17 @@ public interface IFileService
 [ExcludeFromCodeCoverage]
 internal sealed class FileService : IFileService
 {
+    public void EnsureDirectory(string? path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+    }
+
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern, EnumerationOptions options)
         => Directory.EnumerateFiles(path, searchPattern, options);
 
