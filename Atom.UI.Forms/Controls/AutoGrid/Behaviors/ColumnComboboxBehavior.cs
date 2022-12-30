@@ -26,15 +26,16 @@ internal sealed class ColumnComboBoxBehavior : IAutoGridColumnBehavior
         }
         else
         {
-            context.Args.Column = WpfBuilders.DataGridColumnBuilder
+            var builder = WpfBuilders.DataGridColumnBuilder
                 .ForValuePath(context.Property.Name)
-                .WithComboEditor(comboBoxContext.CollectionPropertyName)
-                .WithImageSource(
-                    context.Property.PropertyType == typeof(ITitledItemWithImageViewModel)
-                        ? $"{context.Property.Name}.{nameof(ITitledItemWithImageViewModel.Image)}"
-                        : null
-                )
-                .Build();
+                .WithComboEditor(comboBoxContext.CollectionPropertyName);
+
+            if (context.Property.PropertyType == typeof(ITitledItemWithImageViewModel))
+            {
+                builder = builder.WithImageSource($"{context.Property.Name}.{nameof(ITitledItemWithImageViewModel.Image)}");
+            }
+
+            context.Args.Column = builder.Build();
         }
     }
 }

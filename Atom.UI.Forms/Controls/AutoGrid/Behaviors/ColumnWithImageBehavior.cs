@@ -12,7 +12,9 @@ internal sealed class ColumnWithImageBehavior : IAutoGridColumnBehavior
 
         context.Args.Column = WpfBuilders.DataGridColumnBuilder
             .ForValuePath(context.Property.Name)
-            .WithImageSource(iconSource.IconPropertyPath, iconSource.FixedSize, iconSource.HideText)
+            .WithImageSource(iconSource.IconPropertyPath)
+            .WithImageSize(iconSource.FixedSize)
+            .WithTextHidden(iconSource.HideText)
             .Build();
     }
 }

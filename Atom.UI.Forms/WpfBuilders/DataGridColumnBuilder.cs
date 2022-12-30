@@ -1,19 +1,24 @@
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media.Imaging;
-using WpfAnimatedGif;
 
 namespace Genius.Atom.UI.Forms.WpfBuilders;
 
-internal sealed class DataGridColumnBuilder
+internal class DataGridColumnBuilder
 {
-    private readonly string _valuePath;
+    protected readonly string _valuePath;
+    protected StylingRecord? _cellStyling;
+    private string? _title;
     private IValueConverter? _converter;
     private string? _itemsSourcePath;
-    private string? _imageSource;
-    private double _imageSize;
-    private bool _hideText;
-    private Type? _viewType;
+
+    protected DataGridColumnBuilder(DataGridColumnBuilder parent)
+    {
+        _valuePath = parent._valuePath;
+        _title = parent._title;
+        _converter = parent._converter;
+        _itemsSourcePath = parent._itemsSourcePath;
+        _cellStyling = parent._cellStyling;
+    }
 
     private DataGridColumnBuilder(string valuePath)
     {
@@ -37,50 +42,86 @@ internal sealed class DataGridColumnBuilder
         return this;
     }
 
-    public DataGridColumnBuilder WithImageSource(string? imageSource, double? imageSize = null, bool hideText = false)
+    public DataGridColumnBuilder WithCellStyling(StylingRecord? styling)
     {
-        if (imageSource is null)
-            return this;
-        _imageSource = imageSource;
-        _imageSize = imageSize ?? 16;
-        _hideText = hideText;
+        _cellStyling = styling;
         return this;
     }
 
-    public DataGridColumnBuilder WithViewContent(Type viewType)
+    public DataGridColumnBuilder WithTitle(string title)
     {
-        _viewType = viewType;
+        _title = title;
         return this;
     }
 
-    public DataGridTemplateColumn Build()
+    public DataGridTextWithImageColumnBuilder WithImageSource(string imageSource)
     {
-        var column = new DataGridTemplateColumn {
-            Header = _valuePath,
-            SortMemberPath = _valuePath
-        };
+        return new DataGridTextWithImageColumnBuilder(this, imageSource);
+    }
 
-        var bindToValue = new Binding(_valuePath);
-        if (_converter is not null || _itemsSourcePath is not null)
-            bindToValue.Converter = _converter ?? new PropertyValueStringConverter(null);
+    public DataGridToggleImageButtonColumnBuilder WithToggleImageButton(string imageForTrue, string imageForFalse)
+    {
+        return new DataGridToggleImageButtonColumnBuilder(this, imageForTrue, imageForFalse);
+    }
 
-        if (_viewType is not null)
+    public DataGridToggleSwitchColumnBuilder WithToggleSwitch()
+    {
+        return new DataGridToggleSwitchColumnBuilder(this);
+    }
+
+    public DataGridViewContentColumnBuilder WithViewContent(Type viewType)
+    {
+        return new DataGridViewContentColumnBuilder(this, viewType);
+    }
+
+    public virtual DataGridTemplateColumn Build()
+    {
+        var column = CreateColumn();
+        var binding = CreateBinding();
+
+        column.CellTemplate = CreateTextTemplate(binding);
+
+        if (_itemsSourcePath is not null)
         {
-            var viewContentFactory = new FrameworkElementFactory(_viewType);
-            viewContentFactory.SetBinding(FrameworkElement.DataContextProperty, bindToValue);
-            column.CellTemplate = new DataTemplate { VisualTree = viewContentFactory };
-        }
-        else
-        {
-            column.CellTemplate = _imageSource == null
-                ? CreateTextTemplate(bindToValue)
-                : CreateTextWithImageTemplate(bindToValue, hideText: _hideText);
-
-            if (_itemsSourcePath != null)
-                column.CellEditingTemplate = CreateComboEditor(bindToValue);
+            column.CellEditingTemplate = CreateComboEditor(binding);
         }
 
         return column;
+    }
+
+    protected Binding CreateBinding()
+    {
+        var binding = new Binding(_valuePath)
+        {
+            Converter = _converter ?? new PropertyValueStringConverter(null)
+        };
+
+        if (binding.Converter is null && _itemsSourcePath is not null)
+        {
+            binding.Converter = new PropertyValueStringConverter(null);
+        }
+
+        return binding;
+    }
+
+    protected DataGridTemplateColumn CreateColumn()
+    {
+        return new DataGridTemplateColumn {
+            Header = _title ?? Helpers.MakeCaptionFromPropertyName(_valuePath),
+            SortMemberPath = _valuePath
+        };
+    }
+
+    protected static void SetStyling(FrameworkElementFactory elementFactory, StylingRecord? styling)
+    {
+        if (styling is null) return;
+
+        if (styling.HorizontalAlignment is not null)
+            elementFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, styling.HorizontalAlignment);
+        if (styling.Margin is not null)
+            elementFactory.SetValue(FrameworkElement.MarginProperty, styling.Margin);
+        if (styling.Padding is not null)
+            elementFactory.SetValue(Control.PaddingProperty, styling.Padding);
     }
 
     private static DataTemplate CreateTextTemplate(Binding bindToValue)
@@ -88,52 +129,6 @@ internal sealed class DataGridColumnBuilder
         var textFactory = new FrameworkElementFactory(typeof(TextBlock));
         textFactory.SetBinding(TextBlock.TextProperty, bindToValue);
         return new DataTemplate { VisualTree = textFactory };
-    }
-
-    private DataTemplate CreateTextWithImageTemplate(Binding bindToValue,
-        string? imageTooltip = null,
-        bool imageIsPath = true,
-        string? imageVisibilityFlagPath = null,
-        bool hideText = false)
-    {
-        var stackPanelFactory = new FrameworkElementFactory(typeof(StackPanel));
-        stackPanelFactory.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
-
-        var imageFactory = new FrameworkElementFactory(typeof(Image));
-
-        if (imageIsPath)
-        {
-            imageFactory.SetBinding(ImageBehavior.AnimatedSourceProperty, new Binding(_imageSource) { Converter = new ImageSourceConverter() });
-            imageFactory.SetBinding(UIElement.VisibilityProperty, new Binding(_imageSource) { Converter = new NotNullToVisibilityConverter() });
-        }
-        else
-        {
-            imageFactory.SetValue(ImageBehavior.AnimatedSourceProperty, (BitmapImage)Application.Current.FindResource(_imageSource));
-        }
-
-        if (imageTooltip != null)
-            imageFactory.SetValue(Image.ToolTipProperty, imageTooltip);
-
-        if (imageVisibilityFlagPath != null)
-            imageFactory.SetValue(Image.VisibilityProperty, new Binding(imageVisibilityFlagPath) { Converter = new BooleanToVisibilityConverter() });
-
-        if (_imageSize != 0)
-        {
-            imageFactory.SetValue(Image.HeightProperty, _imageSize);
-            imageFactory.SetValue(Image.WidthProperty, _imageSize);
-        }
-
-        stackPanelFactory.AppendChild(imageFactory);
-
-        if (!hideText)
-        {
-            var textFactory = new FrameworkElementFactory(typeof(TextBlock));
-            textFactory.SetBinding(TextBlock.TextProperty, bindToValue);
-            textFactory.SetValue(Image.MarginProperty, new Thickness(5, 0, 0, 0));
-            stackPanelFactory.AppendChild(textFactory);
-        }
-
-        return new DataTemplate { VisualTree = stackPanelFactory };
     }
 
     private DataTemplate CreateComboEditor(Binding bindToValue)

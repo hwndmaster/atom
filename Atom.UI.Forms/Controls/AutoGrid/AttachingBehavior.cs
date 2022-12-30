@@ -175,9 +175,13 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
     private void AssignRowStyle()
     {
-        AssociatedObject.RowStyle = new Style {
+        var rowStyle = new Style {
             TargetType = typeof(DataGridRow),
             BasedOn = (Style) AssociatedObject.FindResource("MahApps.Styles.DataGridRow")
         };
+
+        WpfHelpers.CopyStyle(AssociatedObject.RowStyle, rowStyle);
+
+        AssociatedObject.RowStyle = rowStyle;
     }
 }

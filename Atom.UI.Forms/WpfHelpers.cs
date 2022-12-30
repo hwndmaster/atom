@@ -51,6 +51,22 @@ public static class WpfHelpers
         return element.FindVisualParent<T>();
     }
 
+    internal static void CopyStyle(Style styleFrom, Style styleTo)
+    {
+        foreach (var resourceKey in styleFrom.Resources.Keys)
+        {
+            styleTo.Resources.Add(resourceKey, styleFrom.Resources[resourceKey]);
+        }
+        foreach (var setter in styleFrom.Setters)
+        {
+            styleTo.Setters.Add(setter);
+        }
+        foreach (var trigger in styleFrom.Triggers)
+        {
+            styleTo.Triggers.Add(trigger);
+        }
+    }
+
     internal static DataGridTemplateColumn CreateButtonColumn(string commandPath, StylingRecord? styling, string? iconName)
     {
         var caption = Helpers.MakeCaptionFromPropertyName(commandPath.Replace("Command", ""));
@@ -76,65 +92,6 @@ public static class WpfHelpers
         return new DataGridTemplateColumn
         {
             CellTemplate = new DataTemplate { VisualTree = buttonFactory }
-        };
-    }
-
-    internal static DataGridTemplateColumn CreateToggleSwitchColumn(string propertyPath, string? iconForTrue, string? iconForFalse, StylingRecord? styling = null)
-    {
-        FrameworkElementFactory elementFactory;
-
-        if (iconForTrue is not null && iconForFalse is not null)
-        {
-            elementFactory = new FrameworkElementFactory(typeof(ToggleButton));
-            elementFactory.SetBinding(ToggleButton.IsCheckedProperty, new Binding(propertyPath)
-            {
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            });
-            elementFactory.SetValue(ToggleButton.WidthProperty, 22d);
-            elementFactory.SetValue(ToggleButton.HeightProperty, 22d);
-            elementFactory.SetValue(Button.BorderThicknessProperty, new Thickness(0));
-
-            var iconForTrueResource = Application.Current.FindResource(iconForTrue);
-            var iconForFalseResource = Application.Current.FindResource(iconForFalse);
-
-            var imageFactory = new FrameworkElementFactory(typeof(Image));
-            imageFactory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler(OnImageLoaded));
-            elementFactory.AppendChild(imageFactory);
-
-            void OnImageLoaded(object sender, RoutedEventArgs args)
-            {
-                var imageElement = (Image)sender;
-                var behavior = new ImageConditionalSourceBehavior
-                {
-                    WhenTrue = iconForTrueResource,
-                    WhenFalse = iconForFalseResource
-                };
-                BindingOperations.SetBinding(behavior, ImageConditionalSourceBehavior.FlagValueProperty, new Binding(propertyPath));
-                Interaction.GetBehaviors(imageElement).Add(behavior);
-            }
-        }
-        else
-        {
-            elementFactory = new FrameworkElementFactory(typeof(ToggleSwitch));
-            elementFactory.SetBinding(ToggleSwitch.IsOnProperty, new Binding(propertyPath)
-            {
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            });
-            elementFactory.SetValue(ToggleSwitch.OnContentProperty, string.Empty);
-            elementFactory.SetValue(ToggleSwitch.OffContentProperty, string.Empty);
-            elementFactory.SetValue(FrameworkElement.MinWidthProperty, 22d);
-        }
-
-        var caption = Helpers.MakeCaptionFromPropertyName(propertyPath);
-        elementFactory.SetValue(FrameworkElement.ToolTipProperty, caption);
-
-        SetStyling(elementFactory, styling);
-
-        return new DataGridTemplateColumn
-        {
-            CellTemplate = new DataTemplate { VisualTree = elementFactory }
         };
     }
 
