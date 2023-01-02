@@ -39,6 +39,15 @@ public sealed class TestFileService : IFileService
         return new MemoryStream(content);
     }
 
+    public Stream OpenReadNoLock(string path)
+        => OpenRead(path);
+
+    public bool PathExists(string path)
+    {
+        return _files.ContainsKey(path)
+            || _files.Any(x => Path.GetDirectoryName(x.Key) == path);
+    }
+
     public byte[] ReadBytesFromFile(string path)
     {
         if (!_files.TryGetValue(path, out var content))

@@ -19,6 +19,17 @@ public interface IFileService
     /// <inheritdoc cref="File.OpenRead(string)"/>
     Stream OpenRead(string path);
 
+    /// <summary>
+    ///   Opens an existing file for reading without applying any lock,
+    ///   which makes possible to read already locked files.
+    /// </summary>
+    /// <param name="path">The file to be opened for reading.</param>
+    /// <returns>A read-only System.IO.FileStream on the specified path.</returns>
+    Stream OpenReadNoLock(string path);
+
+    /// <inheritdoc cref="Path.Exists(string?)"/>
+    bool PathExists(string path);
+
     /// <inheritdoc cref="File.ReadAllBytes(string)"/>
     byte[] ReadBytesFromFile(string path);
 
@@ -54,6 +65,17 @@ internal sealed class FileService : IFileService
 
     public Stream OpenRead(string path)
         => File.OpenRead(path);
+
+    public Stream OpenReadNoLock(string path)
+        => File.Open(path, new FileStreamOptions {
+            Access = FileAccess.Read,
+            Mode = FileMode.Open,
+            Options = FileOptions.Asynchronous,
+            Share = FileShare.ReadWrite
+        });
+
+    public bool PathExists(string path)
+        => Path.Exists(path);
 
     public byte[] ReadBytesFromFile(string path)
         => File.ReadAllBytes(path);
