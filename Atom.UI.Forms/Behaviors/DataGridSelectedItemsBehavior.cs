@@ -81,6 +81,9 @@ public class DataGridSelectedItemsBehavior : Behavior<DataGrid>
 
     private void OnDataGridRowUnselected(object sender, RoutedEventArgs e)
     {
+        if (_updateSuspended)
+            return;
+
         var row = (DataGridRow)e.OriginalSource;
         var selectedItemsList = (IList)SelectedItems;
         _updateSuspended = true;
@@ -90,6 +93,9 @@ public class DataGridSelectedItemsBehavior : Behavior<DataGrid>
 
     private void OnDataGridRowSelected(object sender, RoutedEventArgs e)
     {
+        if (_updateSuspended)
+            return;
+
         var row = (DataGridRow)e.OriginalSource;
         var selectedItemsList = (IList)SelectedItems;
         _updateSuspended = true;
