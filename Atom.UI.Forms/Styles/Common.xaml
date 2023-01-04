@@ -55,29 +55,19 @@
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
         <Style.Triggers>
             <Trigger Property="behaviors:TreeViewMultiSelectBehavior.IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.AccentBase}"></Setter>
-                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Text}"></Setter>
+                <Setter Property="Background" Value="{StaticResource MahApps.Brushes.AccentBase}"></Setter>
+                <Setter Property="TextElement.Foreground" Value="{StaticResource MahApps.Brushes.Text}"></Setter>
             </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="behaviors:TreeViewMultiSelectBehavior.IsSelected" Value="True" />
                     <Condition Property="IsSelectionActive" Value="False" />
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent4}"></Setter>
-                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Text}"/>
+                <Setter Property="Background" Value="{StaticResource MahApps.Brushes.AccentBase}"></Setter>
+                <Setter Property="TextElement.Foreground" Value="{StaticResource MahApps.Brushes.Text}"/>
             </MultiTrigger>
-            <!-- TODO: For some reason is overriden by another rule
-            <MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition Property="IsSelected" Value="True" />
-                    <Condition Property="IsSelectionActive" Value="False" />
-                </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent4}"></Setter>
-                <Setter Property="TextElement.Foreground" Value="{DynamicResource MahApps.Brushes.Text}"/>
-            </MultiTrigger> -->
         </Style.Triggers>
     </Style>
-
 
     <!-- <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource baseStyle}">
     </Style>
