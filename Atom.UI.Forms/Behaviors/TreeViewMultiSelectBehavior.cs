@@ -68,6 +68,11 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
     public static void SetIsSelected(DependencyObject obj, bool value)
     {
         obj.SetValue(IsSelectedProperty, value);
+
+        if (!value && (bool)obj.GetValue(TreeViewItem.IsSelectedProperty))
+        {
+            obj.SetValue(TreeViewItem.IsSelectedProperty, false);
+        }
     }
 
     /// <summary>
