@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.UI.Forms\Atom.UI.Forms.csproj" />
+    <ProjectReference Include="..\Atom.UI.Forms.TestingUtil\Atom.UI.Forms.TestingUtil.csproj" />
+  </ItemGroup>
+
+</Project>
