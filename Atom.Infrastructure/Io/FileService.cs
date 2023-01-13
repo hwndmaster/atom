@@ -16,6 +16,13 @@ public interface IFileService
     /// <inheritdoc cref="File.FileExists(string)"/>
     bool FileExists(string path);
 
+    /// <summary>
+    ///   Determines whether the specified <paramref name="path"/> is a directory or not.
+    /// </summary>
+    /// <param name="path">The path to a directory or file.</param>
+    /// <returns>True if the specified path is pointing to a directory.</returns>
+    bool IsDirectory(string path);
+
     /// <inheritdoc cref="File.OpenRead(string)"/>
     Stream OpenRead(string path);
 
@@ -62,6 +69,24 @@ internal sealed class FileService : IFileService
 
     public bool FileExists(string path)
         => File.Exists(path);
+
+    public bool IsDirectory(string path)
+    {
+        try
+        {
+            if (!Path.Exists(path))
+            {
+                return false;
+            }
+
+            var pathAttr = File.GetAttributes(path);
+            return pathAttr.HasFlag(FileAttributes.Directory);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     public Stream OpenRead(string path)
         => File.OpenRead(path);

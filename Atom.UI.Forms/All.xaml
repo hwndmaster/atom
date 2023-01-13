@@ -5,7 +5,7 @@
         <ResourceDictionary Source="pack://application:,,,/Genius.Atom.UI.Forms;component/Styles/Controls.TagEditor.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- Images -->
+    <!-- Static images -->
     <BitmapImage x:Key="Alert32" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Alert32.png" />
     <BitmapImage x:Key="Copy16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Copy16.png" />
     <BitmapImage x:Key="DonePink16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/DonePink16.png" />

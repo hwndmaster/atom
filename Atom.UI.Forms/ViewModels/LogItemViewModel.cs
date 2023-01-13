@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
+using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.UI.Forms.ViewModels;
@@ -30,9 +31,9 @@ internal sealed class LogItemViewModel : ViewModelBase, ILogItemViewModel
         {
             var icon = Severity switch
             {
-                LogLevel.Warning => "Warning16",
-                LogLevel.Error => "Error16",
-                LogLevel.Critical => "Alert32",
+                LogLevel.Warning => ImageStock.Warning16,
+                LogLevel.Error => ImageStock.Error16,
+                LogLevel.Critical => ImageStock.Alert32,
                 {} => null
             };
             if (icon is null)
@@ -44,6 +45,6 @@ internal sealed class LogItemViewModel : ViewModelBase, ILogItemViewModel
     [Browsable(false)]
     public bool IsSeverityCritical => Severity == LogLevel.Critical;
 
-    [Icon("Copy16")]
+    [Icon(ImageStock.Copy16)]
     public IActionCommand CopyToClipboardCommand { get; }
 }

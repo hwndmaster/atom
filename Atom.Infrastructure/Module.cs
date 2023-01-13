@@ -21,6 +21,7 @@ public static class Module
         services.AddSingleton<IDateTime, SystemDateTime>();
         services.AddSingleton<IEventBus, EventBus>();
         services.AddSingleton<IFileService, FileService>();
+        services.AddTransient<IFileSystemWatcher, FileSystemWatcherWrapper>();
         services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
         services.AddTransient<ISynchronousScheduler, SynchronousScheduler>();
     }

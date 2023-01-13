@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <Version>0.0.25</Version>
+    <Version>0.0.26</Version>
     <Product>Atom</Product>
     <Authors>Dima Kravtsov</Authors>
     <Description>Simple framework for personal pet projects</Description>
@@ -31,18 +31,18 @@
 
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) == false">
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    <InternalsVisibleTo Include="$(AssemblyName).TestingUtil" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 
   <!-- Automated Testing components -->
-  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
     <Using Include="AutoFixture" />
     <Using Include="Moq" />
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
@@ -55,5 +55,6 @@
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
     <PackageReference Include="AutoFixture" />
     <PackageReference Include="Moq" />
+    <PackageReference Include="xunit" />
   </ItemGroup>
 </Project>

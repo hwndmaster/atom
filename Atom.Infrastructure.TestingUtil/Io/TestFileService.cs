@@ -29,6 +29,11 @@ public sealed class TestFileService : IFileService
         return _files.ContainsKey(path);
     }
 
+    public bool IsDirectory(string path)
+    {
+        return !FileExists(path);
+    }
+
     public Stream OpenRead(string path)
     {
         if (!_files.TryGetValue(path, out var content))
