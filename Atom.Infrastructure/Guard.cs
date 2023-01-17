@@ -14,6 +14,7 @@ public static class Guard
             throw new ArgumentNullException(parameterName, message);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNullOrEmpty(string value,
         [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
     {
@@ -21,6 +22,7 @@ public static class Guard
             throw new ArgumentNullException(parameterName);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNullOrWhitespace(string value,
         [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
     {
@@ -28,6 +30,7 @@ public static class Guard
             throw new ArgumentNullException(parameterName);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNegative(int value, string? parameterName)
     {
         if (value < 0)

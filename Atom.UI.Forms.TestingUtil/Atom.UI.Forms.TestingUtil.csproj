@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Atom.UI.Forms\Atom.UI.Forms.csproj" />
+    <ProjectReference Include="..\Atom.Infrastructure.TestingUtil\Atom.Infrastructure.TestingUtil.csproj" />
   </ItemGroup>
 
 </Project>

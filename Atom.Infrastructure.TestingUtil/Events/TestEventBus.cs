@@ -43,5 +43,11 @@ public sealed class TestEventBus : IEventBus
         return matchedEvents[0];
     }
 
+    public void AssertNoEventOfType<T>()
+        where T : IEventMessage
+    {
+        Assert.False(_publishedEvents.OfType<T>().Any());
+    }
+
     public ImmutableArray<IEventMessage> PublishedEvents => _publishedEvents.ToImmutableArray();
 }
