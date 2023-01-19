@@ -3,9 +3,11 @@ using Genius.Atom.Infrastructure.Io;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
+public record FileContext(string FullName, byte[] Content);
+
 public sealed class TestFileService : IFileService
 {
-    private readonly Dictionary<string, byte[]> _files = new();
+    private readonly Dictionary<string, FileContext> _files = new();
     private readonly HashSet<string> _folders = new();
     private readonly bool _ignoreCase;
 
@@ -16,9 +18,29 @@ public sealed class TestFileService : IFileService
 
     public void AddFile(string path, byte[]? content = null)
     {
-        path = NormalizePath(path);
-        _files.Add(path, content ?? Array.Empty<byte>());
-        _folders.Add(Path.GetDirectoryName(path).NotNull());
+        var key = CreatePathKey(path);
+        _files[key] = new FileContext(path, content ?? Array.Empty<byte>());
+        _folders.Add(Path.GetDirectoryName(key).NotNull());
+    }
+
+    public void RemoveFile(string path)
+    {
+        var key = CreatePathKey(path);
+        _files.Remove(key);
+    }
+
+    public void RenameFile(string path, string newPath)
+    {
+        var oldPathKey = CreatePathKey(path);
+        var newPathKey = CreatePathKey(newPath);
+
+        if (!_files.TryGetValue(oldPathKey, out var context))
+        {
+            throw new KeyNotFoundException($"The file with path '{path}' wasn't added beforehand.");
+        }
+
+        _files.Remove(oldPathKey);
+        _files.Add(newPathKey, context with { FullName = newPath });
     }
 
     public void EnsureDirectory(string? path)
@@ -28,10 +50,10 @@ public sealed class TestFileService : IFileService
             return;
         }
 
-        path = NormalizePath(path);
-        if (!_folders.Contains(path))
+        var key = CreatePathKey(path);
+        if (!_folders.Contains(key))
         {
-            _folders.Add(path);
+            _folders.Add(key);
         }
     }
 
@@ -39,13 +61,13 @@ public sealed class TestFileService : IFileService
     {
         return _files
             .Where(x => path.Equals(Path.GetDirectoryName(x.Key), _ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-            .Select(x => x.Key);
+            .Select(x => x.Value.FullName);
     }
 
     public bool FileExists(string path)
     {
-        path = NormalizePath(path);
-        return _files.ContainsKey(path);
+        var key = CreatePathKey(path);
+        return _files.ContainsKey(key);
     }
 
     public bool IsDirectory(string path)
@@ -55,13 +77,13 @@ public sealed class TestFileService : IFileService
 
     public Stream OpenRead(string path)
     {
-        path = NormalizePath(path);
-        if (!_files.TryGetValue(path, out var content))
+        var key = CreatePathKey(path);
+        if (!_files.TryGetValue(key, out var fileContext))
         {
             throw new FileNotFoundException(path);
         }
 
-        return new MemoryStream(content);
+        return new MemoryStream(fileContext.Content);
     }
 
     public Stream OpenReadNoLock(string path)
@@ -69,31 +91,31 @@ public sealed class TestFileService : IFileService
 
     public bool PathExists(string path)
     {
-        path = NormalizePath(path);
-        return _files.ContainsKey(path)
-            || _files.Any(x => Path.GetDirectoryName(x.Key) == path);
+        var key = CreatePathKey(path);
+        return _files.ContainsKey(key)
+            || _files.Any(x => Path.GetDirectoryName(x.Key) == key);
     }
 
     public byte[] ReadBytesFromFile(string path)
     {
-        path = NormalizePath(path);
-        if (!_files.TryGetValue(path, out var content))
+        var key = CreatePathKey(path);
+        if (!_files.TryGetValue(key, out var fileContext))
         {
             throw new FileNotFoundException(path);
         }
 
-        return content;
+        return fileContext.Content;
     }
 
     public string ReadTextFromFile(string path)
     {
-        path = NormalizePath(path);
-        if (!_files.TryGetValue(path, out var content))
+        var key = CreatePathKey(path);
+        if (!_files.TryGetValue(key, out var fileContext))
         {
             throw new FileNotFoundException(path);
         }
 
-        return Encoding.Default.GetString(content);
+        return Encoding.Default.GetString(fileContext.Content);
     }
 
     public Task<string> ReadTextFromFileAsync(string path, CancellationToken cancellationToken)
@@ -103,12 +125,12 @@ public sealed class TestFileService : IFileService
 
     public void WriteTextToFile(string path, string content)
     {
-        path = NormalizePath(path);
-        _files.Add(path, Encoding.Default.GetBytes(content));
+        var key = CreatePathKey(path);
+        _files.Add(key, new FileContext(path, Encoding.Default.GetBytes(content)));
     }
 
-    private string NormalizePath(string path)
+    private string CreatePathKey(string path)
         => _ignoreCase ? path.ToLower() : path;
 
-    public IReadOnlyDictionary<string, byte[]> CurrentFiles => _files;
+    public ICollection<FileContext> Files => _files.Values;
 }
