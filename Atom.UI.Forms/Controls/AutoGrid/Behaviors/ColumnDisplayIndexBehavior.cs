@@ -8,8 +8,7 @@ internal sealed class ColumnDisplayIndexBehavior : IAutoGridColumnBehavior
 
         if (index.HasValue)
         {
-            // TODO: Temporarily disabled because of unhandled exception
-            // context.Args.Column.DisplayIndex = index.Value;
+            context.Args.Column.DisplayIndex = index.Value;
         }
     }
 }

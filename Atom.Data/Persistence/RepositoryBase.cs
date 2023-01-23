@@ -30,33 +30,33 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         _persister = persister;
     }
 
-    public async Task<IEnumerable<TEntity>> GetAllAsync()
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
         await EnsureInitializationAsync();
 
         return _entities.NotNull();
     }
 
-    public async Task<TEntity?> FindByIdAsync(Guid entityId)
+    public virtual async Task<TEntity?> FindByIdAsync(Guid entityId)
     {
         await EnsureInitializationAsync();
 
         return _entities.NotNull().Find(x => x.Id == entityId);
     }
 
-    public async Task DeleteAsync(Guid entityId)
+    public virtual async Task DeleteAsync(Guid entityId)
     {
         await EnsureInitializationAsync();
 
         DeleteInternal(entityId, FILENAME);
     }
 
-    public Task OverwriteAsync(params TEntity[] entities)
+    public virtual Task OverwriteAsync(params TEntity[] entities)
     {
         return StoreInternalAsync(true, entities);
     }
 
-    public Task StoreAsync(params TEntity[] entities)
+    public virtual Task StoreAsync(params TEntity[] entities)
     {
         return StoreInternalAsync(false, entities);
     }
