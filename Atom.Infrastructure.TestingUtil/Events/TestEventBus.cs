@@ -35,18 +35,41 @@ public sealed class TestEventBus : IEventBus
         return _origin.WhenFired<T1, T2, T3>();
     }
 
-    public T GetSingleEvent<T>()
+    public void AssertSingleEvent<T>(Func<T, bool> condition)
         where T : IEventMessage
     {
-        var matchedEvents = _publishedEvents.OfType<T>().ToList();
-        Assert.Single(matchedEvents);
-        return matchedEvents[0];
+        var @event = GetSingleEvent<T>();
+        Assert.True(condition(@event));
+    }
+
+    public void AssertSingleEvent<T>(params Action<T>[] actionToAssert)
+        where T : IEventMessage
+    {
+        var @event = GetSingleEvent<T>();
+        foreach (var action in actionToAssert)
+        {
+            action(@event);
+        }
     }
 
     public void AssertNoEventOfType<T>()
         where T : IEventMessage
     {
         Assert.False(_publishedEvents.OfType<T>().Any());
+    }
+
+    public void AssertNoEventsButOfType<T>()
+        where T : IEventMessage
+    {
+        Assert.False(_publishedEvents.Any(x => x is not T));
+    }
+
+    public T GetSingleEvent<T>()
+        where T : IEventMessage
+    {
+        var matchedEvents = _publishedEvents.OfType<T>().ToList();
+        Assert.Single(matchedEvents);
+        return matchedEvents[0];
     }
 
     public ImmutableArray<IEventMessage> PublishedEvents => _publishedEvents.ToImmutableArray();
