@@ -116,23 +116,6 @@ internal sealed class DiscriminatedTypeConverter<T> : JsonConverter<T>, IJsonCon
         throw new InvalidOperationException($"Object has no discriminator '{DiscriminatorProperty}.");
     }
 
-    private object UpgradeVersionIfNeeded(object value, TypeDiscriminatorRecord fromVersionRecord)
-    {
-        var previousVersionRecord = fromVersionRecord;
-        while (true)
-        {
-            var nextVersionRecord = _typeDiscriminators.GetDiscriminatorByPreviousVersion(previousVersionRecord.Type);
-            if (nextVersionRecord is null || nextVersionRecord.VersionUpgrader is null)
-            {
-                break;
-            }
-            value = nextVersionRecord.VersionUpgrader.Upgrade(value);
-            previousVersionRecord = nextVersionRecord;
-        }
-
-        return value;
-    }
-
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
         if (value is null)
@@ -159,7 +142,7 @@ internal sealed class DiscriminatedTypeConverter<T> : JsonConverter<T>, IJsonCon
         writer.WriteEndObject();
     }
 
-    private JsonSerializerOptions GetModifiedOptions(JsonSerializerOptions options, Type typeToIgnore)
+    private static JsonSerializerOptions GetModifiedOptions(JsonSerializerOptions options, Type typeToIgnore)
     {
         // WORKAROUND - stop cyclic look up
         // If we leave our converter in the options then will get infinite cycling
@@ -169,5 +152,22 @@ internal sealed class DiscriminatedTypeConverter<T> : JsonConverter<T>, IJsonCon
         tempOptions.Converters.Remove(converterFactory);
         tempOptions.Converters.Add(modifiedConverterFactory);
         return tempOptions;
+    }
+
+    private object UpgradeVersionIfNeeded(object value, TypeDiscriminatorRecord fromVersionRecord)
+    {
+        var previousVersionRecord = fromVersionRecord;
+        while (true)
+        {
+            var nextVersionRecord = _typeDiscriminators.GetDiscriminatorByPreviousVersion(previousVersionRecord.Type);
+            if (nextVersionRecord is null || nextVersionRecord.VersionUpgrader is null)
+            {
+                break;
+            }
+            value = nextVersionRecord.VersionUpgrader.Upgrade(value);
+            previousVersionRecord = nextVersionRecord;
+        }
+
+        return value;
     }
 }

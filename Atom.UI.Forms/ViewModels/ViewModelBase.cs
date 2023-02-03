@@ -13,6 +13,7 @@ namespace Genius.Atom.UI.Forms;
 public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
     bool TryGetPropertyValue(string propertyName, out object? value);
+    void Validate();
 }
 
 /// <summary>
@@ -50,6 +51,21 @@ public abstract class ViewModelBase : IViewModel
     public bool TryGetPropertyValue(string propertyName, out object? value)
     {
         return _propertyBag.TryGetValue(propertyName, out value);
+    }
+
+    /// <summary>
+    ///   Validates all properties for which the validation rules are available.
+    /// </summary>
+    /// <remarks>
+    ///   Once validated, if there are any validation errors the <see cref="HasErrors"/> will be updated.
+    /// </remarks>
+    public void Validate()
+    {
+        foreach (var rule in _validationRules)
+        {
+            TryGetPropertyValue(rule.Key, out var value);
+            ValidateProperty(rule.Key, value);
+        }
     }
 
     /// <summary>

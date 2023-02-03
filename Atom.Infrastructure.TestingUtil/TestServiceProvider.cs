@@ -14,12 +14,18 @@ public class TestServiceProvider : IServiceProvider
         _serviceCollection.AddSingleton(typeof(T));
     }
 
+    public void RegisterSingleton<TService, TImplementation>()
+    {
+        _serviceProvider = null;
+        _serviceCollection.AddSingleton(typeof(TService), typeof(TImplementation));
+    }
+
     public void RegisterInstance<T>(T instance)
     {
         Guard.NotNull(instance);
 
         _serviceProvider = null;
-        _serviceCollection.AddSingleton(instance.GetType(), instance);
+        _serviceCollection.AddSingleton(typeof(T), instance);
     }
 
     public object? GetService(Type serviceType)

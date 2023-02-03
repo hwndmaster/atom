@@ -3,9 +3,9 @@ using Genius.Atom.Infrastructure.TestingUtil;
 using Genius.Atom.Infrastructure.TestingUtil.Io;
 using Microsoft.Extensions.Logging;
 
-namespace Genius.Atom.Infrastructure.Tests.Persistence;
+namespace Genius.Atom.Data.Tests.Persistence;
 
-public sealed class JsonPersisterTests
+public sealed partial class JsonPersisterTests
 {
     private readonly Fixture _fixture = new();
     private readonly TestServiceProvider _serviceProvider = new();
