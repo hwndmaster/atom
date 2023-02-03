@@ -20,10 +20,16 @@ internal sealed class JsonPersister : IJsonPersister
     public JsonPersister(IFileService io, ITypeDiscriminators typeDiscriminators, IEnumerable<IJsonConverter> converters)
     {
         _io = io.NotNull();
+
+        var referenceDiscover = new ReferenceDiscoverJsonConverter();
         _jsonOptions = new JsonSerializerOptions {
             PropertyNameCaseInsensitive = true,
             WriteIndented = true,
-            Converters = { new DiscriminatedTypeConverterFactory(typeDiscriminators) },
+            Converters = {
+                referenceDiscover,
+                new ReferenceJsonConverter(referenceDiscover),
+                new DiscriminatedTypeConverterFactory(typeDiscriminators)
+            }
         };
 
         foreach (var converter in converters)
