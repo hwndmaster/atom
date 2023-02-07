@@ -15,7 +15,7 @@ internal sealed class DataGridToggleSwitchColumnBuilder : DataGridColumnBuilder
     {
         var column = CreateColumn();
         var binding = CreateBinding();
-        binding.Mode = BindingMode.TwoWay;
+        binding.Mode = _readOnly ? BindingMode.OneWay : BindingMode.TwoWay;
         binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
 
         var elementFactory = new FrameworkElementFactory(typeof(ToggleSwitch));
@@ -23,6 +23,11 @@ internal sealed class DataGridToggleSwitchColumnBuilder : DataGridColumnBuilder
         elementFactory.SetValue(ToggleSwitch.OnContentProperty, string.Empty);
         elementFactory.SetValue(ToggleSwitch.OffContentProperty, string.Empty);
         elementFactory.SetValue(FrameworkElement.MinWidthProperty, 22d);
+
+        if (_readOnly)
+        {
+            elementFactory.SetValue(UIElement.IsEnabledProperty, false);
+        }
 
         StylingHelpers.SetStyling(elementFactory, _cellStyling);
 

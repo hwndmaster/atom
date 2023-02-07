@@ -16,8 +16,7 @@ internal sealed class ColumnToggleButtonBehavior : IAutoGridColumnBehavior
         var iconForFalse = context.BuildToggleButtonColumn.IconForFalse;
 
         var columnBuilder = DataGridColumnBuilder.ForValuePath(context.Property.Name)
-            .WithTitle(context.BuildColumn.DisplayName)
-            .WithCellStyling(context.BuildColumn.Style);
+            .BasedOnAutoGridColumnContext(context);
 
         if (iconForTrue is not null && iconForFalse is not null)
         {

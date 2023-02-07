@@ -14,7 +14,7 @@ public static class Properties
 {
     public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.RegisterAttached(
         "ItemsSource",
-        typeof(IEnumerable),
+        typeof(object),
         typeof(Properties),
         new PropertyMetadata(ItemsSourceChanged));
 
@@ -35,14 +35,14 @@ public static class Properties
         typeof(bool),
         typeof(Properties));
 
-    public static void SetItemsSource(DependencyObject element, IEnumerable value)
+    public static void SetItemsSource(DependencyObject element, object value)
     {
         element.SetValue(ItemsSourceProperty, value);
     }
 
-    public static IEnumerable GetItemsSource(DependencyObject element)
+    public static object GetItemsSource(DependencyObject element)
     {
-        return (IEnumerable) element.GetValue(ItemsSourceProperty);
+        return element.GetValue(ItemsSourceProperty);
     }
 
     public static void SetAutoGridBuilder(DependencyObject element, IAutoGridBuilder? value)
@@ -109,14 +109,18 @@ public static class Properties
 
         if (groupByProps.Count == 0 && filterByProps.Length == 0)
         {
-            d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue);
+            d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue is CollectionViewSource cvs
+                ? cvs.View
+                : e.NewValue);
         }
         else
         {
-            var collectionViewSource = new CollectionViewSource
-            {
-                Source = e.NewValue
-            };
+            var collectionViewSource = e.NewValue is CollectionViewSource cvs
+                ? cvs
+                : new CollectionViewSource
+                {
+                    Source = e.NewValue
+                };
 
             SetupGrouping(groupByProps, collectionViewSource);
             SetupFiltering(d, filterByProps, collectionViewSource);
@@ -189,7 +193,6 @@ public static class Properties
         {
             if (string.IsNullOrEmpty(filter))
             {
-                e.Accepted = true;
                 return;
             }
 
@@ -200,7 +203,7 @@ public static class Properties
                 {
                     if (stringValue.Contains(filter, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        e.Accepted = true;
+                        // Accepted
                         return;
                     }
                 }

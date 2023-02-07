@@ -18,6 +18,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
     {
         _columnBehaviors = new IAutoGridColumnBehavior[] {
             // Column type changers:
+            new ColumnTextBehavior(),
             new ColumnTagEditorBehavior(),
             new ColumnButtonBehavior(),
             new ColumnToggleButtonBehavior(),

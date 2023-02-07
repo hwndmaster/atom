@@ -10,4 +10,5 @@ public sealed class AutoGridBuildCommandColumnContext : AutoGridBuildColumnConte
     }
 
     public string? Icon { get; init; }
+    public Size? IconSize { get; init; }
 }

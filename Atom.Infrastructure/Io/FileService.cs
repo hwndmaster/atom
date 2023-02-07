@@ -99,10 +99,10 @@ public interface IFileService
     string ReadTextFromFile(string path, Encoding encoding);
 
     /// <inheritdoc cref="File.ReadAllTextAsync(string, CancellationToken)"/>
-    Task<string> ReadTextFromFileAsync(string path, CancellationToken cancellationToken);
+    Task<string> ReadTextFromFileAsync(string path, CancellationToken? cancellationToken = default);
 
     /// <inheritdoc cref="File.ReadAllTextAsync(string, Encoding, CancellationToken)"/>
-    Task<string> ReadTextFromFileAsync(string path, Encoding encoding, CancellationToken cancellationToken);
+    Task<string> ReadTextFromFileAsync(string path, Encoding encoding, CancellationToken? cancellationToken = default);
 
     /// <inheritdoc cref="File.WriteAllText(string, string?)"/>
     void WriteTextToFile(string path, string content);
@@ -162,16 +162,22 @@ internal sealed class FileService : IFileService
         => Directory.EnumerateDirectories(path, searchPattern, searchOption);
 
     public IEnumerable<string> EnumerateFiles(string path)
-        => Directory.EnumerateFiles(path);
+        => Directory.Exists(path) ? Directory.EnumerateFiles(path) : Array.Empty<string>();
 
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern)
-        => Directory.EnumerateFiles(path, searchPattern);
+        => Directory.Exists(path)
+            ? Directory.EnumerateFiles(path, searchPattern)
+            : Array.Empty<string>();
 
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern, EnumerationOptions options)
-        => Directory.EnumerateFiles(path, searchPattern, options);
+        => Directory.Exists(path)
+            ? Directory.EnumerateFiles(path, searchPattern, options)
+            : Array.Empty<string>();
 
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption)
-        => Directory.EnumerateFiles(path, searchPattern, searchOption);
+        => Directory.Exists(path)
+            ? Directory.EnumerateFiles(path, searchPattern, searchOption)
+            : Array.Empty<string>();
 
     public bool FileExists(string path)
         => File.Exists(path);
@@ -226,11 +232,11 @@ internal sealed class FileService : IFileService
     public string ReadTextFromFile(string path, Encoding encoding)
         => File.ReadAllText(path, encoding);
 
-    public Task<string> ReadTextFromFileAsync(string path, CancellationToken cancellationToken)
-        => File.ReadAllTextAsync(path, cancellationToken);
+    public Task<string> ReadTextFromFileAsync(string path, CancellationToken? cancellationToken = default)
+        => File.ReadAllTextAsync(path, cancellationToken ?? default);
 
-    public Task<string> ReadTextFromFileAsync(string path, Encoding encoding, CancellationToken cancellationToken)
-        => File.ReadAllTextAsync(path, encoding, cancellationToken);
+    public Task<string> ReadTextFromFileAsync(string path, Encoding encoding, CancellationToken? cancellationToken = default)
+        => File.ReadAllTextAsync(path, encoding, cancellationToken ?? default);
 
     public void WriteTextToFile(string path, string content)
         => File.WriteAllText(path, content);

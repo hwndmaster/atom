@@ -8,13 +8,16 @@ internal sealed class ColumnTooltipBehavior : IAutoGridColumnBehavior
 {
     public void Attach(AutoGridColumnContext context)
     {
-        if (context.BuildColumn.ToolTipPath is null)
+        if (context.BuildColumn.ToolTipPath is not null)
         {
-            return;
+            var style = StylingHelpers.EnsureDefaultCellStyle(context.Args.Column);
+            var binding = new Binding(context.BuildColumn.ToolTipPath);
+            style.Setters.Add(new Setter(ToolTipService.ToolTipProperty, binding));
         }
-
-        var style = StylingHelpers.EnsureDefaultCellStyle(context.Args.Column);
-        var binding = new Binding(context.BuildColumn.ToolTipPath);
-        style.Setters.Add(new Setter(ToolTipService.ToolTipProperty, binding));
+        else if (context.BuildColumn.ToolTip is not null)
+        {
+            var style = StylingHelpers.EnsureDefaultCellStyle(context.Args.Column);
+            style.Setters.Add(new Setter(ToolTipService.ToolTipProperty, context.BuildColumn.ToolTip));
+        }
     }
 }

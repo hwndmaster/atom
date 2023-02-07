@@ -33,6 +33,7 @@ internal sealed class AutoGridContextBuilderToggleButtonColumn : AutoGridContext
             IconForFalse = _iconForFalse,
             IsReadOnly = _isReadOnly,
             Style = _style,
+            ToolTip = _toolTip,
             ToolTipPath = _toolTipPath,
             ValueConverter = DetermineValueConverter(null)
         };

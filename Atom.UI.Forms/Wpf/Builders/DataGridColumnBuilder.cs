@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using Genius.Atom.UI.Forms.Controls.AutoGrid;
 
 namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
@@ -8,14 +9,20 @@ internal class DataGridColumnBuilder
 {
     protected readonly string _valuePath;
     protected StylingRecord? _cellStyling;
+    protected bool _readOnly;
     private string? _title;
+    private string? _toolTip;
+    private string? _toolTipPath;
     private IValueConverter? _converter;
     private string? _itemsSourcePath;
 
     protected DataGridColumnBuilder(DataGridColumnBuilder parent)
     {
         _valuePath = parent._valuePath;
+        _readOnly = parent._readOnly;
         _title = parent._title;
+        _toolTip = parent._toolTip;
+        _toolTipPath = parent._toolTipPath;
         _converter = parent._converter;
         _itemsSourcePath = parent._itemsSourcePath;
         _cellStyling = parent._cellStyling;
@@ -31,7 +38,23 @@ internal class DataGridColumnBuilder
         return new DataGridColumnBuilder(valuePath);
     }
 
-    public DataGridColumnBuilder WithConverter(IValueConverter converter)
+    public DataGridColumnBuilder AsReadOnly(bool readOnly)
+    {
+        _readOnly = readOnly;
+        return this;
+    }
+
+    public DataGridColumnBuilder BasedOnAutoGridColumnContext(AutoGridColumnContext context)
+    {
+        return AsReadOnly(context.IsReadOnly || context.DataGrid.IsReadOnly)
+            .WithConverter(context.BuildColumn.ValueConverter)
+            .WithCellStyling(context.BuildColumn.Style)
+            .WithTitle(context.BuildColumn.DisplayName)
+            .WithToolTip(context.BuildColumn.ToolTip)
+            .WithToolTipPath(context.BuildColumn.ToolTipPath);
+    }
+
+    public DataGridColumnBuilder WithConverter(IValueConverter? converter)
     {
         _converter = converter;
         return this;
@@ -55,14 +78,31 @@ internal class DataGridColumnBuilder
         return this;
     }
 
-    public DataGridButtonColumnBuilder RenderAsButton(string? imagePath)
+    public DataGridColumnBuilder WithToolTip(string? toolTip)
     {
-        return new DataGridButtonColumnBuilder(this, imagePath);
+        _toolTip = toolTip;
+        return this;
+    }
+
+    public DataGridColumnBuilder WithToolTipPath(string? toolTipPath)
+    {
+        _toolTipPath = toolTipPath;
+        return this;
+    }
+
+    public DataGridButtonColumnBuilder RenderAsButton(string? imagePath, Size? imageSize = null)
+    {
+        return new DataGridButtonColumnBuilder(this, imagePath, imageSize);
     }
 
     public DataGridTagEditorColumnBuilder RenderAsTagEditor()
     {
         return new DataGridTagEditorColumnBuilder(this);
+    }
+
+    public DataGridTextColumnBuilder RenderAsText()
+    {
+        return new DataGridTextColumnBuilder(this);
     }
 
     public DataGridTextWithImageColumnBuilder RenderAsTextWithImage(string imageSource)
@@ -121,6 +161,18 @@ internal class DataGridColumnBuilder
             Header = _title ?? Helpers.MakeCaptionFromPropertyName(_valuePath),
             SortMemberPath = _valuePath
         };
+    }
+
+    protected void SetupToolTip(FrameworkElementFactory elementFactory, string defaultToolTip)
+    {
+        if (_toolTipPath is not null)
+        {
+            var binding = new Binding(_toolTipPath);
+            elementFactory.SetBinding(TextBlock.TextProperty, binding);
+            return;
+        }
+
+        elementFactory.SetValue(FrameworkElement.ToolTipProperty, _toolTip ?? defaultToolTip);
     }
 
     private static DataTemplate CreateTextTemplate(Binding bindToValue)

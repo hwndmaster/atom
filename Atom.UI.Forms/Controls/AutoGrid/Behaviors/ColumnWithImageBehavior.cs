@@ -14,6 +14,7 @@ internal sealed class ColumnWithImageBehavior : IAutoGridColumnBehavior
 
         context.Args.Column = DataGridColumnBuilder
             .ForValuePath(context.Property.Name)
+            .BasedOnAutoGridColumnContext(context)
             .RenderAsTextWithImage(iconSource.IconPropertyPath)
             .WithImageSize(iconSource.FixedSize)
             .WithTextHidden(iconSource.HideText)

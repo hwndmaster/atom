@@ -120,12 +120,12 @@ public sealed partial class TestFileService : IFileService
         return encoding.GetString(fileContext.Content);
     }
 
-    public Task<string> ReadTextFromFileAsync(string path, CancellationToken cancellationToken)
+    public Task<string> ReadTextFromFileAsync(string path, CancellationToken? cancellationToken = default)
     {
         return Task.FromResult(ReadTextFromFile(path));
     }
 
-    public Task<string> ReadTextFromFileAsync(string path, Encoding encoding, CancellationToken cancellationToken)
+    public Task<string> ReadTextFromFileAsync(string path, Encoding encoding, CancellationToken? cancellationToken = default)
     {
         return Task.FromResult(ReadTextFromFile(path, encoding));
     }

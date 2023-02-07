@@ -19,6 +19,7 @@ public abstract class AutoGridBuildColumnContext
     public int? DisplayIndex { get; internal set; }
     public bool AutoWidth { get; init; }
     public bool IsReadOnly { get; init; }
+    public string? ToolTip { get; init; }
     public string? ToolTipPath { get; init; }
     public StylingRecord? Style { get; init; }
     public IValueConverter? ValueConverter { get; init; }

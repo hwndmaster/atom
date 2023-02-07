@@ -14,6 +14,7 @@ public interface IAutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuild
     TBuilder WithAutoWidth(bool autoWidth = true);
     TBuilder WithDisplayName(string displayName);
     TBuilder WithStyle(StylingRecord style);
+    TBuilder WithToolTip(string toolTip);
     TBuilder WithToolTipPath(string toolTipPath);
     TBuilder WithValueConverter<TValueConverter>()
         where TValueConverter : IValueConverter;
@@ -26,6 +27,7 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
     protected bool _autoWidth = false;
     protected bool _isReadOnly = false;
     protected StylingRecord? _style;
+    protected string? _toolTip;
     protected string? _toolTipPath;
     protected Type? _valueConverterType;
 
@@ -56,6 +58,12 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
     public TBuilder WithStyle(StylingRecord style)
     {
         _style = style;
+        return BuilderInstance;
+    }
+
+    public TBuilder WithToolTip(string toolTip)
+    {
+        _toolTip = toolTip;
         return BuilderInstance;
     }
 

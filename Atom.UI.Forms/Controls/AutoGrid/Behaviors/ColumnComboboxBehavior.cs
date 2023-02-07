@@ -30,6 +30,7 @@ internal sealed class ColumnComboBoxBehavior : IAutoGridColumnBehavior
         {
             var builder = DataGridColumnBuilder
                 .ForValuePath(context.Property.Name)
+                .BasedOnAutoGridColumnContext(context)
                 .WithComboEditor(comboBoxContext.CollectionPropertyName);
 
             if (context.Property.PropertyType == typeof(ITitledItemWithImageViewModel))

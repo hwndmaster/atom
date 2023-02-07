@@ -9,6 +9,9 @@ internal static partial class Helpers
 
     public static Type GetListItemType(object value)
     {
+        if (value is CollectionViewSource collectionViewSource)
+            value = collectionViewSource.View.SourceCollection;
+
         if (value is ListCollectionView listCollectionView)
             value = listCollectionView.SourceCollection;
 

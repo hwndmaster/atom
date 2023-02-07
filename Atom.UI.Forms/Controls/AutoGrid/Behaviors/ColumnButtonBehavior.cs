@@ -13,10 +13,11 @@ internal sealed class ColumnButtonBehavior : IAutoGridColumnBehavior
         }
 
         var icon = context.BuildCommandColumn?.Icon;
+        var iconSize = context.BuildCommandColumn?.IconSize;
 
         context.Args.Column = DataGridColumnBuilder.ForValuePath(context.Property.Name)
-            .WithCellStyling(context.BuildColumn.Style)
-            .RenderAsButton(icon)
+            .BasedOnAutoGridColumnContext(context)
+            .RenderAsButton(icon, iconSize)
             .Build();
     }
 }

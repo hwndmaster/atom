@@ -57,6 +57,7 @@ internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderC
             IsReadOnly = _isReadOnly,
             IconSource = _iconSource,
             Style = _style,
+            ToolTip = _toolTip,
             ToolTipPath = _toolTipPath,
             ValueConverter = DetermineValueConverter(_displayFormat)
         };
