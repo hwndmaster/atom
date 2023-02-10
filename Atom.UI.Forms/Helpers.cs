@@ -15,8 +15,8 @@ internal static partial class Helpers
         if (value is ListCollectionView listCollectionView)
             value = listCollectionView.SourceCollection;
 
-        if (value is ITypedObservableList typedObservableList)
-            return typedObservableList.ItemType;
+        if (value is ITypedObservableCollection typedObservableCollection)
+            return typedObservableCollection.ItemType;
 
         return value.GetType().GetGenericArguments().Single();
     }

@@ -10,6 +10,8 @@ public interface IAutoGridContextBuilder
 public interface IAutoGridContextBuilder<TViewModel> : IAutoGridContextBuilder
     where TViewModel : class, IViewModel
 {
+    IAutoGridContextBuilder<TViewModel> EnableVirtualization();
+    IAutoGridContextBuilder<TViewModel> MakeReadOnly();
     IAutoGridContextBuilder<TViewModel> WithColumns(Action<IAutoGridContextBuilderColumns<TViewModel>> columnsBuilderAction);
     IAutoGridContextBuilder<TViewModel> WithRecordFactory<TFactory>()
         where TFactory : IFactory<TViewModel>;
@@ -20,11 +22,27 @@ internal sealed class AutoGridContextBuilder<TViewModel> : IAutoGridContextBuild
 {
     private readonly AutoGridContextBuilderColumns<TViewModel> _columnsBuilder;
     private readonly List<AutoGridBuildColumnContext> _columns = new();
+    private bool _enableVirtualization = false;
+    private bool _makeReadOnly = false;
     private IFactory<TViewModel>? _recordFactory;
 
     public AutoGridContextBuilder(AutoGridContextBuilderColumns<TViewModel> columnsBuilder)
     {
         _columnsBuilder = columnsBuilder.NotNull();
+    }
+
+    public IAutoGridContextBuilder<TViewModel> EnableVirtualization()
+    {
+        _enableVirtualization = true;
+
+        return this;
+    }
+
+    public IAutoGridContextBuilder<TViewModel> MakeReadOnly()
+    {
+        _makeReadOnly = true;
+
+        return this;
     }
 
     public IAutoGridContextBuilder<TViewModel> WithColumns(Action<IAutoGridContextBuilderColumns<TViewModel>> columnsBuilderAction)
@@ -49,6 +67,10 @@ internal sealed class AutoGridContextBuilder<TViewModel> : IAutoGridContextBuild
 
         var recordFactoryProxy = new DefaultFactory<object>(() => _recordFactory.Create());
 
-        return new AutoGridBuildContext(_columns, recordFactoryProxy);
+        return new AutoGridBuildContext(_columns, recordFactoryProxy)
+        {
+            EnableVirtualization = _enableVirtualization,
+            MakeReadOnly = _makeReadOnly
+        };
     }
 }

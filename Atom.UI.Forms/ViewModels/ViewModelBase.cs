@@ -21,14 +21,17 @@ public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 /// </summary>
 public abstract class ViewModelBase : IViewModel
 {
-    private readonly ConcurrentDictionary<string, object?> _propertyBag = new();
     private readonly Dictionary<string, List<string>> _errors = new();
     private readonly Dictionary<string, List<PropertyValidation>> _validationRules = new();
+    private ConcurrentDictionary<string, object?>? _propertyBag;
     private bool _suspendDirtySet = false;
 
-    protected ViewModelBase()
+    protected ViewModelBase(bool determineValidationRulesFromAttributes = false)
     {
-        DetectValidationRules();
+        if (determineValidationRulesFromAttributes)
+        {
+            DetectValidationRules();
+        }
     }
 
     /// <summary>
@@ -50,7 +53,7 @@ public abstract class ViewModelBase : IViewModel
 
     public bool TryGetPropertyValue(string propertyName, out object? value)
     {
-        return _propertyBag.TryGetValue(propertyName, out value);
+        return GetPropertyBag().TryGetValue(propertyName, out value);
     }
 
     /// <summary>
@@ -178,7 +181,7 @@ public abstract class ViewModelBase : IViewModel
     {
         Guard.NotNull(propertyName, nameof(propertyName));
 
-        var result = _propertyBag.GetOrAdd(propertyName, _ => defaultValue);
+        var result = GetPropertyBag().GetOrAdd(propertyName, _ => defaultValue);
 
         return (TValue)result!;
     }
@@ -193,7 +196,7 @@ public abstract class ViewModelBase : IViewModel
     {
         Guard.NotNull(propertyName, nameof(propertyName));
 
-        var isInitial = !_propertyBag.TryGetValue(propertyName, out object? oldValue);
+        var isInitial = !GetPropertyBag().TryGetValue(propertyName, out object? oldValue);
 
         if (Equals(oldValue, propertyValue))
         {
@@ -205,7 +208,7 @@ public abstract class ViewModelBase : IViewModel
             return;
         }
 
-        _propertyBag.AddOrUpdate(propertyName, _ => propertyValue, (_, __) => propertyValue);
+        GetPropertyBag().AddOrUpdate(propertyName, _ => propertyValue, (_, __) => propertyValue);
         ValidateProperty(propertyName, propertyValue);
         valueChangedHandler?.Invoke(isInitial ? propertyValue : (TValue)oldValue!, propertyValue);
 
@@ -299,6 +302,12 @@ public abstract class ViewModelBase : IViewModel
                 _validationRules[prop.Name].Add(new PropertyValidation(validationRule, null));
             }
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private ConcurrentDictionary<string, object?> GetPropertyBag()
+    {
+        return _propertyBag ??= new();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

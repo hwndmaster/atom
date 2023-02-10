@@ -91,6 +91,19 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
     private void OnAutoGridBuilderChanged(object? sender, EventArgs e)
     {
         _autoGridBuildContext = AutoGridBuildContext.CreateLazy(AssociatedObject);
+
+        if (_autoGridBuildContext.Value.EnableVirtualization)
+        {
+            AssociatedObject.SetValue(VirtualizingPanel.IsVirtualizingProperty, true);
+            AssociatedObject.SetValue(VirtualizingPanel.IsVirtualizingWhenGroupingProperty, true);
+            AssociatedObject.SetValue(DataGrid.EnableRowVirtualizationProperty, true);
+            AssociatedObject.SetValue(ScrollViewer.CanContentScrollProperty, true);
+        }
+
+        if (_autoGridBuildContext.Value.MakeReadOnly)
+        {
+            AssociatedObject.SetValue(DataGrid.IsReadOnlyProperty, true);
+        }
     }
 
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)

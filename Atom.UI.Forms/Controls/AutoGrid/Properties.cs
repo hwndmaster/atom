@@ -137,7 +137,7 @@ public static class Properties
             AttachToPropertyChangedEvents(groupByProps, collectionViewSource, enumerable);
 
             // Ensure all new items will be attached
-            var observableCollection = collectionViewSource.Source as ITypedObservableList;
+            var observableCollection = collectionViewSource.Source as ITypedObservableCollection;
             if (observableCollection is not null)
             {
                 // TODO: Dispose event subscription when detached

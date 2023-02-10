@@ -35,4 +35,7 @@ public sealed class AutoGridBuildContext
     public ImmutableArray<AutoGridBuildColumnContext> Columns { get; }
 
     public IFactory<object> RecordFactory { get; init; }
+
+    public bool EnableVirtualization { get; init; }
+    public bool MakeReadOnly { get; init; }
 }
