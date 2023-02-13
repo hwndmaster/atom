@@ -72,12 +72,17 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
 
     internal AutoGridBuildColumnContext[] Build()
     {
+        var index = 0;
         return _columnBuilders
             .Cast<IHasBuildColumnContext>()
-            .Select((x, index) =>
+            .Select((x) =>
             {
                 var columnContext = x.Build();
-                columnContext.DisplayIndex = index;
+                if (columnContext is not AutoGridBuildTextColumnContext textColumn
+                    || !textColumn.IsGrouped)
+                {
+                    columnContext.DisplayIndex = index++;
+                }
                 return columnContext;
             })
             .ToArray();

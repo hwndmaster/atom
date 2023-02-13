@@ -52,6 +52,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
         AssociatedObject.AddingNewItem += OnAddingNewItem;
 
+        AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Genius.AutoGrid.GroupStyle"));
+
         var dpd = DependencyPropertyDescriptor.FromProperty(DataGrid.ItemsSourceProperty, typeof(DataGrid));
         dpd?.AddValueChanged(AssociatedObject, OnItemsSourceChanged);
 
@@ -73,19 +75,21 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             return;
         }
 
-        AssignRowStyle();
+        var rowStyle = CreateRowStyle();
 
         var listItemType = Helpers.GetListItemType(AssociatedObject.ItemsSource);
         if (AssociatedObject.SelectionMode == DataGridSelectionMode.Extended &&
             typeof(ISelectable).IsAssignableFrom(listItemType))
         {
-            BindIsSelected();
+            BindIsSelected(rowStyle);
         }
 
         if (typeof(IEditable).IsAssignableFrom(listItemType))
         {
-            BindIsEditing();
+            BindIsEditing(rowStyle);
         }
+
+        AssociatedObject.RowStyle = rowStyle;
     }
 
     private void OnAutoGridBuilderChanged(object? sender, EventArgs e)
@@ -157,16 +161,16 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         }
     }
 
-    private void BindIsSelected()
+    private void BindIsSelected(Style style)
     {
         var binding = new Binding(nameof(ISelectable.IsSelected));
-        AssociatedObject.RowStyle.Setters.Add(new Setter(DataGrid.IsSelectedProperty, binding));
+        style.Setters.Add(new Setter(DataGrid.IsSelectedProperty, binding));
     }
 
-    private void BindIsEditing()
+    private void BindIsEditing(Style style)
     {
         var binding = new Binding(nameof(IEditable.IsEditing));
-        AssociatedObject.RowStyle.Setters.Add(new Setter(Properties.IsEditingProperty, binding));
+        style.Setters.Add(new Setter(Properties.IsEditingProperty, binding));
 
         AssociatedObject.BeginningEdit += (sender, e) =>
         {
@@ -188,7 +192,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         };
     }
 
-    private void AssignRowStyle()
+    private Style CreateRowStyle()
     {
         var rowStyle = new Style {
             TargetType = typeof(DataGridRow),
@@ -197,6 +201,6 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
         StylingHelpers.CopyStyle(AssociatedObject.RowStyle, rowStyle);
 
-        AssociatedObject.RowStyle = rowStyle;
+        return rowStyle;
     }
 }

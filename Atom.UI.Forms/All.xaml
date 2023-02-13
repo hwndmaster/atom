@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Genius.Atom.UI.Forms;component/Styles/Common.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Genius.Atom.UI.Forms;component/Styles/Controls.AutoGrid.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Genius.Atom.UI.Forms;component/Styles/Controls.TagEditor.xaml" />
     </ResourceDictionary.MergedDictionaries>
 

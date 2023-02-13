@@ -17,6 +17,7 @@ public static class Module
     public static void Configure(IServiceCollection services)
     {
         services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
+        services.AddSingleton(typeof(IFactory<>), typeof(ServiceFactory<>));
         services.AddSingleton<ICommandBus, CommandBus>();
         services.AddSingleton<IDateTime, SystemDateTime>();
         services.AddSingleton<IEventBus, EventBus>();

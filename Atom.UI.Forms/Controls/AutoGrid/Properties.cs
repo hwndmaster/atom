@@ -97,17 +97,17 @@ public static class Properties
         var dataGrid = (DataGrid)d;
         var itemType = Helpers.GetListItemType(e.NewValue);
         var properties = itemType.GetProperties();
-        var groupByProps = properties
-            .Where(x => x.GetCustomAttributes(false).OfType<GroupByAttribute>().Any())
-            .ToList();
-
         var buildContext = AutoGridBuildContext.CreateLazy(dataGrid);
+
+        var groupByProps = buildContext.Value.Columns.OfType<AutoGridBuildTextColumnContext>()
+            .Where(x => x.IsGrouped)
+            .ToArray();
         var filterByProps = buildContext.Value.Columns
             .OfType<AutoGridBuildTextColumnContext>()
             .Where(x => x.Filterable)
             .ToArray();
 
-        if (groupByProps.Count == 0 && filterByProps.Length == 0)
+        if (groupByProps.Length == 0 && filterByProps.Length == 0)
         {
             d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue is CollectionViewSource cvs
                 ? cvs.View
@@ -129,7 +129,7 @@ public static class Properties
         }
     }
 
-    private static void SetupGrouping(List<PropertyInfo> groupByProps, CollectionViewSource collectionViewSource)
+    private static void SetupGrouping(AutoGridBuildTextColumnContext[] groupByProps, CollectionViewSource collectionViewSource)
     {
         if (collectionViewSource.Source is IEnumerable enumerable)
         {
@@ -153,17 +153,17 @@ public static class Properties
 
         foreach (var groupByProp in groupByProps)
         {
-            collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(groupByProp.Name));
+            collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(groupByProp.Property.Name));
         }
     }
 
-    private static void AttachToPropertyChangedEvents(List<PropertyInfo> groupByProps, CollectionViewSource collectionViewSource, IEnumerable items)
+    private static void AttachToPropertyChangedEvents(AutoGridBuildTextColumnContext[] groupByProps, CollectionViewSource collectionViewSource, IEnumerable items)
     {
         foreach (var childViewModel in items.OfType<ViewModelBase>())
         {
             foreach (var groupByProp in groupByProps)
             {
-                childViewModel.WhenChanged(groupByProp.Name, (object _) =>
+                childViewModel.WhenChanged(groupByProp.Property.Name, (object _) =>
                     collectionViewSource.View.Refresh());
             }
         }
