@@ -18,9 +18,11 @@ public interface IAutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuild
     TBuilder WithToolTipPath(string toolTipPath);
     TBuilder WithValueConverter<TValueConverter>()
         where TValueConverter : IValueConverter;
+    TBuilder WithValueConverter(IValueConverter valueConverter);
+    TBuilder WithValueConverter(Func<IValueConverter> valueConverterFactory);
 }
 
-internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn<TBuilder>, IHasBuildColumnContext
+internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn<TBuilder>, IHasBuildColumnContext
     where TBuilder : IAutoGridContextBuilderColumn<TBuilder>
 {
     private string? _displayName;
@@ -29,6 +31,8 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
     protected StylingRecord? _style;
     protected string? _toolTip;
     protected string? _toolTipPath;
+    protected IValueConverter? _valueConverter;
+    protected Func<IValueConverter>? _valueConverterFactory;
     protected Type? _valueConverterType;
 
     protected AutoGridContextBuilderColumn(PropertyDescriptor propertyDescriptor)
@@ -80,16 +84,38 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
         return BuilderInstance;
     }
 
+    public TBuilder WithValueConverter(IValueConverter valueConverter)
+    {
+        _valueConverter = valueConverter;
+        return BuilderInstance;
+    }
+
+    public TBuilder WithValueConverter(Func<IValueConverter> valueConverterFactory)
+    {
+        _valueConverterFactory = valueConverterFactory;
+        return BuilderInstance;
+    }
+
     public abstract AutoGridBuildColumnContext Build();
 
     protected string DetermineDisplayName()
     {
         return _displayName
-            ?? Regex.Replace(PropertyDescriptor.Name, "[A-Z]", " $0");
+            ?? DisplayNameRegex().Replace(PropertyDescriptor.Name, " $0");
     }
 
     protected IValueConverter? DetermineValueConverter(string? displayFormat)
     {
+        if (_valueConverter is not null)
+        {
+            return _valueConverter;
+        }
+
+        if (_valueConverterFactory is not null)
+        {
+            return _valueConverterFactory();
+        }
+
         if (_valueConverterType is not null)
         {
             return ((Module.ServiceProvider.GetService(_valueConverterType)
@@ -107,4 +133,7 @@ internal abstract class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContex
 
     protected abstract TBuilder BuilderInstance { get; }
     protected PropertyDescriptor PropertyDescriptor { get; }
+
+    [GeneratedRegex("[A-Z]")]
+    private static partial Regex DisplayNameRegex();
 }

@@ -1,8 +1,8 @@
-namespace Genius.Atom.Infrastructure;
+namespace Genius.Atom.Infrastructure.Linq;
 
 // NOTE: Originally taken from https://raw.githubusercontent.com/fsateler/MoreLINQ/master/MoreLinq/FullJoin.cs
 
-public static class LinqExtensions
+public static class FullJoinExtensions
 {
     /// <summary>
     ///   Performs a full outer join on two homogeneous sequences.

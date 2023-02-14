@@ -92,26 +92,26 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
 
         if (browser == "Chrome")
         {
-            var webkit = Utils.RandomInt(500, 599).ToString();
-            var version = $"{Utils.RandomInt(0, 24)}.0{Utils.RandomInt(0, 1500)}.{Utils.RandomInt(0, 999)}";
+            var webkit = Randomizer.RandomInt(500, 599).ToString();
+            var version = $"{Randomizer.RandomInt(0, 24)}.0{Randomizer.RandomInt(0, 1500)}.{Randomizer.RandomInt(0, 999)}";
 
             return $"Mozilla/5.0 ({os}) AppleWebKit{webkit}.0 (KHTML, live Gecko) Chrome/{version} Safari/{webkit}";
         }
         if (browser == "Firefox")
         {
-            var year = Utils.RandomInt(2000, 2021);
-            var month = Utils.RandomInt(1, 12);
-            var day = Utils.RandomInt(1, 28);
+            var year = Randomizer.RandomInt(2000, 2021);
+            var month = Randomizer.RandomInt(1, 12);
+            var day = Randomizer.RandomInt(1, 28);
             var gecko = $"{year}{month:00}{day:00}";
-            var version = $"{Utils.RandomInt(1, 15)}.0";
+            var version = $"{Randomizer.RandomInt(1, 15)}.0";
 
             return $"Mozilla/5.0 ({os}; rv:{version}) Gecko/{gecko} Firefox/{version}";
         }
         if (browser == "IE")
         {
-            var version = $"{Utils.RandomInt(1, 10)}.0";
-            var engine = $"{Utils.RandomInt(1, 5)}.0";
-            var option = Utils.RandomBool();
+            var version = $"{Randomizer.RandomInt(1, 10)}.0";
+            var engine = $"{Randomizer.RandomInt(1, 5)}.0";
+            var option = Randomizer.RandomBool();
             string token;
             if (option)
             {

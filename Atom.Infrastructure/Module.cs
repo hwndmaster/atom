@@ -3,6 +3,7 @@ using Genius.Atom.Infrastructure.Commands;
 using Genius.Atom.Infrastructure.Events;
 using Genius.Atom.Infrastructure.Io;
 using Genius.Atom.Infrastructure.Net;
+using Genius.Atom.Infrastructure.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Infrastructure;

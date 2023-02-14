@@ -1,4 +1,6 @@
-namespace Genius.Atom.Infrastructure.TestingUtil;
+using Genius.Atom.Infrastructure.Tasks;
+
+namespace Genius.Atom.Infrastructure.TestingUtil.Tasks;
 
 public sealed class TestSynchronousScheduler : ISynchronousScheduler
 {

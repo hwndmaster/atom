@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Genius.Atom.Infrastructure;
 
-public static class Utils
+public static class Randomizer
 {
     private static readonly Random _rnd = new();
 

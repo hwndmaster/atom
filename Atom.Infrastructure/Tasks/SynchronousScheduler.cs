@@ -1,4 +1,4 @@
-namespace Genius.Atom.Infrastructure;
+namespace Genius.Atom.Infrastructure.Tasks;
 
 public interface ISynchronousScheduler
 {
