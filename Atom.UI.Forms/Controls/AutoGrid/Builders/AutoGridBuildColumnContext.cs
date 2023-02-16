@@ -14,6 +14,10 @@ public abstract class AutoGridBuildColumnContext
         IsReadOnly = false;
     }
 
+    public bool IsGroupedColumn()
+        => this is AutoGridBuildTextColumnContext textColumnContext
+            && textColumnContext.IsGrouped;
+
     public PropertyDescriptor Property { get; }
     public string DisplayName { get; }
     public int? DisplayIndex { get; internal set; }

@@ -5,16 +5,16 @@ namespace Genius.Atom.UI.Forms.Demo.AutoGridBuilders
 {
     public class SampleDataAutoGridBuilder : IAutoGridBuilder
     {
-        private readonly IAutoGridContextBuilder<SampleData> _contextBuilder;
+        private readonly IFactory<IAutoGridContextBuilder<SampleData>> _contextBuilderFactory;
 
-        public SampleDataAutoGridBuilder(IAutoGridContextBuilder<SampleData> contextBuilder)
+        public SampleDataAutoGridBuilder(IFactory<IAutoGridContextBuilder<SampleData>> contextBuilderFactory)
         {
-            _contextBuilder = contextBuilder.NotNull();
+            _contextBuilderFactory = contextBuilderFactory.NotNull();
         }
 
         public AutoGridBuildContext Build()
         {
-            return _contextBuilder
+            return _contextBuilderFactory.Create()
                 .WithColumns(c => c.AddAll())
                 .WithRecordFactory<SampleDataFactory>()
                 .Build();

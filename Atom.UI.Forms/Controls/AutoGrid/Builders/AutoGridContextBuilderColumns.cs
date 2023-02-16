@@ -63,7 +63,9 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
     public IAutoGridContextBuilderColumns<TViewModel> AddAll()
     {
         _columnBuilders.AddRange(
-            _propertyDescriptors.Cast<PropertyDescriptor>()
+            _propertyDescriptors
+                .Cast<PropertyDescriptor>()
+                .Where(pd => !AutoGridBuilderHelpers.IsIgnorableProperty(pd.Name))
                 .Select(pd => AutoGridBuilderHelpers.CreateContextBuilderColumn(pd))
         );
 

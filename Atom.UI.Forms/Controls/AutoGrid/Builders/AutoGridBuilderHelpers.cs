@@ -5,7 +5,7 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 internal static class AutoGridBuilderHelpers
 {
-    public static IAutoGridContextBuilderColumn CreateContextBuilderColumn(PropertyDescriptor property)
+    internal static IAutoGridContextBuilderColumn CreateContextBuilderColumn(PropertyDescriptor property)
     {
         Guard.NotNull(property);
 
@@ -14,11 +14,34 @@ internal static class AutoGridBuilderHelpers
             return new AutoGridContextBuilderCommandColumn(property);
         }
 
+        if (IsGroupableColumn(property))
+        {
+            return new AutoGridContextBuilderTextColumn(property)
+                .IsGrouped();
+        }
+
         return new AutoGridContextBuilderTextColumn(property);
     }
 
-    public static bool IsCommandColumn(PropertyDescriptor property)
+    internal static bool IsIgnorableProperty(string propertyName)
+    {
+        var ignoreProperties = new [] {
+            nameof(IHasDirtyFlag.IsDirty),
+            nameof(ISelectable.IsSelected),
+            nameof(IEditable.IsEditing),
+            nameof(INotifyDataErrorInfo.HasErrors)
+        };
+
+        return ignoreProperties.Contains(propertyName);
+    }
+
+    internal static bool IsCommandColumn(PropertyDescriptor property)
     {
         return typeof(ICommand).IsAssignableFrom(property.PropertyType);
+    }
+
+    internal static bool IsGroupableColumn(PropertyDescriptor property)
+    {
+        return typeof(IGroupableViewModel).IsAssignableFrom(property.PropertyType);
     }
 }

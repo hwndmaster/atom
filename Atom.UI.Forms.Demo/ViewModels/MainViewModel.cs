@@ -5,7 +5,7 @@ using Genius.Atom.UI.Forms.Demo.AutoGridBuilders;
 
 namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
-public class MainViewModel
+public class MainViewModel : ViewModelBase
 {
     private readonly IAtomViewModelFactory _vmFactory;
 
@@ -14,6 +14,7 @@ public class MainViewModel
     {
         _vmFactory = vmFactory.NotNull();
         AutoGridBuilder = autoGridBuilder.NotNull();
+        var sampleDataFactoryImpl = (SampleDataFactory)sampleDataFactory;
 
         TagsForControl1 = _vmFactory.CreateTagEditorViewModel(tagsContext.TagsObservables);
 
@@ -21,12 +22,14 @@ public class MainViewModel
         TagsForControl1.AddSelected(tagsContext.TagsObservables[1]);
         TagsForControl1.AddSelected(tagsContext.TagsObservables[2]);
 
-        GridItems.Add(sampleDataFactory.Create());
+        var group = new SampleGroupableViewModel() { GroupTitle = "Group 1", IsExpanded = true };
+
+        GridItems.Add(sampleDataFactoryImpl.ForGroup(group).Create());
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[0]);
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[4]);
         GridItems[0].Tags.AddSelected(GridItems[0].Tags.AllTags[8]);
 
-        var item2 = sampleDataFactory.Create();
+        var item2 = sampleDataFactoryImpl.ForGroup(group).Create();
         item2.Name = "Very very very very very very very very very very very very very long name";
         item2.DateTime = DateTime.Now.AddDays(100);
         GridItems.Add(item2);

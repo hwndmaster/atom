@@ -4,6 +4,12 @@ namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
 public class SampleData : ViewModelBase, IEditable, ISelectable
 {
+    public SampleGroupableViewModel Groupable
+    {
+        get => GetOrDefault<SampleGroupableViewModel>();
+        set => RaiseAndSetIfChanged(value);
+    }
+
     public string Name
     {
         get => GetOrDefault<string>();

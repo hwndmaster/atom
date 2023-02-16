@@ -94,12 +94,10 @@ public static class Properties
     private static void ItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var dataGrid = (DataGrid)d;
-        var itemType = Helpers.GetListItemType(e.NewValue);
-        var properties = itemType.GetProperties();
         var buildContext = AutoGridBuildContext.CreateLazy(dataGrid);
 
-        var groupByProps = buildContext.Value.Columns.OfType<AutoGridBuildTextColumnContext>()
-            .Where(x => x.IsGrouped)
+        var groupByProps = buildContext.Value.Columns
+            .Where(x => x.IsGroupedColumn())
             .ToArray();
         var filterByProps = buildContext.Value.Columns
             .OfType<AutoGridBuildTextColumnContext>()
@@ -128,7 +126,7 @@ public static class Properties
         }
     }
 
-    private static void SetupGrouping(AutoGridBuildTextColumnContext[] groupByProps, CollectionViewSource collectionViewSource)
+    private static void SetupGrouping(AutoGridBuildColumnContext[] groupByProps, CollectionViewSource collectionViewSource)
     {
         if (collectionViewSource.Source is IEnumerable enumerable)
         {
@@ -156,7 +154,7 @@ public static class Properties
         }
     }
 
-    private static void AttachToPropertyChangedEvents(AutoGridBuildTextColumnContext[] groupByProps, CollectionViewSource collectionViewSource, IEnumerable items)
+    private static void AttachToPropertyChangedEvents(AutoGridBuildColumnContext[] groupByProps, CollectionViewSource collectionViewSource, IEnumerable items)
     {
         foreach (var childViewModel in items.OfType<ViewModelBase>())
         {
@@ -173,8 +171,8 @@ public static class Properties
     {
         var vm = GetViewModel(d);
 
-        var filterContext = vm.GetType().GetProperties()
-            .FirstOrDefault(x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any());
+        var filterContext = Array.Find(vm.GetType().GetProperties(),
+            x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any());
 
         if (filterContext is null || filterByProps.Length == 0)
             return;

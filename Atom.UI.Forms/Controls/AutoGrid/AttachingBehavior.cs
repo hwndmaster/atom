@@ -52,8 +52,6 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
         AssociatedObject.AddingNewItem += OnAddingNewItem;
 
-        AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Genius.AutoGrid.GroupStyle"));
-
         var dpd = DependencyPropertyDescriptor.FromProperty(DataGrid.ItemsSourceProperty, typeof(DataGrid));
         dpd?.AddValueChanged(AssociatedObject, OnItemsSourceChanged);
 
@@ -108,6 +106,20 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         {
             AssociatedObject.SetValue(DataGrid.IsReadOnlyProperty, true);
         }
+
+        var groupingProperties = _autoGridBuildContext.Value.Columns.Where(x => x.IsGroupedColumn()).ToArray();
+        if (groupingProperties.Any())
+        {
+            if (groupingProperties.Any(x => AutoGridBuilderHelpers.IsGroupableColumn(x.Property)))
+            {
+                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Genius.AutoGrid.Group.GroupableViewModel"));
+                AssociatedObject.SetValue(Grid.IsSharedSizeScopeProperty, true);
+            }
+            else
+            {
+                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Genius.AutoGrid.Group.String"));
+            }
+        }
     }
 
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -121,15 +133,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
         var context = new AutoGridColumnContext(AssociatedObject, e, buildColumnContext);
 
-        var ignoreProperties = new [] {
-            nameof(IHasDirtyFlag.IsDirty),
-            nameof(ISelectable.IsSelected),
-            nameof(IEditable.IsEditing),
-            nameof(INotifyDataErrorInfo.HasErrors)
-        };
-
-        if (ignoreProperties.Contains(e.PropertyName)
-            || (buildColumnContext is AutoGridBuildTextColumnContext textColumn && textColumn.IsGrouped))
+        if (AutoGridBuilderHelpers.IsIgnorableProperty(e.PropertyName)
+            || buildColumnContext.IsGroupedColumn())
             //|| typeof(ICollection).IsAssignableFrom(context.Property.PropertyType))
         {
             e.Cancel = true;

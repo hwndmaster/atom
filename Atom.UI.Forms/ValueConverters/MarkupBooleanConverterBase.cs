@@ -8,8 +8,8 @@ public abstract class MarkupBooleanConverterBase<T> : MarkupExtension, IValueCon
 {
     protected MarkupBooleanConverterBase(T trueValue, T falseValue)
     {
-        True = trueValue.NotNull(nameof(trueValue));
-        False = falseValue.NotNull(nameof(falseValue));
+        True = trueValue.NotNull();
+        False = falseValue.NotNull();
     }
 
     public T True { get; set; }
