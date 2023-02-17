@@ -11,7 +11,7 @@ public record struct CommandGroupingField(string? Label, string? ImageName, IAct
 public interface IGroupableViewModel : IViewModel
 {
     string GroupTitle { get; }
-    int ItemCount { get; }
+    int? ItemCount { get; }
     bool IsExpanded { get; set; }
     IEnumerable<IGroupingField> ExtraGroupFields { get; }
 }

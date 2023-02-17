@@ -45,8 +45,8 @@
                                         <TextBlock Grid.Column="0" Style="{StaticResource Genius.AutoGrid.Group.Title}" Text="{Binding Name.GroupTitle}" />
                                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                                             <TextBlock Text=" Items: "/>
-                                            <TextBlock Text="{Binding Name.ItemCount}" Visibility="{Binding Name.ItemCount, Converter={local:IntIsGreaterThanZeroToVisibilityConverter}}" />
-                                            <TextBlock Text="{Binding ItemCount}" Visibility="{Binding Name.ItemCount, Converter={local:InvertedIntIsGreaterThanZeroToVisibilityConverter}}" />
+                                            <TextBlock Text="{Binding Name.ItemCount}" Visibility="{Binding Name.ItemCount, Converter={local:NotNullToVisibilityConverter}}" />
+                                            <TextBlock Text="{Binding ItemCount}" Visibility="{Binding Name.ItemCount, Converter={local:InvertedNotNullToVisibilityConverter}}" />
                                         </StackPanel>
                                         <ItemsControl Grid.Column="2" ItemsSource="{Binding Name.ExtraGroupFields}">
                                             <ItemsControl.ItemsPanel>

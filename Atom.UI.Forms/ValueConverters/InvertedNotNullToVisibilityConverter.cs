@@ -3,16 +3,16 @@ using System.Windows.Markup;
 
 namespace Genius.Atom.UI.Forms;
 
-internal sealed class NotNullToVisibilityConverter : MarkupExtension, IValueConverter
+internal sealed class InvertedNotNullToVisibilityConverter : MarkupExtension, IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
         if (value is null)
         {
-            return Visibility.Collapsed;
+            return Visibility.Visible;
         }
 
-        return Visibility.Visible;
+        return Visibility.Collapsed;
     }
 
     public object? ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

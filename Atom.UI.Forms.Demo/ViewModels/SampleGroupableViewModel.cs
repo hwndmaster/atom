@@ -18,7 +18,7 @@ public class SampleGroupableViewModel : ViewModelBase, IGroupableViewModel
         set => RaiseAndSetIfChanged(value);
     }
 
-    public int ItemCount
+    public int? ItemCount
     {
         get => GetOrDefault<int>();
         set => RaiseAndSetIfChanged(value);
