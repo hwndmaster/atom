@@ -39,6 +39,13 @@ public sealed class PropertyValueStringConverter : IValueConverter
         if (targetType.IsAssignableFrom(value.GetType()))
             return value;
 
-        throw new NotSupportedException();
+        try
+        {
+            return System.Convert.ChangeType(value, targetType);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

@@ -14,12 +14,19 @@
         <StackPanel Orientation="Horizontal" Margin="{StaticResource Genius.AutoGrid.Group.ItemMargin}" VerticalAlignment="Center">
             <TextBlock Text="{Binding Path=Label}" />
             <TextBlock Text=" " />
-            <TextBlock Text="{Binding Path=Value}" />
+            <TextBlock ToolTip="{Binding ToolTip}">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{local:WrappingConverter}">
+                        <Binding Path="Value" />
+                        <Binding Path="Converter" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
         </StackPanel>
     </DataTemplate>
     <DataTemplate DataType="{x:Type local:CommandGroupingField}">
         <StackPanel Orientation="Horizontal" Margin="{StaticResource Genius.AutoGrid.Group.ItemMargin}" VerticalAlignment="Center">
-            <Button Content="{Binding Label}" Command="{Binding Command}" />
+            <Button Content="{Binding Label}" Command="{Binding Command}" ToolTip="{Binding ToolTip}" />
         </StackPanel>
     </DataTemplate>
 

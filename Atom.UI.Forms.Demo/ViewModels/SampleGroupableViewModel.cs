@@ -18,11 +18,7 @@ public class SampleGroupableViewModel : ViewModelBase, IGroupableViewModel
         set => RaiseAndSetIfChanged(value);
     }
 
-    public int? ItemCount
-    {
-        get => GetOrDefault<int>();
-        set => RaiseAndSetIfChanged(value);
-    }
+    public int? ItemCount => null; // Will be determined automatically
 
     public bool IsExpanded
     {
@@ -34,9 +30,9 @@ public class SampleGroupableViewModel : ViewModelBase, IGroupableViewModel
     {
         get
         {
-            yield return new ValueGroupingField("Abbr", GroupTitle[0], null);
-            yield return new ValueGroupingField("Random Number", Guid.NewGuid().GetHashCode(), null);
-            yield return new CommandGroupingField("RUN IT!", null, RunItCommand);
+            yield return new ValueGroupingField("Abbr", GroupTitle[0], null, "This is an abbreviation");
+            yield return new ValueGroupingField("Random Number", Guid.NewGuid().GetHashCode(), new PropertyValueStringConverter("#,###,##0"));
+            yield return new CommandGroupingField("RUN IT!", RunItCommand, null, "Do something");
         }
     }
 
