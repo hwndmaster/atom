@@ -120,7 +120,7 @@ public static class Properties
                 };
 
             SetupGrouping(groupByProps, collectionViewSource);
-            SetupFiltering(d, filterByProps, collectionViewSource);
+            SetupFiltering(d, filterByProps, collectionViewSource, buildContext.Value.FilterContextScope);
 
             d.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
         }
@@ -167,19 +167,20 @@ public static class Properties
     }
 
     private static void SetupFiltering(DependencyObject d, AutoGridBuildTextColumnContext[] filterByProps,
-        CollectionViewSource collectionViewSource)
+        CollectionViewSource collectionViewSource, string? filterContextScope)
     {
         var vm = GetViewModel(d);
 
-        var filterContext = Array.Find(vm.GetType().GetProperties(),
-            x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any());
+        var filterContext = filterContextScope is null
+            ? Array.Find(vm.GetType().GetProperties(), x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any())
+            : Array.Find(vm.GetType().GetProperties(), x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>()
+                .Any(x => filterContextScope.Equals(x.Scope, StringComparison.Ordinal)));
 
         if (filterContext is null || filterByProps.Length == 0)
             return;
 
         string filter = string.Empty;
         // TODO: Dispose event subscription when detached
-        // TODO: Use vm.WhenChanged() which returns IObservable<T>
         vm.WhenChanged(filterContext.Name, (string s) => {
             filter = s;
             collectionViewSource.View.Refresh();
@@ -196,17 +197,10 @@ public static class Properties
             foreach (var filterProp in filterByProps)
             {
                 var value = filterProp.Property.GetValue(e.Item);
-                if (value is string stringValue)
+
+                if (AutoGridRowFilter.IsMatch(value, filter, filterProp.ValueConverter))
                 {
-                    if (stringValue.Contains(filter, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        // Accepted
-                        return;
-                    }
-                }
-                else
-                {
-                    throw new NotSupportedException($"Type '{value?.GetType().Name}' is not supported yet for AutoGrid filtering");
+                    return;
                 }
             }
 

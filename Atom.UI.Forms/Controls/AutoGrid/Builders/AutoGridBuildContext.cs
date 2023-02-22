@@ -37,5 +37,6 @@ public sealed class AutoGridBuildContext
     public IFactory<object> RecordFactory { get; init; }
 
     public bool EnableVirtualization { get; init; }
+    public string? FilterContextScope { get; init; }
     public bool MakeReadOnly { get; init; }
 }
