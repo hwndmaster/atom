@@ -3,7 +3,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 
-namespace Genius.Atom.UI.Forms.Behaviors;
+namespace Genius.Atom.UI.Forms;
 
 public class FilterBoxBehavior : Behavior<TextBox>
 {

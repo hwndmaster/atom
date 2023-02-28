@@ -4,7 +4,7 @@ using System.Reactive.Disposables;
 using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
 
-namespace Genius.Atom.UI.Forms.Behaviors;
+namespace Genius.Atom.UI.Forms;
 
 public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
 {

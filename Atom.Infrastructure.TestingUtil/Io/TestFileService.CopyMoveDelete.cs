@@ -1,9 +1,6 @@
-using System.Text;
-using Genius.Atom.Infrastructure.Io;
-
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
-public sealed partial class TestFileService : IFileService
+public sealed partial class TestFileService
 {
     public void CopyFile(string sourceFileName, string destFileName)
         => CopyOrMoveFile(sourceFileName, destFileName, overwrite: false, copy: true);

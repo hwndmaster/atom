@@ -3,18 +3,20 @@ using Genius.Atom.Infrastructure.Io;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
-public abstract record EntityContext(string FullName, FileAttributes Attributes);
-public record FileContext(string FullName, byte[] Content, FileAttributes Attributes) : EntityContext(FullName, Attributes);
-public record DirectoryContext(string FullName, FileAttributes Attributes) : EntityContext(FullName, Attributes);
+public abstract record EntityContext(string FullName, FileSystemDetails GenericDetails);
+public record FileContext(string FullName, byte[] Content, FileDetails Details) : EntityContext(FullName, Details);
+public record DirectoryContext(string FullName, DirectoryDetails Details) : EntityContext(FullName, Details);
 
 public sealed partial class TestFileService : IFileService
 {
     private readonly Dictionary<string, FileContext> _files = new();
     private readonly Dictionary<string, DirectoryContext> _dirs = new();
+    private readonly IDateTime _dateTime;
     private readonly bool _ignoreCase;
 
-    public TestFileService(bool ignoreCase = true)
+    public TestFileService(IDateTime? dateTime = null, bool ignoreCase = true)
     {
+        _dateTime = dateTime ?? new TestDateTime();
         _ignoreCase = ignoreCase;
     }
 
@@ -23,7 +25,7 @@ public sealed partial class TestFileService : IFileService
         Guard.NotNullOrWhitespace(path);
 
         var key = CreatePathKey(path);
-        _files[key] = new FileContext(path, content ?? Array.Empty<byte>(), fileAttributes ?? FileAttributes.Normal);
+        _files[key] = new FileContext(path, content ?? Array.Empty<byte>(), CreateFileDetails(path, content?.Length ?? 0, fileAttributes));
 
         AddDirectory(Path.GetDirectoryName(key).NotNull());
     }
@@ -35,7 +37,10 @@ public sealed partial class TestFileService : IFileService
         if (_dirs.ContainsKey(path))
             return;
 
-        _dirs.Add(path, new DirectoryContext(path, FileAttributes.Directory | (fileAttributes ?? 0)));
+        _dirs.Add(path, new DirectoryContext(path, new DirectoryDetails(path,
+            FileAttributes.Directory | (fileAttributes ?? 0),
+            _dateTime.Now, _dateTime.NowUtc, _dateTime.Now, _dateTime.NowUtc, _dateTime.Now, _dateTime.NowUtc,
+            this)));
     }
 
     public Stream CreateFile(string path)
@@ -64,6 +69,28 @@ public sealed partial class TestFileService : IFileService
     {
         var key = CreatePathKey(path);
         return _files.ContainsKey(key);
+    }
+
+    public DirectoryDetails GetDirectoryDetails(string path)
+    {
+        var key = CreatePathKey(path);
+        if (!_dirs.TryGetValue(key, out var dirContext))
+        {
+            throw new DirectoryNotFoundException(path);
+        }
+
+        return dirContext.Details;
+    }
+
+    public FileDetails GetFileDetails(string fullPath)
+    {
+        var key = CreatePathKey(fullPath);
+        if (!_files.TryGetValue(key, out var fileContext))
+        {
+            throw new FileNotFoundException(fullPath);
+        }
+
+        return fileContext.Details;
     }
 
     public bool IsDirectory(string path)
@@ -136,7 +163,9 @@ public sealed partial class TestFileService : IFileService
     public void WriteTextToFile(string path, string content, Encoding encoding)
     {
         var key = CreatePathKey(path);
-        _files.Add(key, new FileContext(path, encoding.GetBytes(content), FileAttributes.Normal));
+
+        var contentBytes = encoding.GetBytes(content);
+        _files.Add(key, new FileContext(path, contentBytes, CreateFileDetails(path, contentBytes.Length, FileAttributes.Normal)));
     }
 
     public Task WriteTextToFileAsync(string path, string content, Encoding encoding, CancellationToken? cancellationToken = null)
@@ -144,6 +173,11 @@ public sealed partial class TestFileService : IFileService
         WriteTextToFile(path, content, encoding);
         return Task.CompletedTask;
     }
+
+    private FileDetails CreateFileDetails(string path, long length, FileAttributes? attributes)
+        => new(path, length, attributes ?? FileAttributes.Normal,
+            _dateTime.Now, _dateTime.NowUtc, _dateTime.Now, _dateTime.NowUtc, _dateTime.Now, _dateTime.NowUtc,
+            this);
 
     private string CreatePathKey(string path)
         => _ignoreCase ? path.ToLower() : path;

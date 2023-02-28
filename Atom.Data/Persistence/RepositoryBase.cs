@@ -1,3 +1,5 @@
+using System.Reactive;
+using System.Reactive.Subjects;
 using Genius.Atom.Infrastructure.Entities;
 using Genius.Atom.Infrastructure.Events;
 using Microsoft.Extensions.Logging;
@@ -18,6 +20,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
     protected readonly IEventBus _eventBus;
     protected readonly ILogger _logger;
     protected readonly IJsonPersister _persister;
+    protected readonly Subject<IReadOnlyList<TEntity>> _loaded = new();
 
     private List<TEntity>? _entities;
 
@@ -83,6 +86,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
 
         _entities = _persister.LoadCollection<TEntity>(FILENAME).NotNull().ToList();
         await FillUpRelationsAsync();
+        _loaded.OnNext(_entities.AsReadOnly());
     }
 
     private void DeleteInternal(Guid entityId, string fileName)
@@ -157,4 +161,6 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
 
         _logger.LogInformation("Entities of type {typeName} updated.", typeof(TEntity).Name);
     }
+
+    protected IObservable<IReadOnlyList<TEntity>> Loaded => _loaded;
 }

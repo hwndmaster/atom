@@ -1,7 +1,7 @@
 using System.Windows.Controls;
 using System.Windows.Documents;
 
-namespace Genius.Atom.UI.Forms.Behaviors;
+namespace Genius.Atom.UI.Forms;
 
 public class RichTextDocumentBehavior
 {

@@ -3,7 +3,7 @@ using System.Windows.Markup;
 
 namespace Genius.Atom.UI.Forms;
 
-internal sealed class InvertedNotNullToVisibilityConverter : MarkupExtension, IValueConverter
+public sealed class InvertedNotNullToVisibilityConverter : MarkupExtension, IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {

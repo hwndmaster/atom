@@ -56,7 +56,7 @@ public sealed partial class TestFileService : IFileService
             .Where(x =>
             {
                 if (options.AttributesToSkip != 0
-                    && (x.Attributes & options.AttributesToSkip) == x.Attributes)
+                    && (x.GenericDetails.Attributes & options.AttributesToSkip) == x.GenericDetails.Attributes)
                 {
                     return false;
                 }

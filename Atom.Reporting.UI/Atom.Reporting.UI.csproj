@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Infrastructure\Atom.Infrastructure.csproj" />
+    <ProjectReference Include="..\Atom.Reporting\Atom.Reporting.csproj" />
+    <ProjectReference Include="..\Atom.UI.Forms\Atom.UI.Forms.csproj" />
+  </ItemGroup>
+
+</Project>

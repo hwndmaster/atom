@@ -6,7 +6,7 @@ using System.Windows.Input;
 using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Xaml.Behaviors;
 
-namespace Genius.Atom.UI.Forms.Behaviors;
+namespace Genius.Atom.UI.Forms;
 
 // NOTE: This implementation was originally taken here:
 //       https://github.com/markjulmar/mvvmhelpers/blob/master/Julmar.Wpf.Helpers/Julmar.Wpf.Behaviors/Interactivity/MultiSelectTreeViewBehavior.cs

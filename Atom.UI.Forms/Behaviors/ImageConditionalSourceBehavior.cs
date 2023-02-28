@@ -2,7 +2,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Microsoft.Xaml.Behaviors;
 
-namespace Genius.Atom.UI.Forms.Behaviors;
+namespace Genius.Atom.UI.Forms;
 
 public sealed class ImageConditionalSourceBehavior : Behavior<Image>
 {
