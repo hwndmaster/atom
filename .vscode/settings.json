@@ -8,5 +8,6 @@
         "lcov.info"
     ],
     "dotnet-test-explorer.autoWatch": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "dotnet.defaultSolution": "Atom.sln"
 }

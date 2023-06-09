@@ -30,6 +30,14 @@ public sealed class DirectoryDetails : FileSystemDetails
         Name = Path.GetFileName(path).NotNull();
     }
 
+    public long CalculateDirectorySize()
+    {
+        return _fileService
+            .EnumerateFiles(FullPath, "*", SearchOption.AllDirectories)
+            .Select(x => _fileService.GetFileDetails(x).Length)
+            .Sum();
+    }
+
     public override bool Exists => _fileService.PathExists(Name);
 
     public override string Name { get; protected set; }

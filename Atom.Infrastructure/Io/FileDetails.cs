@@ -33,7 +33,7 @@ public sealed class FileDetails : FileSystemDetails
         Init(filePath, info.Length);
     }
 
-    [MemberNotNull(nameof(Name), nameof(DirectoryName), nameof(Length))]
+    [MemberNotNull(nameof(Name), nameof(Length))]
     private void Init(string filePath, long length)
     {
         Name = Path.GetFileName(filePath).NotNull();
