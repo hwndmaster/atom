@@ -12,6 +12,7 @@
     <BitmapImage x:Key="DonePink16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/DonePink16.png" />
     <BitmapImage x:Key="Error16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Error16.png" />
     <BitmapImage x:Key="Outdated16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Outdated16.png" />
+    <BitmapImage x:Key="Pen16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Pen16.png" />
     <BitmapImage x:Key="Plus16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Plus16.png" />
     <BitmapImage x:Key="Refresh16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Refresh16.png" />
     <BitmapImage x:Key="Trash16" UriSource="pack://application:,,,/Genius.Atom.UI.Forms;component/Assets/Trash16.png" />

@@ -109,4 +109,18 @@ public static class ViewModelExtensions
             .Where(x => propNames.Length == 0 || propNames.Contains(x.EventArgs.PropertyName))
             .Select(_ => Unit.Default);
     }
+
+    /// <summary>
+    ///   Returns an observable which is triggered every time when a validation error is added or removed.
+    /// </summary>
+    /// <param name="viewModel">The view model.</param>
+    /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
+    /// <returns>An observable.</returns>
+    public static IObservable<DataErrorsChangedEventArgs> WhenError<TViewModel>(this TViewModel viewModel)
+        where TViewModel : IViewModel
+    {
+        return Observable.FromEventPattern<EventHandler<DataErrorsChangedEventArgs>, DataErrorsChangedEventArgs>(
+            h => viewModel.ErrorsChanged += h, h => viewModel.ErrorsChanged -= h)
+            .Select(x => x.EventArgs);
+    }
 }
