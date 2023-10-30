@@ -417,8 +417,9 @@ public class DelayedObservableCollection<T> : Collection<T>,
                         foreach (Delegate delegateItem in _notifyInfo.RootCollection.CollectionChanged.GetInvocationList())
                         {
                             if (delegateItem.Target is ListCollectionView
-                                && args.Action == NotifyCollectionChangedAction.Add
-                                && args.NewItems?.Count > 1)
+                                && (
+                                    (args.Action == NotifyCollectionChangedAction.Add && args.NewItems?.Count > 1)
+                                    || (args.Action == NotifyCollectionChangedAction.Remove && args.OldItems?.Count > 1)))
                             {
                                 // To prevent "Range actions are not supported." NotSupportedException
                                 // in ListCollectionView we change the eventual event to Action == Reset
