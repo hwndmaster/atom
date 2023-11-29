@@ -65,6 +65,13 @@ public interface IFileService
     DirectoryDetails GetDirectoryDetails(string path);
 
     /// <summary>
+    ///   Returns directory size.
+    /// </summary>
+    /// <param name="path">The path to the directory.</param>
+    /// <param name="recursive">A flag indicating whether to perform a recursive directory size determination or not.</param>
+    long GetDirectorySize(string path, bool recursive);
+
+    /// <summary>
     ///   Returns file information.
     /// </summary>
     /// <param name="fullPath">The full path to the file.</param>

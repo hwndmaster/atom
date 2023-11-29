@@ -74,6 +74,12 @@ internal sealed class FileService : IFileService
     public DirectoryDetails GetDirectoryDetails(string path)
         => new(path, new DirectoryInfo(path), this);
 
+    public long GetDirectorySize(string path, bool recursive)
+    {
+        var dirInfo = new DirectoryInfo(path);
+        return GetDirectorySizeInternal(dirInfo, recursive);
+    }
+
     public FileDetails GetFileDetails(string fullPath)
         => new(fullPath, new FileInfo(fullPath), this);
 
@@ -141,4 +147,26 @@ internal sealed class FileService : IFileService
 
     public Task WriteTextToFileAsync(string path, string content, Encoding encoding, CancellationToken? cancellationToken = default)
         => File.WriteAllTextAsync(path, content, encoding, cancellationToken ?? default);
+
+    private static long GetDirectorySizeInternal(DirectoryInfo directoryInfo, bool recursive)
+    {
+        long size = 0;
+
+        var fileInfos = directoryInfo.GetFiles();
+        foreach (var fileInfo in fileInfos)
+        {
+            size += fileInfo.Length;
+        }
+
+        if (recursive)
+        {
+            DirectoryInfo[] subDirectories = directoryInfo.GetDirectories();
+            foreach (DirectoryInfo subDirectory in subDirectories)
+            {
+                size += GetDirectorySizeInternal(subDirectory, recursive);
+            }
+        }
+
+        return size;
+    }
 }

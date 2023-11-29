@@ -18,7 +18,7 @@ public sealed partial class TestFileService : IFileService
         });
 
     public IEnumerable<string> EnumerateDirectories(string path, string searchPattern, EnumerationOptions options)
-        => EnumerateFilesOrDirectories(_dirs.Values, path, searchPattern, options);
+        => EnumerateFilesOrDirectories(_dirs.Values, path, searchPattern, options).Select(x => x.FullName);
 
     public IEnumerable<string> EnumerateFiles(string path)
         => EnumerateFiles(path, "*", new EnumerationOptions());
@@ -27,7 +27,7 @@ public sealed partial class TestFileService : IFileService
         => EnumerateFiles(path, searchPattern, new EnumerationOptions());
 
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern, EnumerationOptions options)
-        => EnumerateFilesOrDirectories(_files.Values, path, searchPattern, options);
+        => EnumerateFilesOrDirectories(_files.Values, path, searchPattern, options).Select(x => x.FullName);
 
     public IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption)
         => EnumerateFiles(path, searchPattern, new EnumerationOptions
@@ -35,7 +35,7 @@ public sealed partial class TestFileService : IFileService
             RecurseSubdirectories = searchOption == SearchOption.AllDirectories
         });
 
-    private IEnumerable<string> EnumerateFilesOrDirectories(IEnumerable<EntityContext> collection, string path, string searchPattern, EnumerationOptions options)
+    private IEnumerable<EntityContext> EnumerateFilesOrDirectories(IEnumerable<EntityContext> collection, string path, string? searchPattern, EnumerationOptions options)
     {
         if (options.MaxRecursionDepth is not int.MaxValue or 0)
             throw new NotSupportedException("Custom MaxRecursionDepth values are not supported.");
@@ -48,7 +48,7 @@ public sealed partial class TestFileService : IFileService
             && !searchPattern.Equals("*")
             && !searchPattern.Equals("*.*");
         var regex = useSearchPattern
-            ? new Regex("^" + Regex.Escape(searchPattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$",
+            ? new Regex("^" + Regex.Escape(searchPattern!).Replace(@"\*", ".*").Replace(@"\?", ".") + "$",
                 RegexOptions.Singleline | (_ignoreCase ? RegexOptions.IgnoreCase : 0))
             : null;
 
@@ -85,7 +85,6 @@ public sealed partial class TestFileService : IFileService
                 }
 
                 return path.Equals(pathToThisEntity, pathComparer);
-            })
-            .Select(x => x.FullName);
+            });
     }
 }
