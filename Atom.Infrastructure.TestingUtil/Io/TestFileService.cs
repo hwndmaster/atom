@@ -82,9 +82,9 @@ public sealed partial class TestFileService : IFileService
         return dirContext.Details;
     }
 
-    public long GetDirectorySize(string path, bool recursive)
+    public long GetDirectorySize(string path, string? searchPattern, bool recursive)
     {
-        var files = EnumerateFilesOrDirectories(_files.Values, path, null, new EnumerationOptions { RecurseSubdirectories = recursive }).ToArray();
+        var files = EnumerateFilesOrDirectories(_files.Values, path, searchPattern, new EnumerationOptions { RecurseSubdirectories = recursive }).ToArray();
 
         if (files.Length == 0)
         {

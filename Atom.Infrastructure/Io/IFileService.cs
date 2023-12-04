@@ -68,8 +68,9 @@ public interface IFileService
     ///   Returns directory size.
     /// </summary>
     /// <param name="path">The path to the directory.</param>
+    /// <param name="searchPattern">The file search pattern (Optional).</param>
     /// <param name="recursive">A flag indicating whether to perform a recursive directory size determination or not.</param>
-    long GetDirectorySize(string path, bool recursive);
+    long GetDirectorySize(string path, string? searchPattern, bool recursive);
 
     /// <summary>
     ///   Returns file information.

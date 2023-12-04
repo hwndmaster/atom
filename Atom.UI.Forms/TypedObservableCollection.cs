@@ -10,12 +10,12 @@ public interface ITypedObservableCollection : INotifyCollectionChanged
 
 public sealed class TypedObservableCollection<TContract, TType> : DelayedObservableCollection<TContract>, ITypedObservableCollection, ITypedList
 {
-    public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors)
+    public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[]? listAccessors)
     {
         return TypeDescriptor.GetProperties(typeof(TType));
     }
 
-    public string GetListName(PropertyDescriptor[] listAccessors)
+    public string GetListName(PropertyDescriptor[]? listAccessors)
     {
         return string.Empty;
     }

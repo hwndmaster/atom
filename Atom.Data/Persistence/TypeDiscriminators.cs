@@ -118,7 +118,7 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
 
     private void AddMapping(TypeDiscriminatorRecord record)
     {
-        _logger.LogTrace("Adding mapping: '{type}' as '{discriminator}' version '{version}'",
+        _logger.LogTrace("Type '{type}' mapped as '{discriminator}' version '{version}'",
             record.Type.FullName, record.Discriminator, record.Version);
 
         _discriminatorsByDiscriminatorAndVersion.Add(CreateDiscriminatorQualifiedName(record.Discriminator, record.Version), record);
