@@ -59,7 +59,8 @@ internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderC
             Style = _style,
             ToolTip = _toolTip,
             ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter(_displayFormat)
+            ValueConverter = DetermineValueConverter(_displayFormat),
+            Visibility = _visibilityBinding,
         };
     }
 

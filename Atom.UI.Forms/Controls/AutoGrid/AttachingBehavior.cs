@@ -40,7 +40,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             new ColumnHeaderNameBehavior(),
             new ColumnReadOnlyBehavior(),
             new ColumnAutoWidthBehavior(),
-            new ColumnDisplayIndexBehavior()
+            new ColumnDisplayIndexBehavior(),
+            new ColumnVisibilityBehavior(),
         };
     }
 
@@ -58,7 +59,26 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         var dpd2 = DependencyPropertyDescriptor.FromProperty(Properties.AutoGridBuilderProperty, typeof(DataGrid));
         dpd2?.AddValueChanged(AssociatedObject, OnAutoGridBuilderChanged);
 
+        AttachBindingProxy();
+
         base.OnAttached();
+    }
+
+    /// <summary>
+    ///   Creates a resource within DataGrid bound to DataContext to make it available
+    ///   in DataGridColumn binding, as a workaround, because traversing up with RelativeSource
+    ///   doesn't work for columns.
+    /// </summary>
+    private void AttachBindingProxy()
+    {
+        var bindingProxy = new BindingProxy();
+        var binding = new Binding("DataContext")
+        {
+            Source = AssociatedObject,
+            Mode = BindingMode.OneWay
+        };
+        BindingOperations.SetBinding(bindingProxy, BindingProxy.DataProperty, binding);
+        AssociatedObject.Resources.Add("proxy", bindingProxy);
     }
 
     private void OnAddingNewItem(object? sender, AddingNewItemEventArgs e)

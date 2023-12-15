@@ -20,6 +20,7 @@ public interface IAutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuild
         where TValueConverter : IValueConverter;
     TBuilder WithValueConverter(IValueConverter valueConverter);
     TBuilder WithValueConverter(Func<IValueConverter> valueConverterFactory);
+    TBuilder WithVisibility(string propertyNameToBind);
 }
 
 internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn<TBuilder>, IHasBuildColumnContext
@@ -34,6 +35,7 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGr
     protected IValueConverter? _valueConverter;
     protected Func<IValueConverter>? _valueConverterFactory;
     protected Type? _valueConverterType;
+    protected string? _visibilityBinding;
 
     protected AutoGridContextBuilderColumn(PropertyDescriptor propertyDescriptor)
     {
@@ -93,6 +95,12 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGr
     public TBuilder WithValueConverter(Func<IValueConverter> valueConverterFactory)
     {
         _valueConverterFactory = valueConverterFactory;
+        return BuilderInstance;
+    }
+
+    public TBuilder WithVisibility(string propertyNameToBind)
+    {
+        _visibilityBinding = propertyNameToBind;
         return BuilderInstance;
     }
 

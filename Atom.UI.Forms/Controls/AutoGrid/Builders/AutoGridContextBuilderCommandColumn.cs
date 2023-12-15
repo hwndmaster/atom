@@ -41,7 +41,8 @@ internal sealed class AutoGridContextBuilderCommandColumn : AutoGridContextBuild
             Style = _style,
             ToolTip = _toolTip,
             ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter(null)
+            ValueConverter = DetermineValueConverter(null),
+            Visibility = _visibilityBinding,
         };
     }
 

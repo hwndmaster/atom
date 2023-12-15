@@ -27,4 +27,5 @@ public abstract class AutoGridBuildColumnContext
     public string? ToolTipPath { get; init; }
     public StylingRecord? Style { get; init; }
     public IValueConverter? ValueConverter { get; init; }
+    public string? Visibility { get; init; }
 }
