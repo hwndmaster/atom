@@ -8,47 +8,92 @@ public interface IActionCommand : ICommand
     IObservable<bool> Executed { get; }
 }
 
-public class ActionCommand : IActionCommand
+public interface IActionCommand<T> : IActionCommand
 {
-    private readonly Func<object?, Task> _asyncAction;
-    private readonly Predicate<object?>? _canExecute;
-    private readonly Subject<bool> _executed = new();
+    bool CanExecute(T parameter);
+    Task Execute(T parameter);
+}
 
-    public event EventHandler? CanExecuteChanged
+public sealed class ActionCommand : ActionCommand<object?>
+{
+    public ActionCommand()
+        : base(_ => { }, null)
     {
-        add { CommandManager.RequerySuggested += value; }
-        remove { CommandManager.RequerySuggested -= value; }
     }
 
-    public IObservable<bool> Executed => _executed;
+    public ActionCommand(Func<object?, Task> asyncAction)
+        : base(asyncAction, null)
+    {
+    }
+
+    public ActionCommand(Action<object?> action)
+        : base(action, null)
+    {
+    }
+
+    public ActionCommand(Action<object?> action, Predicate<object?>? canExecute)
+        : base(action, canExecute)
+    {
+    }
+
+    public ActionCommand(Func<object?, Task> asyncAction, Predicate<object?>? canExecute)
+        : base(asyncAction, canExecute)
+    {
+    }
+}
+
+public class ActionCommand<T> : IActionCommand<T>
+{
+    private readonly Func<T, Task> _asyncAction;
+    private readonly Predicate<T>? _canExecute;
+    private readonly Subject<bool> _executed = new();
 
     public ActionCommand()
         : this (_ => { }, null)
     {
     }
 
-    public ActionCommand(Func<object?, Task> asyncAction)
+    public ActionCommand(Func<T, Task> asyncAction)
         : this (asyncAction, null)
     {
     }
 
-    public ActionCommand(Action<object?> action)
+    public ActionCommand(Action<T> action)
         : this (action, null)
     {
     }
 
-    public ActionCommand(Action<object?> action, Predicate<object?>? canExecute)
+    public ActionCommand(Action<T> action, Predicate<T>? canExecute)
         : this ((o) => { action(o); return Task.CompletedTask; }, canExecute)
     {
     }
 
-    public ActionCommand(Func<object?, Task> asyncAction, Predicate<object?>? canExecute)
+    public ActionCommand(Func<T, Task> asyncAction, Predicate<T>? canExecute)
     {
         _asyncAction = asyncAction.NotNull(nameof(asyncAction));
         _canExecute = canExecute;
     }
 
+    public bool CanExecute(T parameter) => CanExecuteInternal(parameter);
+    public Task Execute(T parameter) => ExecuteInternal(parameter);
+
     public bool CanExecute(object? parameter)
+    {
+        if (parameter is T value)
+            return CanExecuteInternal(value);
+
+        return CanExecuteInternal(default!);
+    }
+
+    public void Execute(object? parameter)
+    {
+        if (parameter is T value)
+            ExecuteInternal(value);
+        else
+            ExecuteInternal(default!);
+    }
+
+    private bool CanExecuteInternal(T parameter)
     {
         if (_canExecute is not null)
         {
@@ -58,7 +103,7 @@ public class ActionCommand : IActionCommand
         return true;
     }
 
-    public async void Execute(object? parameter)
+    private async Task ExecuteInternal(T parameter)
     {
         try
         {
@@ -78,4 +123,12 @@ public class ActionCommand : IActionCommand
             MessageBox.Show(ex.Message, "Action failed", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
+
+    public event EventHandler? CanExecuteChanged
+    {
+        add { CommandManager.RequerySuggested += value; }
+        remove { CommandManager.RequerySuggested -= value; }
+    }
+
+    public IObservable<bool> Executed => _executed;
 }
