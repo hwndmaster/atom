@@ -20,6 +20,11 @@ public interface IAutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuild
         where TValueConverter : IValueConverter;
     TBuilder WithValueConverter(IValueConverter valueConverter);
     TBuilder WithValueConverter(Func<IValueConverter> valueConverterFactory);
+
+    /// <summary>
+    ///   Extends the column to make it hidable depending on the value, provided by the path at <paramref name="propertyNameToBind"/>.
+    /// </summary>
+    /// <param name="propertyNameToBind">The path to the property of the parent view model which contains a boolean value indicating whether the column must be visible or not.</param>
     TBuilder WithVisibility(string propertyNameToBind);
 }
 

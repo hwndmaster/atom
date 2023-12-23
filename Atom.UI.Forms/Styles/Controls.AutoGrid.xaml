@@ -2,16 +2,16 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Genius.Atom.UI.Forms">
 
-    <Thickness x:Key="Genius.AutoGrid.Group.ItemMargin">10 0 0 0</Thickness>
+    <Thickness x:Key="Atom.AutoGrid.Group.ItemMargin">10 0 0 0</Thickness>
 
-    <Style x:Key="Genius.AutoGrid.Group.Title" TargetType="TextBlock">
+    <Style x:Key="Atom.AutoGrid.Group.Title" TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Margin" Value="0,0,0,3" />
     </Style>
 
     <DataTemplate DataType="{x:Type local:ValueGroupingField}">
-        <StackPanel Orientation="Horizontal" Margin="{StaticResource Genius.AutoGrid.Group.ItemMargin}" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource Atom.AutoGrid.Group.ItemMargin}" VerticalAlignment="Center">
             <TextBlock Text="{Binding Path=Label}" />
             <TextBlock Text=" " />
             <TextBlock ToolTip="{Binding ToolTip}">
@@ -25,12 +25,12 @@
         </StackPanel>
     </DataTemplate>
     <DataTemplate DataType="{x:Type local:CommandGroupingField}">
-        <StackPanel Orientation="Horizontal" Margin="{StaticResource Genius.AutoGrid.Group.ItemMargin}" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Margin="{StaticResource Atom.AutoGrid.Group.ItemMargin}" VerticalAlignment="Center">
             <Button Content="{Binding Label}" Command="{Binding Command}" ToolTip="{Binding ToolTip}" />
         </StackPanel>
     </DataTemplate>
 
-    <GroupStyle x:Key="Genius.AutoGrid.Group.GroupableViewModel">
+    <GroupStyle x:Key="Atom.AutoGrid.Group.GroupableViewModel">
         <GroupStyle.ContainerStyle>
             <Style TargetType="GroupItem">
                 <Setter Property="Template">
@@ -49,7 +49,7 @@
                                             <ColumnDefinition SharedSizeGroup="ItemCountSizeGroup" Width="Auto" />
                                             <ColumnDefinition SharedSizeGroup="ExtraFieldsSizeGroup" Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Style="{StaticResource Genius.AutoGrid.Group.Title}" Text="{Binding Name.GroupTitle}" />
+                                        <TextBlock Grid.Column="0" Style="{StaticResource Atom.AutoGrid.Group.Title}" Text="{Binding Name.GroupTitle}" />
                                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                                             <TextBlock Text=" Items: "/>
                                             <TextBlock Text="{Binding Name.ItemCount}" Visibility="{Binding Name.ItemCount, Converter={local:NotNullToVisibilityConverter}}" />
@@ -78,7 +78,7 @@
         </GroupStyle.ContainerStyle>
     </GroupStyle>
 
-    <GroupStyle x:Key="Genius.AutoGrid.Group.String">
+    <GroupStyle x:Key="Atom.AutoGrid.Group.String">
         <GroupStyle.ContainerStyle>
             <Style TargetType="GroupItem">
                 <Setter Property="Template">
@@ -87,7 +87,7 @@
                             <Expander IsExpanded="True">
                                 <Expander.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Style="{StaticResource Genius.AutoGrid.Group.Title}" Text="{Binding Name}" />
+                                        <TextBlock Style="{StaticResource Atom.AutoGrid.Group.Title}" Text="{Binding Name}" />
                                         <TextBlock Text=" ("/>
                                         <TextBlock Text="{Binding Path=ItemCount}"/>
                                         <TextBlock Text=")"/>

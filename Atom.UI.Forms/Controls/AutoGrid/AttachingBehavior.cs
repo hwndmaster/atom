@@ -22,7 +22,6 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             new ColumnTagEditorBehavior(),
             new ColumnButtonBehavior(),
             new ColumnToggleButtonBehavior(),
-            new ColumnWithImageBehavior(),
             new ColumnComboBoxBehavior(),
             new ColumnAttachedViewBehavior(),
 
@@ -132,12 +131,12 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         {
             if (groupingProperties.Any(x => AutoGridBuilderHelpers.IsGroupableColumn(x.Property)))
             {
-                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Genius.AutoGrid.Group.GroupableViewModel"));
+                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.GroupableViewModel"));
                 AssociatedObject.SetValue(Grid.IsSharedSizeScopeProperty, true);
             }
             else
             {
-                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Genius.AutoGrid.Group.String"));
+                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.String"));
             }
         }
     }

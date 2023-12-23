@@ -5,7 +5,7 @@ using WpfAnimatedGif;
 
 namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
-internal sealed class DataGridTextWithImageColumnBuilder : DataGridColumnBuilder
+internal sealed class DataGridTextWithImageColumnBuilder : DataGridTextColumnBuilder
 {
     private readonly string? _imageSource;
     private double _imageSize = 16;
@@ -94,10 +94,9 @@ internal sealed class DataGridTextWithImageColumnBuilder : DataGridColumnBuilder
 
         if (!_hideText)
         {
-            var textFactory = new FrameworkElementFactory(typeof(TextBlock));
-            textFactory.SetBinding(TextBlock.TextProperty, binding);
-            textFactory.SetValue(Image.MarginProperty, new Thickness(5, 0, 0, 0));
-            stackPanelFactory.AppendChild(textFactory);
+            var textBlock = RenderTextBlock();
+            textBlock.SetValue(FrameworkElement.MarginProperty, new Thickness(5, 0, 0, 0));
+            stackPanelFactory.AppendChild(textBlock);
         }
 
         column.CellTemplate = new DataTemplate { VisualTree = stackPanelFactory };

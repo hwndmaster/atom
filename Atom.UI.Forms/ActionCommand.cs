@@ -1,5 +1,7 @@
 ﻿using System.Reactive.Subjects;
 using System.Windows.Input;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.UI.Forms;
 
@@ -87,10 +89,18 @@ public class ActionCommand<T> : IActionCommand<T>
 
     public void Execute(object? parameter)
     {
+        Task task;
+
         if (parameter is T value)
-            ExecuteInternal(value);
+            task = ExecuteInternal(value);
         else
-            ExecuteInternal(default!);
+            task = ExecuteInternal(default!);
+
+        task.ContinueWith(t =>
+        {
+            var logger = Module.ServiceProvider.GetRequiredService<ILogger<ActionCommand>>();
+            logger.LogError(t.Exception, $"ActionCommand execution failure. Parameter = '{parameter}'");
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     private bool CanExecuteInternal(T parameter)

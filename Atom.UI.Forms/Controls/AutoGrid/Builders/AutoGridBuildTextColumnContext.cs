@@ -12,6 +12,8 @@ public sealed class AutoGridBuildTextColumnContext : AutoGridBuildColumnContext
     }
 
     public string? DisplayFormat { get; init; }
+    public string? TextHighlightingPatternPath { get; init; }
+    public string? TextHighlightingUseRegexPath { get; init; }
     public bool IsGrouped { get; init; }
     public bool Filterable { get; init; }
     public IconSourceRecord? IconSource { get; init; }
