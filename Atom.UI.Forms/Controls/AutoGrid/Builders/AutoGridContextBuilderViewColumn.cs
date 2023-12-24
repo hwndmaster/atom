@@ -2,12 +2,12 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public interface IAutoGridContextBuilderViewColumn : IAutoGridContextBuilderColumn<IAutoGridContextBuilderViewColumn>
+public interface IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel> : IAutoGridContextBuilderColumn<IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>
 {
-    IAutoGridContextBuilderViewColumn WithAttachedViewType(Type viewType);
+    IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel> WithAttachedViewType(Type viewType);
 }
 
-internal sealed class AutoGridContextBuilderViewColumn : AutoGridContextBuilderColumn<IAutoGridContextBuilderViewColumn>, IAutoGridContextBuilderViewColumn
+internal sealed class AutoGridContextBuilderViewColumn<TViewModel, TParentViewModel> : AutoGridContextBuilderColumn<IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>, IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>
 {
     private Type? _viewType;
 
@@ -16,13 +16,13 @@ internal sealed class AutoGridContextBuilderViewColumn : AutoGridContextBuilderC
     {
     }
 
-    public IAutoGridContextBuilderViewColumn WithAttachedViewType(Type viewType)
+    public IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel> WithAttachedViewType(Type viewType)
     {
         _viewType = viewType;
         return this;
     }
 
-    public override AutoGridBuildColumnContext Build()
+    internal override AutoGridBuildColumnContext Build()
     {
         return new AutoGridBuildViewColumnContext(PropertyDescriptor, DetermineDisplayName(), _viewType.NotNull())
         {
@@ -32,5 +32,5 @@ internal sealed class AutoGridContextBuilderViewColumn : AutoGridContextBuilderC
         };
     }
 
-    protected override AutoGridContextBuilderViewColumn BuilderInstance => this;
+    protected override AutoGridContextBuilderViewColumn<TViewModel, TParentViewModel> BuilderInstance => this;
 }

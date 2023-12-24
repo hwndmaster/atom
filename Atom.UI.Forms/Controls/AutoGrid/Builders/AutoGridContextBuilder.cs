@@ -4,31 +4,28 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 public interface IAutoGridContextBuilder
 {
-    /// <summary>
-    ///   Creates a new DataGrid context.
-    /// </summary>
-    AutoGridBuildContext Build();
 }
 
-public interface IAutoGridContextBuilder<TViewModel> : IAutoGridContextBuilder
+public interface IAutoGridContextBuilder<TViewModel, TParentViewModel> : IAutoGridContextBuilder
     where TViewModel : class, IViewModel
+    where TParentViewModel : IViewModel
 {
     /// <summary>
     ///   Enables row and groups virtualization for better performance.
     ///   NOTE: May cause side effects, such as binding issues reported to the console.
     /// </summary>
-    IAutoGridContextBuilder<TViewModel> EnableVirtualization();
+    IAutoGridContextBuilder<TViewModel, TParentViewModel> EnableVirtualization();
 
     /// <summary>
     ///   Makes the DataGrid completely readonly.
     /// </summary>
-    IAutoGridContextBuilder<TViewModel> MakeReadOnly();
+    IAutoGridContextBuilder<TViewModel, TParentViewModel> MakeReadOnly();
 
     /// <summary>
     ///   Defines the columns to show.
     /// </summary>
     /// <param name="columnsBuilderAction"></param>
-    IAutoGridContextBuilder<TViewModel> WithColumns(Action<IAutoGridContextBuilderColumns<TViewModel>> columnsBuilderAction);
+    IAutoGridContextBuilder<TViewModel, TParentViewModel> WithColumns(Action<IAutoGridContextBuilderColumns<TViewModel, TParentViewModel>> columnsBuilderAction);
 
     /// <summary>
     ///   Specifies the scope name for the filter context. The parent view model should contain a property marked with a <see cref="FilterContextAttribute"/>
@@ -54,47 +51,50 @@ public interface IAutoGridContextBuilder<TViewModel> : IAutoGridContextBuilder
     ///      .Build()
     ///   </code>
     /// </example>
-    IAutoGridContextBuilder<TViewModel> WithFilterContextScope(string scopeName);
+    IAutoGridContextBuilder<TViewModel, TParentViewModel> WithFilterContextScope(string scopeName);
 
     /// <summary>
     ///   Defines the view model factory type which can be injected and used by the DataGrid when creating a new row.
     ///   NOTE: If the type isn't registered in the DI container, a parameterless constructor will be used then.
     /// </summary>
     /// <typeparam name="TFactory">The factory type.</typeparam>
-    IAutoGridContextBuilder<TViewModel> WithRecordFactory<TFactory>()
+    IAutoGridContextBuilder<TViewModel, TParentViewModel> WithRecordFactory<TFactory>()
         where TFactory : IFactory<TViewModel>;
 }
 
-internal sealed class AutoGridContextBuilder<TViewModel> : IAutoGridContextBuilder<TViewModel>
+internal sealed class AutoGridContextBuilder<TViewModel, TParentViewModel>
+    : IAutoGridContextBuilder<TViewModel, TParentViewModel>,
+        IHasBuildContext
     where TViewModel : class, IViewModel
+    where TParentViewModel : IViewModel
 {
-    private readonly AutoGridContextBuilderColumns<TViewModel> _columnsBuilder;
+    private readonly AutoGridContextBuilderColumns<TViewModel, TParentViewModel> _columnsBuilder;
     private readonly List<AutoGridBuildColumnContext> _columns = new();
     private bool _enableVirtualization = false;
     private bool _makeReadOnly = false;
     private string? _filterContextScope = null;
     private IFactory<TViewModel>? _recordFactory;
 
-    public AutoGridContextBuilder(AutoGridContextBuilderColumns<TViewModel> columnsBuilder)
+    public AutoGridContextBuilder(AutoGridContextBuilderColumns<TViewModel, TParentViewModel> columnsBuilder)
     {
         _columnsBuilder = columnsBuilder.NotNull();
     }
 
-    public IAutoGridContextBuilder<TViewModel> EnableVirtualization()
+    public IAutoGridContextBuilder<TViewModel, TParentViewModel> EnableVirtualization()
     {
         _enableVirtualization = true;
 
         return this;
     }
 
-    public IAutoGridContextBuilder<TViewModel> MakeReadOnly()
+    public IAutoGridContextBuilder<TViewModel, TParentViewModel> MakeReadOnly()
     {
         _makeReadOnly = true;
 
         return this;
     }
 
-    public IAutoGridContextBuilder<TViewModel> WithColumns(Action<IAutoGridContextBuilderColumns<TViewModel>> columnsBuilderAction)
+    public IAutoGridContextBuilder<TViewModel, TParentViewModel> WithColumns(Action<IAutoGridContextBuilderColumns<TViewModel, TParentViewModel>> columnsBuilderAction)
     {
         columnsBuilderAction(_columnsBuilder);
 
@@ -103,14 +103,14 @@ internal sealed class AutoGridContextBuilder<TViewModel> : IAutoGridContextBuild
         return this;
     }
 
-    public IAutoGridContextBuilder<TViewModel> WithFilterContextScope(string scopeName)
+    public IAutoGridContextBuilder<TViewModel, TParentViewModel> WithFilterContextScope(string scopeName)
     {
         _filterContextScope = scopeName;
 
         return this;
     }
 
-    public IAutoGridContextBuilder<TViewModel> WithRecordFactory<TFactory>()
+    public IAutoGridContextBuilder<TViewModel, TParentViewModel> WithRecordFactory<TFactory>()
         where TFactory : IFactory<TViewModel>
     {
         _recordFactory = Module.ServiceProvider.GetService<TFactory>().NotNull();

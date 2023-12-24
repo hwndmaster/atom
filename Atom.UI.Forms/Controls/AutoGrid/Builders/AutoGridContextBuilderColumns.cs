@@ -3,23 +3,30 @@ using System.Linq.Expressions;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public interface IAutoGridContextBuilderColumns<TViewModel>
-        where TViewModel : class, IViewModel
+public interface IAutoGridContextBuilderColumns<TViewModel, TParentViewModel>
+    where TViewModel : class, IViewModel
+    where TParentViewModel : IViewModel
 {
-    IAutoGridContextBuilderColumns<TViewModel> AddText<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderTextColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddText(string propertyName, Action<IAutoGridContextBuilderTextColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn>? options = null)
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddAll();
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>>? options = null)
         where TProperty : IActionCommand;
-    IAutoGridContextBuilderColumns<TViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(Expression<Func<TViewModel, bool>> propertyAccessor, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(string propertyName, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddView<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderViewColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddView(string propertyName, Action<IAutoGridContextBuilderViewColumn>? options = null);
-    IAutoGridContextBuilderColumns<TViewModel> AddAll();
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddDynamic(
+        Expression<Func<TParentViewModel, DynamicColumnsViewModel?>> columnsPropertyAccessor,
+        Expression<Func<TViewModel, DynamicColumnEntriesViewModel?>> entriesPropertyAccessor,
+        Action<IAutoGridContextBuilderDynamicColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddDynamic(string columnsPropertyName, string entriesPropertyName, Action<IAutoGridContextBuilderDynamicColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddText<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddText(string propertyName, Action<IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddToggleButton(Expression<Func<TViewModel, bool>> propertyAccessor, Action<IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddToggleButton(string propertyName, Action<IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddView<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddView(string propertyName, Action<IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>>? options = null);
 }
 
-internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridContextBuilderColumns<TViewModel>
-        where TViewModel : class, IViewModel
+internal sealed class AutoGridContextBuilderColumns<TViewModel, TParentViewModel> : IAutoGridContextBuilderColumns<TViewModel, TParentViewModel>
+    where TViewModel : class, IViewModel
+    where TParentViewModel : IViewModel
 {
     private readonly List<IAutoGridContextBuilderColumn> _columnBuilders = new();
     private readonly PropertyDescriptorCollection _propertyDescriptors;
@@ -29,48 +36,57 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
         _propertyDescriptors = TypeDescriptor.GetProperties(typeof(TViewModel));
     }
 
-    public IAutoGridContextBuilderColumns<TViewModel> AddText<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderTextColumn>? options = null)
-        => AddText(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddText(string propertyName, Action<IAutoGridContextBuilderTextColumn>? options = null)
-        => AddColumnInternal(pd => new AutoGridContextBuilderTextColumn(pd), propertyName, options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddComboBox<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderComboBoxColumn>? options = null)
-        => AddComboBox(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddComboBox(string propertyName, Action<IAutoGridContextBuilderComboBoxColumn>? options = null)
-        => AddColumnInternal(pd => new AutoGridContextBuilderComboBoxColumn(pd), propertyName, options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn>? options = null)
-        where TProperty : IActionCommand
-        => AddCommand(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn>? options = null)
-        => AddColumnInternal(pd => new AutoGridContextBuilderCommandColumn(pd), propertyName, options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(Expression<Func<TViewModel, bool>> propertyAccessor, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null)
-        => AddToggleButton(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddToggleButton(string propertyName, Action<IAutoGridContextBuilderToggleButtonColumn>? options = null)
-        => AddColumnInternal(pd => new AutoGridContextBuilderToggleButtonColumn(pd), propertyName, options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddView<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderViewColumn>? options = null)
-        => AddView(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddView(string propertyName, Action<IAutoGridContextBuilderViewColumn>? options = null)
-        => AddColumnInternal(pd => new AutoGridContextBuilderViewColumn(pd), propertyName, options);
-
-    public IAutoGridContextBuilderColumns<TViewModel> AddAll()
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddAll()
     {
         _columnBuilders.AddRange(
             _propertyDescriptors
                 .Cast<PropertyDescriptor>()
                 .Where(pd => !AutoGridBuilderHelpers.IsIgnorableProperty(pd.Name))
-                .Select(pd => AutoGridBuilderHelpers.CreateContextBuilderColumn(pd))
+                .Select(pd => AutoGridBuilderHelpers.CreateContextBuilderColumn<TViewModel, TParentViewModel>(pd))
         );
 
         return this;
     }
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddComboBox<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddComboBox(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddComboBox(string propertyName, Action<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>(pd), propertyName, options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>>? options = null)
+        where TProperty : IActionCommand
+        => AddCommand(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>(pd), propertyName, options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddDynamic(
+        Expression<Func<TParentViewModel, DynamicColumnsViewModel>> columnsPropertyAccessor,
+        Expression<Func<TViewModel, DynamicColumnEntriesViewModel>> entriesPropertyAccessor,
+        Action<IAutoGridContextBuilderDynamicColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddDynamic(ExpressionHelpers.GetPropertyName(columnsPropertyAccessor), ExpressionHelpers.GetPropertyName(entriesPropertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddDynamic(string columnsPropertyName, string entriesPropertyName, Action<IAutoGridContextBuilderDynamicColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderDynamicColumn<TViewModel, TParentViewModel>(pd, columnsPropertyName), entriesPropertyName, options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddText<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddText(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddText(string propertyName, Action<IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>(pd), propertyName, options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddToggleButton(Expression<Func<TViewModel, bool>> propertyAccessor, Action<IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddToggleButton(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddToggleButton(string propertyName, Action<IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>(pd), propertyName, options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddView<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddView(ExpressionHelpers.GetPropertyName(propertyAccessor), options);
+
+    public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddView(string propertyName, Action<IAutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>>? options = null)
+        => AddColumnInternal(pd => new AutoGridContextBuilderViewColumn<TViewModel, TParentViewModel>(pd), propertyName, options);
 
     internal AutoGridBuildColumnContext[] Build()
     {
@@ -79,7 +95,7 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
             .Cast<IHasBuildColumnContext>()
             .Select((x) =>
             {
-                var columnContext = x.Build();
+                var columnContext = x.BuildInternal();
                 if (columnContext is not AutoGridBuildTextColumnContext textColumn
                     || !textColumn.IsGrouped)
                 {
@@ -90,7 +106,7 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel> : IAutoGridConte
             .ToArray();
     }
 
-    private IAutoGridContextBuilderColumns<TViewModel> AddColumnInternal<T>(Func<PropertyDescriptor, T> createFunc, string propertyName, Action<T>? options = null)
+    private IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddColumnInternal<T>(Func<PropertyDescriptor, T> createFunc, string propertyName, Action<T>? options = null)
         where T : IAutoGridContextBuilderColumn
     {
         var propertyDescriptor = _propertyDescriptors.Find(propertyName, false).NotNull();

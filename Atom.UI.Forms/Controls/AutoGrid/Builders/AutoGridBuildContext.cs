@@ -4,13 +4,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public sealed class AutoGridBuildContext
+internal sealed class AutoGridBuildContext
 {
+    private readonly Lazy<AutoGridBuildColumnContext[]> _groupByPropertiesLazy;
+    private readonly Lazy<AutoGridBuildColumnContext[]> _filterByPropertiesLazy;
+
     internal AutoGridBuildContext(IEnumerable<AutoGridBuildColumnContext> columns,
         IFactory<object> recordFactory)
     {
         Columns = columns.NotNull().ToImmutableArray();
         RecordFactory = recordFactory.NotNull();
+
+        _groupByPropertiesLazy = new(() => Columns
+            .Where(x => x.IsGroupedColumn())
+            .ToArray());
+        _filterByPropertiesLazy = new(() => Columns
+            .OfType<AutoGridBuildTextColumnContext>()
+            .Where(x => x.Filterable)
+            .ToArray());
     }
 
     internal static Lazy<AutoGridBuildContext> CreateLazy(DataGrid dataGrid)
@@ -18,7 +29,18 @@ public sealed class AutoGridBuildContext
         var autoGridBuilder = Properties.GetAutoGridBuilder(dataGrid);
         if (autoGridBuilder is not null)
         {
-            return new(() => autoGridBuilder.Build());
+            return new(() =>
+            {
+                var buildContext = Properties.GetBuildContext(dataGrid);
+                if (buildContext is not null)
+                    return buildContext;
+
+                var contextBuilder = autoGridBuilder.Build() as IHasBuildContext
+                    ?? throw new InvalidOperationException("A wrong type of context builder has been returned.");
+                buildContext = contextBuilder.Build();
+                Properties.SetBuildContext(dataGrid, buildContext);
+                return buildContext;
+            });
         }
         else
         {
@@ -39,4 +61,8 @@ public sealed class AutoGridBuildContext
     public bool EnableVirtualization { get; init; }
     public string? FilterContextScope { get; init; }
     public bool MakeReadOnly { get; init; }
+
+    // Calculatable properties:
+    public AutoGridBuildColumnContext[] GroupByProperties => _groupByPropertiesLazy.Value;
+    public AutoGridBuildColumnContext[] FilterByProperties => _filterByPropertiesLazy.Value;
 }

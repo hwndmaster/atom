@@ -2,12 +2,12 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public interface IAutoGridContextBuilderToggleButtonColumn : IAutoGridContextBuilderColumn<IAutoGridContextBuilderToggleButtonColumn>
+public interface IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel> : IAutoGridContextBuilderColumn<IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>
 {
-    IAutoGridContextBuilderToggleButtonColumn WithIcons(string iconForTrue, string iconForFalse);
+    IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel> WithIcons(string iconForTrue, string iconForFalse);
 }
 
-internal sealed class AutoGridContextBuilderToggleButtonColumn : AutoGridContextBuilderColumn<IAutoGridContextBuilderToggleButtonColumn>, IAutoGridContextBuilderToggleButtonColumn
+internal sealed class AutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel> : AutoGridContextBuilderColumn<IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>, IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel>
 {
     private string? _iconForTrue;
     private string? _iconForFalse;
@@ -17,14 +17,14 @@ internal sealed class AutoGridContextBuilderToggleButtonColumn : AutoGridContext
     {
     }
 
-    public IAutoGridContextBuilderToggleButtonColumn WithIcons(string iconForTrue, string iconForFalse)
+    public IAutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel> WithIcons(string iconForTrue, string iconForFalse)
     {
         _iconForTrue = iconForTrue;
         _iconForFalse = iconForFalse;
         return this;
     }
 
-    public override AutoGridBuildColumnContext Build()
+    internal override AutoGridBuildColumnContext Build()
     {
         return new AutoGridBuildToggleButtonColumnContext(PropertyDescriptor, DetermineDisplayName())
         {
@@ -40,5 +40,5 @@ internal sealed class AutoGridContextBuilderToggleButtonColumn : AutoGridContext
         };
     }
 
-    protected override AutoGridContextBuilderToggleButtonColumn BuilderInstance => this;
+    protected override AutoGridContextBuilderToggleButtonColumn<TViewModel, TParentViewModel> BuilderInstance => this;
 }

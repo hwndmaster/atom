@@ -46,6 +46,22 @@ public static class ViewModelExtensions
     {
         string propertyName = ExpressionHelpers.GetPropertyName(propertyAccessor);
 
+        return WhenChanged<TViewModel, TProperty>(viewModel, propertyName);
+    }
+
+    /// <summary>
+    ///   Returns an observable which is triggered every time when the view model property defined
+    ///   in the <paramref name="propertyAccessor"/> parameter has changed in the instance of <paramref name="viewModel"/>.
+    /// </summary>
+    /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
+    /// <typeparam name="TProperty">The type of the property.</typeparam>
+    /// <param name="viewModel">The view model.</param>
+    /// <param name="propertyAccessor">An expression which points to the property.</param>
+    /// <returns>An observable.</returns>
+    public static IObservable<TProperty?> WhenChanged<TViewModel, TProperty>(this TViewModel viewModel,
+        string propertyName)
+        where TViewModel : IViewModel
+    {
         ViewModelBase viewModelBase = (viewModel as ViewModelBase).NotNull();
 
         return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(

@@ -6,7 +6,7 @@ using Genius.Atom.UI.Forms.Wpf;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-internal sealed class DefaultAutoGridBuilder : IAutoGridBuilder
+internal sealed class DefaultAutoGridBuilder
 {
     private Type? _recordType;
 

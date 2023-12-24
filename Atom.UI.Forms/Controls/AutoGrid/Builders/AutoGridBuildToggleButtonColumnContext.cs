@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public sealed class AutoGridBuildToggleButtonColumnContext : AutoGridBuildColumnContext
+internal sealed class AutoGridBuildToggleButtonColumnContext : AutoGridBuildColumnContext
 {
     public AutoGridBuildToggleButtonColumnContext(PropertyDescriptor property, string displayName)
         : base(property, displayName)

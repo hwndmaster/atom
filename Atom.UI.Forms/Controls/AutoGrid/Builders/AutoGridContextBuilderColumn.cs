@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Wpf;
@@ -7,29 +8,31 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 public interface IAutoGridContextBuilderColumn { }
 
-public interface IAutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn
-    where TBuilder : IAutoGridContextBuilderColumn<TBuilder>
+public interface IAutoGridContextBuilderColumn<TBuilder, TViewModel, TParentViewModel> : IAutoGridContextBuilderColumn
+    where TBuilder : IAutoGridContextBuilderColumn<TBuilder, TViewModel, TParentViewModel>
 {
     TBuilder IsReadOnly(bool isReadOnly = true);
     TBuilder WithAutoWidth(bool autoWidth = true);
     TBuilder WithDisplayName(string displayName);
     TBuilder WithStyle(StylingRecord style);
     TBuilder WithToolTip(string toolTip);
-    TBuilder WithToolTipPath(string toolTipPath);
+    TBuilder WithToolTipPath(Expression<Func<TViewModel, string>> toolTipPath);
     TBuilder WithValueConverter<TValueConverter>()
         where TValueConverter : IValueConverter;
     TBuilder WithValueConverter(IValueConverter valueConverter);
     TBuilder WithValueConverter(Func<IValueConverter> valueConverterFactory);
 
     /// <summary>
-    ///   Extends the column to make it hidable depending on the value, provided by the path at <paramref name="propertyNameToBind"/>.
+    ///   Extends the column to make it hidable depending on the value, provided by the path at <paramref name="visibilityProperty"/>.
     /// </summary>
-    /// <param name="propertyNameToBind">The path to the property of the parent view model which contains a boolean value indicating whether the column must be visible or not.</param>
-    TBuilder WithVisibility(string propertyNameToBind);
+    /// <param name="visibilityProperty">The property of the parent view model which contains a boolean value indicating whether the column must be visible or not.</param>
+    TBuilder WithVisibility(Expression<Func<TParentViewModel, bool>> visibilityProperty);
 }
 
-internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGridContextBuilderColumn<TBuilder>, IHasBuildColumnContext
-    where TBuilder : IAutoGridContextBuilderColumn<TBuilder>
+internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>
+    : IAutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>,
+        IHasBuildColumnContext
+    where TBuilder : IAutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>
 {
     private string? _displayName;
     protected bool _autoWidth = false;
@@ -47,7 +50,7 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGr
         PropertyDescriptor = propertyDescriptor;
     }
 
-    public TBuilder IsReadOnly(bool isReadOnly = true)
+    public virtual TBuilder IsReadOnly(bool isReadOnly = true)
     {
         _isReadOnly = isReadOnly;
         return BuilderInstance;
@@ -78,9 +81,9 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGr
         return BuilderInstance;
     }
 
-    public TBuilder WithToolTipPath(string toolTipPath)
+    public TBuilder WithToolTipPath(Expression<Func<TVIewModel, string>> toolTipPath)
     {
-        _toolTipPath = toolTipPath;
+        _toolTipPath = ExpressionHelpers.GetPropertyName(toolTipPath);
         return BuilderInstance;
     }
 
@@ -103,13 +106,14 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder> : IAutoGr
         return BuilderInstance;
     }
 
-    public TBuilder WithVisibility(string propertyNameToBind)
+    public TBuilder WithVisibility(Expression<Func<TParentViewModel, bool>> visibilityProperty)
     {
-        _visibilityBinding = propertyNameToBind;
+        _visibilityBinding = ExpressionHelpers.GetPropertyName(visibilityProperty);
         return BuilderInstance;
     }
 
-    public abstract AutoGridBuildColumnContext Build();
+    internal abstract AutoGridBuildColumnContext Build();
+    public AutoGridBuildColumnContext BuildInternal() => Build();
 
     protected string DetermineDisplayName()
     {

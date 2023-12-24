@@ -1,4 +1,4 @@
-namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
+namespace Genius.Atom.UI.Forms.Controls.AutoGrid.ColumnBehaviors;
 
 internal sealed class ColumnFormattingBehavior : IAutoGridColumnBehavior
 {

@@ -5,22 +5,22 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 internal static class AutoGridBuilderHelpers
 {
-    internal static IAutoGridContextBuilderColumn CreateContextBuilderColumn(PropertyDescriptor property)
+    internal static IAutoGridContextBuilderColumn CreateContextBuilderColumn<TViewModel, TParentViewModel>(PropertyDescriptor property)
     {
         Guard.NotNull(property);
 
         if (IsCommandColumn(property))
         {
-            return new AutoGridContextBuilderCommandColumn(property);
+            return new AutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>(property);
         }
 
         if (IsGroupableColumn(property))
         {
-            return new AutoGridContextBuilderTextColumn(property)
+            return new AutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>(property)
                 .IsGrouped();
         }
 
-        return new AutoGridContextBuilderTextColumn(property);
+        return new AutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>(property);
     }
 
     internal static bool IsIgnorableProperty(string propertyName)

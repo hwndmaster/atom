@@ -1,23 +1,26 @@
 using System.ComponentModel;
+using System.Linq.Expressions;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public interface IAutoGridContextBuilderTextColumn : IAutoGridContextBuilderColumn<IAutoGridContextBuilderTextColumn>
+public interface IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>
+    : IAutoGridContextBuilderColumn<IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>
 {
-    IAutoGridContextBuilderTextColumn Filterable(bool filterable = true);
-    IAutoGridContextBuilderTextColumn IsGrouped(bool isGrouped = true);
-    IAutoGridContextBuilderTextColumn WithDisplayFormat(string displayFormat);
-    IAutoGridContextBuilderTextColumn WithIconSource(IconSourceRecord iconSource);
+    IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> Filterable(bool filterable = true);
+    IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> IsGrouped(bool isGrouped = true);
+    IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> WithDisplayFormat(string displayFormat);
+    IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> WithIconSource(IconSourceRecord<TViewModel> iconSource);
 
     /// <summary>
     ///   Extends the text block of the cell to be able to highlight the text using the references pattern.
     /// </summary>
-    /// <param name="patternPath">The path to the property of the parent view model which contains a pattern value.</param>
-    /// <param name="useRegexPath">The path to the property of the parent view model which contains a boolean value indicating whether the pattern is a regular expression or not.</param>
-    IAutoGridContextBuilderTextColumn WithTextHighlighting(string patternPath, string? useRegexPath = null);
+    /// <param name="patternProperty">The property of the parent view model which contains a pattern value.</param>
+    /// <param name="useRegexProperty">The property of the parent view model which contains a boolean value indicating whether the pattern is a regular expression or not.</param>
+    IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> WithTextHighlighting(Expression<Func<TParentViewModel, string>> patternProperty, Expression<Func<TParentViewModel, bool>>? useRegexProperty = null);
 }
 
-internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderColumn<IAutoGridContextBuilderTextColumn>, IAutoGridContextBuilderTextColumn
+internal sealed class AutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>
+    : AutoGridContextBuilderColumn<IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>, IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>
 {
     private string? _displayFormat;
     private bool _filterable;
@@ -31,38 +34,45 @@ internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderC
     {
     }
 
-    public IAutoGridContextBuilderTextColumn Filterable(bool filterable = true)
+    public IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> Filterable(bool filterable = true)
     {
         _filterable = filterable;
         return this;
     }
 
-    public IAutoGridContextBuilderTextColumn IsGrouped(bool isGrouped = true)
+    public IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> IsGrouped(bool isGrouped = true)
     {
         _isGrouped = isGrouped;
         return this;
     }
 
-    public IAutoGridContextBuilderTextColumn WithDisplayFormat(string displayFormat)
+    public IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> WithDisplayFormat(string displayFormat)
     {
         _displayFormat = displayFormat;
         return this;
     }
 
-    public IAutoGridContextBuilderTextColumn WithIconSource(IconSourceRecord iconSource)
+    public IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> WithIconSource(IconSourceRecord<TViewModel> iconSource)
     {
-        _iconSource = iconSource;
+        Guard.NotNull(iconSource);
+
+        _iconSource = new IconSourceRecord(
+            ExpressionHelpers.GetPropertyName(iconSource.IconPropertyPath),
+            iconSource.FixedSize,
+            iconSource.HideText);
         return this;
     }
 
-    public IAutoGridContextBuilderTextColumn WithTextHighlighting(string patternPath, string? useRegexPath = null)
+    public IAutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> WithTextHighlighting(Expression<Func<TParentViewModel, string>> patternProperty, Expression<Func<TParentViewModel, bool>>? useRegexProperty = null)
     {
-        _textHighlightingPatternPath = patternPath;
-        _textHighlightingUseRegexPath = useRegexPath;
+        _textHighlightingPatternPath = ExpressionHelpers.GetPropertyName(patternProperty);
+        _textHighlightingUseRegexPath = useRegexProperty is null
+            ? null
+            : ExpressionHelpers.GetPropertyName(useRegexProperty);
         return this;
     }
 
-    public override AutoGridBuildColumnContext Build()
+    internal override AutoGridBuildColumnContext Build()
     {
         return new AutoGridBuildTextColumnContext(PropertyDescriptor, DetermineDisplayName())
         {
@@ -82,5 +92,5 @@ internal sealed class AutoGridContextBuilderTextColumn : AutoGridContextBuilderC
         };
     }
 
-    protected override AutoGridContextBuilderTextColumn BuilderInstance => this;
+    protected override AutoGridContextBuilderTextColumn<TViewModel, TParentViewModel> BuilderInstance => this;
 }

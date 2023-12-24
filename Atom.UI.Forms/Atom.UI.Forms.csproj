@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" />
+    <PackageReference Include="ReactiveUI.WPF" />
     <PackageReference Include="WpfAnimatedGif" />
     <PackageReference Include="DotNetProjects.WpfToolkit.Input" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
+namespace Genius.Atom.UI.Forms.Controls.AutoGrid.ColumnBehaviors;
 
 internal sealed class ColumnValidationBehavior : IAutoGridColumnBehavior
 {

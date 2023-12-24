@@ -2,12 +2,12 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public interface IAutoGridContextBuilderComboBoxColumn : IAutoGridContextBuilderColumn<IAutoGridContextBuilderComboBoxColumn>
+public interface IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> : IAutoGridContextBuilderColumn<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>
 {
-    IAutoGridContextBuilderComboBoxColumn WithListSource(string collectionPropertyPath, bool fromOwnerContext);
+    IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> WithListSource(string collectionPropertyPath, bool fromOwnerContext);
 }
 
-internal sealed class AutoGridContextBuilderComboBoxColumn : AutoGridContextBuilderColumn<IAutoGridContextBuilderComboBoxColumn>, IAutoGridContextBuilderComboBoxColumn
+internal sealed class AutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> : AutoGridContextBuilderColumn<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>, IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>
 {
     private string? _collectionPropertyName;
     private bool _fromOwnerContext;
@@ -17,14 +17,14 @@ internal sealed class AutoGridContextBuilderComboBoxColumn : AutoGridContextBuil
     {
     }
 
-    public IAutoGridContextBuilderComboBoxColumn WithListSource(string collectionPropertyName, bool fromOwnerContext)
+    public IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> WithListSource(string collectionPropertyName, bool fromOwnerContext)
     {
         _collectionPropertyName = collectionPropertyName.NotNull();
         _fromOwnerContext = fromOwnerContext;
         return this;
     }
 
-    public override AutoGridBuildColumnContext Build()
+    internal override AutoGridBuildColumnContext Build()
     {
         Guard.NotNull(_collectionPropertyName, message: "Call .WithListSource() before calling Build().");
 
@@ -37,5 +37,5 @@ internal sealed class AutoGridContextBuilderComboBoxColumn : AutoGridContextBuil
         };
     }
 
-    protected override AutoGridContextBuilderComboBoxColumn BuilderInstance => this;
+    protected override AutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> BuilderInstance => this;
 }

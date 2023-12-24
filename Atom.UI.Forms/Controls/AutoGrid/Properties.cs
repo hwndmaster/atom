@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Threading;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.Wpf;
 
@@ -17,9 +16,20 @@ public static class Properties
         typeof(Properties),
         new PropertyMetadata(ItemsSourceChanged));
 
+    public static readonly DependencyProperty DynamicColumnsProperty = DependencyProperty.RegisterAttached(
+        "DynamicColumns",
+        typeof(DynamicColumnContextState[]),
+        typeof(Properties));
+
     public static readonly DependencyProperty AutoGridBuilderProperty = DependencyProperty.RegisterAttached(
         "AutoGridBuilder",
         typeof(IAutoGridBuilder),
+        typeof(Properties),
+        new PropertyMetadata());
+
+    public static readonly DependencyProperty BuildContextProperty = DependencyProperty.RegisterAttached(
+        "BuildContext",
+        typeof(AutoGridBuildContext),
         typeof(Properties),
         new PropertyMetadata());
 
@@ -34,14 +44,19 @@ public static class Properties
         typeof(bool),
         typeof(Properties));
 
+    public static object GetItemsSource(DependencyObject element)
+    {
+        return element.GetValue(ItemsSourceProperty);
+    }
+
     public static void SetItemsSource(DependencyObject element, object value)
     {
         element.SetValue(ItemsSourceProperty, value);
     }
 
-    public static object GetItemsSource(DependencyObject element)
+    public static IAutoGridBuilder? GetAutoGridBuilder(DependencyObject element)
     {
-        return element.GetValue(ItemsSourceProperty);
+        return (IAutoGridBuilder?)element.GetValue(AutoGridBuilderProperty);
     }
 
     public static void SetAutoGridBuilder(DependencyObject element, IAutoGridBuilder? value)
@@ -49,9 +64,14 @@ public static class Properties
         element.SetValue(AutoGridBuilderProperty, value);
     }
 
-    public static IAutoGridBuilder? GetAutoGridBuilder(DependencyObject element)
+    internal static AutoGridBuildContext? GetBuildContext(DependencyObject element)
     {
-        return (IAutoGridBuilder?) element.GetValue(AutoGridBuilderProperty);
+        return (AutoGridBuildContext?)element.GetValue(BuildContextProperty);
+    }
+
+    internal static void SetBuildContext(DependencyObject element, AutoGridBuildContext? value)
+    {
+        element.SetValue(BuildContextProperty, value);
     }
 
     private static void IsEditingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -94,17 +114,9 @@ public static class Properties
     private static void ItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var dataGrid = (DataGrid)d;
-        var buildContext = AutoGridBuildContext.CreateLazy(dataGrid);
+        var buildContext = AutoGridBuildContext.CreateLazy(dataGrid).Value;
 
-        var groupByProps = buildContext.Value.Columns
-            .Where(x => x.IsGroupedColumn())
-            .ToArray();
-        var filterByProps = buildContext.Value.Columns
-            .OfType<AutoGridBuildTextColumnContext>()
-            .Where(x => x.Filterable)
-            .ToArray();
-
-        if (groupByProps.Length == 0 && filterByProps.Length == 0)
+        if (buildContext.GroupByProperties.Length == 0 && buildContext.FilterByProperties.Length == 0)
         {
             d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue is CollectionViewSource cvs
                 ? cvs.View
@@ -119,98 +131,12 @@ public static class Properties
                     Source = e.NewValue
                 };
 
-            SetupGrouping(groupByProps, collectionViewSource);
-            SetupFiltering(d, filterByProps, collectionViewSource, buildContext.Value.FilterContextScope);
+            new GroupingBehavior().Attach(dataGrid, buildContext, collectionViewSource);
+            new FilteringBehavior().Attach(dataGrid, buildContext, collectionViewSource);
 
             d.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
         }
-    }
 
-    private static void SetupGrouping(AutoGridBuildColumnContext[] groupByProps, CollectionViewSource collectionViewSource)
-    {
-        if (collectionViewSource.Source is IEnumerable enumerable)
-        {
-            // Attach current items
-            AttachToPropertyChangedEvents(groupByProps, collectionViewSource, enumerable);
-
-            // Ensure all new items will be attached
-            var observableCollection = collectionViewSource.Source as ITypedObservableCollection;
-            if (observableCollection is not null)
-            {
-                // TODO: Dispose event subscription when detached
-                // TODO: Use ObservableExtensions.WhenCollectionChanged
-                observableCollection.CollectionChanged += (sender, args) => {
-                    if (args.Action == NotifyCollectionChangedAction.Add)
-                    {
-                        AttachToPropertyChangedEvents(groupByProps, collectionViewSource, args.NewItems!);
-                    }
-                };
-            }
-        }
-
-        foreach (var groupByProp in groupByProps)
-        {
-            collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(groupByProp.Property.Name));
-        }
-    }
-
-    private static void AttachToPropertyChangedEvents(AutoGridBuildColumnContext[] groupByProps, CollectionViewSource collectionViewSource, IEnumerable items)
-    {
-        foreach (var childViewModel in items.OfType<ViewModelBase>())
-        {
-            foreach (var groupByProp in groupByProps)
-            {
-                childViewModel.WhenChanged(groupByProp.Property.Name, (object _) =>
-                    collectionViewSource.View.Refresh());
-            }
-        }
-    }
-
-    private static void SetupFiltering(DependencyObject d, AutoGridBuildTextColumnContext[] filterByProps,
-        CollectionViewSource collectionViewSource, string? filterContextScope)
-    {
-        var vm = GetViewModel(d);
-
-        var filterContext = filterContextScope is null
-            ? Array.Find(vm.GetType().GetProperties(), x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any())
-            : Array.Find(vm.GetType().GetProperties(), x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>()
-                .Any(x => filterContextScope.Equals(x.Scope, StringComparison.Ordinal)));
-
-        if (filterContext is null || filterByProps.Length == 0)
-            return;
-
-        string filter = string.Empty;
-        // TODO: Dispose event subscription when detached
-        vm.WhenChanged(filterContext.Name, (string s) => {
-            filter = s;
-            collectionViewSource.View.Refresh();
-        });
-
-        // TODO: Dispose event subscription when detached
-        collectionViewSource.Filter += (object sender, FilterEventArgs e) =>
-        {
-            if (string.IsNullOrEmpty(filter))
-            {
-                return;
-            }
-
-            foreach (var filterProp in filterByProps)
-            {
-                var value = filterProp.Property.GetValue(e.Item);
-
-                if (AutoGridRowFilter.IsMatch(value, filter, filterProp.ValueConverter))
-                {
-                    return;
-                }
-            }
-
-            e.Accepted = false;
-        };
-    }
-
-    private static ViewModelBase GetViewModel(DependencyObject d)
-    {
-        return ((FrameworkElement)d).DataContext as ViewModelBase
-            ?? throw new InvalidCastException($"Cannot cast DataContext to {nameof(ViewModelBase)}");
+        new DynamicColumnsBehavior().Attach(dataGrid, buildContext);
     }
 }

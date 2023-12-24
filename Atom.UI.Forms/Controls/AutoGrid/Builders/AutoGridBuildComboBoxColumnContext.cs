@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public sealed class AutoGridBuildComboBoxColumnContext : AutoGridBuildColumnContext
+internal sealed class AutoGridBuildComboBoxColumnContext : AutoGridBuildColumnContext
 {
     public AutoGridBuildComboBoxColumnContext(PropertyDescriptor property, string displayName,
         string collectionPropertyName, bool fromOwnerContext)

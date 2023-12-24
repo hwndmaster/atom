@@ -1,10 +1,11 @@
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.ColumnBehaviors;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Xaml.Behaviors;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
@@ -16,7 +17,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
     static AttachingBehavior()
     {
-        _columnBehaviors = new IAutoGridColumnBehavior[] {
+        _columnBehaviors = [
             // Column type changers:
             new ColumnTextBehavior(),
             new ColumnTagEditorBehavior(),
@@ -41,7 +42,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             new ColumnAutoWidthBehavior(),
             new ColumnDisplayIndexBehavior(),
             new ColumnVisibilityBehavior(),
-        };
+        ];
     }
 
     protected override void OnAttached()
@@ -94,17 +95,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
 
         var rowStyle = CreateRowStyle();
 
-        var listItemType = Helpers.GetListItemType(AssociatedObject.ItemsSource);
-        if (AssociatedObject.SelectionMode == DataGridSelectionMode.Extended &&
-            typeof(ISelectable).IsAssignableFrom(listItemType))
-        {
-            BindIsSelected(rowStyle);
-        }
-
-        if (typeof(IEditable).IsAssignableFrom(listItemType))
-        {
-            BindIsEditing(rowStyle);
-        }
+        new SelectableBehavior().Attach(AssociatedObject, rowStyle);
+        new EditableBehavior().Attach(AssociatedObject, rowStyle);
 
         AssociatedObject.RowStyle = rowStyle;
     }
@@ -125,26 +117,18 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
         {
             AssociatedObject.SetValue(DataGrid.IsReadOnlyProperty, true);
         }
-
-        var groupingProperties = _autoGridBuildContext.Value.Columns.Where(x => x.IsGroupedColumn()).ToArray();
-        if (groupingProperties.Any())
-        {
-            if (groupingProperties.Any(x => AutoGridBuilderHelpers.IsGroupableColumn(x.Property)))
-            {
-                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.GroupableViewModel"));
-                AssociatedObject.SetValue(Grid.IsSharedSizeScopeProperty, true);
-            }
-            else
-            {
-                AssociatedObject.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.String"));
-            }
-        }
     }
 
     private void OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
     {
         var buildColumnContext = _autoGridBuildContext.Value.Columns.FirstOrDefault(x => x.Property.Name.Equals(e.PropertyName));
         if (buildColumnContext is null)
+        {
+            e.Cancel = true;
+            return;
+        }
+
+        if (buildColumnContext is AutoGridBuildDynamicColumnContext)
         {
             e.Cancel = true;
             return;
@@ -183,37 +167,6 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
                 postProcessing();
             }
         }
-    }
-
-    private void BindIsSelected(Style style)
-    {
-        var binding = new Binding(nameof(ISelectable.IsSelected));
-        style.Setters.Add(new Setter(DataGrid.IsSelectedProperty, binding));
-    }
-
-    private void BindIsEditing(Style style)
-    {
-        var binding = new Binding(nameof(IEditable.IsEditing));
-        style.Setters.Add(new Setter(Properties.IsEditingProperty, binding));
-
-        AssociatedObject.BeginningEdit += (sender, e) =>
-        {
-            if (e.Row.Item is IEditable editable)
-            {
-                e.Row.SetValue(Properties.IsEditingHandlingSuspendedProperty, true);
-                editable.IsEditing = true;
-                e.Row.SetValue(Properties.IsEditingHandlingSuspendedProperty, false);
-            }
-        };
-        AssociatedObject.RowEditEnding += (sender, e) =>
-        {
-            if (e.Row.Item is IEditable editable)
-            {
-                e.Row.SetValue(Properties.IsEditingHandlingSuspendedProperty, true);
-                editable.IsEditing = false;
-                e.Row.SetValue(Properties.IsEditingHandlingSuspendedProperty, false);
-            }
-        };
     }
 
     private Style CreateRowStyle()

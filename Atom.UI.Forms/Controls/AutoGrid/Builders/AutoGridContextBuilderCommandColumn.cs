@@ -2,13 +2,13 @@ using System.ComponentModel;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public interface IAutoGridContextBuilderCommandColumn : IAutoGridContextBuilderColumn<IAutoGridContextBuilderCommandColumn>
+public interface IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> : IAutoGridContextBuilderColumn<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>
 {
-    IAutoGridContextBuilderCommandColumn WithIcon(string icon, double size);
-    IAutoGridContextBuilderCommandColumn WithIcon(string icon, Size? size = null);
+    IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> WithIcon(string icon, double size);
+    IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> WithIcon(string icon, Size? size = null);
 }
 
-internal sealed class AutoGridContextBuilderCommandColumn : AutoGridContextBuilderColumn<IAutoGridContextBuilderCommandColumn>, IAutoGridContextBuilderCommandColumn
+internal sealed class AutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> : AutoGridContextBuilderColumn<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>, IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>
 {
     private string? _icon;
     private Size? _iconSize;
@@ -18,19 +18,19 @@ internal sealed class AutoGridContextBuilderCommandColumn : AutoGridContextBuild
     {
     }
 
-    public IAutoGridContextBuilderCommandColumn WithIcon(string icon, double size)
+    public IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> WithIcon(string icon, double size)
     {
         return WithIcon(icon, new Size(size, size));
     }
 
-    public IAutoGridContextBuilderCommandColumn WithIcon(string icon, Size? size = null)
+    public IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> WithIcon(string icon, Size? size = null)
     {
         _icon = icon;
         _iconSize = size;
         return this;
     }
 
-    public override AutoGridBuildColumnContext Build()
+    internal override AutoGridBuildColumnContext Build()
     {
         return new AutoGridBuildCommandColumnContext(PropertyDescriptor, DetermineDisplayName())
         {
@@ -46,5 +46,5 @@ internal sealed class AutoGridContextBuilderCommandColumn : AutoGridContextBuild
         };
     }
 
-    protected override AutoGridContextBuilderCommandColumn BuilderInstance => this;
+    protected override AutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel> BuilderInstance => this;
 }

@@ -23,8 +23,8 @@ public static class Module
         services.AddTransient<ILogsTabViewModel, LogsTabViewModel>();
 
         // AutoGridBuilder:
-        services.AddTransient(typeof(IAutoGridContextBuilder<>), typeof(AutoGridContextBuilder<>));
-        services.AddTransient(typeof(AutoGridContextBuilderColumns<>));
+        services.AddTransient(typeof(IAutoGridContextBuilder<,>), typeof(AutoGridContextBuilder<,>));
+        services.AddTransient(typeof(AutoGridContextBuilderColumns<,>));
         services.AddTransient<DefaultAutoGridBuilder>();
 
         // Misc:

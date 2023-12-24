@@ -5,7 +5,7 @@ using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
-public sealed class AutoGridColumnContext
+internal sealed class AutoGridColumnContext
 {
     private readonly List<Action> _postProcessing = new();
 

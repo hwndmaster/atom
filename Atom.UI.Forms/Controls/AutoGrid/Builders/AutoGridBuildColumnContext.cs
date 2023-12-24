@@ -4,12 +4,12 @@ using Genius.Atom.UI.Forms.Wpf;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
-public abstract class AutoGridBuildColumnContext
+internal abstract class AutoGridBuildColumnContext
 {
-    protected AutoGridBuildColumnContext(PropertyDescriptor property, string displayName)
+    protected AutoGridBuildColumnContext(PropertyDescriptor property, string? displayName = null)
     {
         Property = property;
-        DisplayName = displayName;
+        DisplayName = displayName ?? property.Name;
         AutoWidth = false;
         IsReadOnly = false;
     }
