@@ -62,8 +62,8 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel, TParentViewModel
         => AddColumnInternal(pd => new AutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>(pd), propertyName, options);
 
     public IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddDynamic(
-        Expression<Func<TParentViewModel, DynamicColumnsViewModel>> columnsPropertyAccessor,
-        Expression<Func<TViewModel, DynamicColumnEntriesViewModel>> entriesPropertyAccessor,
+        Expression<Func<TParentViewModel, DynamicColumnsViewModel?>> columnsPropertyAccessor,
+        Expression<Func<TViewModel, DynamicColumnEntriesViewModel?>> entriesPropertyAccessor,
         Action<IAutoGridContextBuilderDynamicColumn<TViewModel, TParentViewModel>>? options = null)
         => AddDynamic(ExpressionHelpers.GetPropertyName(columnsPropertyAccessor), ExpressionHelpers.GetPropertyName(entriesPropertyAccessor), options);
 

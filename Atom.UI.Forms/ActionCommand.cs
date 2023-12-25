@@ -130,7 +130,10 @@ public class ActionCommand<T> : IActionCommand<T>
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Action failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+            var message = $"Action command execution failure. Parameter = '{parameter}'";
+            var logger = Module.ServiceProvider.GetRequiredService<ILogger<ActionCommand>>();
+            logger.LogError(ex, message);
+            MessageBox.Show(message + ". Check logs for details.", "Action failed", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
