@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Media;
 
 namespace Genius.Atom.UI.Forms.Wpf;
@@ -48,5 +50,13 @@ public static class WpfExtensions
             parent = VisualTreeHelper.GetParent(parent) as UIElement;
         }
         return null;
+    }
+
+    public static IObservable<Unit> WhenLoadedOneTime(this FrameworkElement frameworkElement)
+    {
+        return Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
+            h => frameworkElement.Loaded += h, h => frameworkElement.Loaded -= h)
+            .Take(1)
+            .Select(x => Unit.Default);
     }
 }
