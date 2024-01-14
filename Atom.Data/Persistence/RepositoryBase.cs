@@ -23,6 +23,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
     protected readonly Subject<IReadOnlyList<TEntity>> _loaded = new();
 
     private List<TEntity>? _entities;
+    private readonly ReaderWriterLockSlim _initializationLocker = new();
 
     private readonly string FILENAME = @$".\Data\{typeof(TEntity).Name}.json";
 
@@ -79,13 +80,17 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
 
     private async Task EnsureInitializationAsync()
     {
+        _initializationLocker.EnterWriteLock();
+
         if (_entities is not null)
         {
+            _initializationLocker.ExitWriteLock();
             return;
         }
 
         _entities = _persister.LoadCollection<TEntity>(FILENAME).NotNull().ToList();
         await FillUpRelationsAsync();
+        _initializationLocker.ExitWriteLock();
         _loaded.OnNext(_entities.AsReadOnly());
     }
 
