@@ -55,7 +55,15 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
         var column = CreateColumn();
         var textBlock = RenderTextBlock();
         column.CellTemplate = new DataTemplate { VisualTree = textBlock };
+        column.CellEditingTemplate = CreateTextBoxTemplate(CreateBinding());
         return column;
+    }
+
+    private static DataTemplate CreateTextBoxTemplate(Binding bindToValue)
+    {
+        var textFactory = new FrameworkElementFactory(typeof(TextBox));
+        textFactory.SetBinding(TextBox.TextProperty, bindToValue);
+        return new DataTemplate { VisualTree = textFactory };
     }
 
     // TODO: Cover with unit tests
