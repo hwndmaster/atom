@@ -19,7 +19,6 @@ public partial class App : Application
         base.OnStartup(e);
 
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddLogging();
         serviceCollection.AddTransient<MainWindow>();
         serviceCollection.AddTransient<MainViewModel>();
         serviceCollection.AddSingleton<TagsContext>();
@@ -28,7 +27,7 @@ public partial class App : Application
         serviceCollection.AddTransient<SampleDataAutoGridBuilder>();
 
         Infrastructure.Module.Configure(serviceCollection);
-        UI.Forms.Module.Configure(serviceCollection, this);
+        UI.Forms.Module.Configure(serviceCollection, this, enableSerilog: false);
 
         ServiceProvider = serviceCollection.BuildServiceProvider();
 
