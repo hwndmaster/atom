@@ -55,4 +55,4 @@ jobs:
     - name: Pack Reporting.UI
       run: dotnet pack Atom.Reporting.UI/Atom.Reporting.UI.csproj --configuration Release
     - name: Publish packages to GPR
-      run: dotnet nuget push **/*.nupkg --skip-duplicate
+      run: dotnet nuget push **/*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}
