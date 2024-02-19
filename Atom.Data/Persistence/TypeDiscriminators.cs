@@ -10,6 +10,10 @@ public interface ITypeDiscriminators
         where T : class
         where TPreviousVersion : class
         where TVersionUpgrader : IDataVersionUpgrader<TPreviousVersion, T>;
+    void AddVersionUpgrader<T, TPreviousVersion, TVersionUpgrader>()
+        where T : class
+        where TPreviousVersion : class
+        where TVersionUpgrader : IDataVersionUpgrader<TPreviousVersion, T>;
     bool HasMapping(Type type);
 }
 
@@ -17,10 +21,11 @@ internal interface ITypeDiscriminatorsInternal : ITypeDiscriminators
 {
     TypeDiscriminatorRecord GetDiscriminator(Type type);
     TypeDiscriminatorRecord GetDiscriminator(string discriminator, int version);
-    TypeDiscriminatorRecord? GetDiscriminatorByPreviousVersion(Type type);
+    (TypeDiscriminatorRecord Record, TypePreviousVersion PreviousVersion)? GetDiscriminatorByPreviousVersion(Type type);
 }
 
-internal record TypeDiscriminatorRecord(string Discriminator, Type Type, Type? PreviousVersionType, int Version, DataVersionUpgraderProxy? VersionUpgrader);
+internal sealed record TypePreviousVersion(Type PreviousVersionType, DataVersionUpgraderProxy VersionUpgrader);
+internal sealed record TypeDiscriminatorRecord(string Discriminator, Type Type, List<TypePreviousVersion> PreviousVersions, int Version);
 
 internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminatorsInternal
 {
@@ -39,7 +44,7 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
 
     public void AddMapping<T>(string discriminator, int version = 1)
     {
-        var record = new TypeDiscriminatorRecord(discriminator, typeof(T), null, version, null);
+        var record = new TypeDiscriminatorRecord(discriminator, typeof(T), [], version);
         AddMapping(record);
     }
 
@@ -62,8 +67,32 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
             throw new InvalidOperationException($"The previous version '{previousVersionRecord.Version}' must be less than the passing one '{version}'.");
         }
 
-        var record = new TypeDiscriminatorRecord(discriminator, typeof(T), previousVersionType, version, versionUpgraderProxy);
+        var record = new TypeDiscriminatorRecord(discriminator, typeof(T), [new TypePreviousVersion(previousVersionType, versionUpgraderProxy)], version);
         AddMapping(record);
+    }
+
+    public void AddVersionUpgrader<T, TPreviousVersion, TVersionUpgrader>()
+        where T : class
+        where TPreviousVersion : class
+        where TVersionUpgrader : IDataVersionUpgrader<TPreviousVersion, T>
+    {
+        var previousVersionType = typeof(TPreviousVersion);
+        if (!_discriminatorsByTypeName.TryGetValue(previousVersionType.FullName.NotNull(), out var previousVersionRecord))
+        {
+            throw new InvalidOperationException($"The discriminator for type '{previousVersionType.FullName}' is not registered.");
+        }
+
+        //if (previousVersionRecord.Version >= version)
+        //{
+        //    throw new InvalidOperationException($"The previous version '{previousVersionRecord.Version}' must be less than the passing one '{version}'.");
+        //}
+
+        var versionUpgrader = _serviceProvider.GetRequiredService<TVersionUpgrader>();
+        var versionUpgraderProxy = DataVersionUpgraderProxy.Create(versionUpgrader);
+
+        var typeName = typeof(T).FullName.NotNull();
+        var record = _discriminatorsByTypeName[typeName];
+        record.PreviousVersions.Add(new TypePreviousVersion(previousVersionType, versionUpgraderProxy));
     }
 
     public bool HasMapping(Type type)
@@ -98,11 +127,20 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
         return value;
     }
 
-    public TypeDiscriminatorRecord? GetDiscriminatorByPreviousVersion(Type type)
+    public (TypeDiscriminatorRecord, TypePreviousVersion)? GetDiscriminatorByPreviousVersion(Type type)
     {
         Guard.NotNull(type);
 
-        return _discriminatorsByTypeName.Values.FirstOrDefault(x => x.PreviousVersionType == type);
+        foreach (var record in _discriminatorsByTypeName.Values)
+        {
+            var previousVersion = record.PreviousVersions.FirstOrDefault(x => x.PreviousVersionType == type);
+            if (previousVersion is not null)
+            {
+                return (record, previousVersion);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

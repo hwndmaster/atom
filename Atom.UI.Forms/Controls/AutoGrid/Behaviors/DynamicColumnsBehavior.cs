@@ -2,6 +2,7 @@ using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
+using Genius.Atom.UI.Forms.Controls.AutoGrid.ColumnBehaviors;
 using ReactiveUI;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
@@ -75,22 +76,31 @@ internal sealed class DynamicColumnsBehavior
             dataGrid.Columns.Remove(previousColumn);
         }
 
-        List<DataGridTextColumn> dataGridColumns = new();
+        List<DataGridTextColumn> dataGridColumns = [];
         if (dynamicColumnsVm is not null)
         {
             for (var i = 0; i < dynamicColumnsVm.ColumnNames.Length; i++)
             {
                 DataGridTextColumn textColumn = new()
                 {
-                    Header = dynamicColumnsVm.ColumnNames[i],
+                    Header = string.Empty,
                     Binding = new Binding($"{dynamicColumnContext.Property.Name}[{i}]")
                 };
+                var args = new DataGridAutoGeneratingColumnEventArgs(dynamicColumnsVm.ColumnNames[i], typeof(string), textColumn);
+                dynamicColumnContext.DisplayName = dynamicColumnsVm.ColumnNames[i];
+                var columnContext = new AutoGridColumnContext(dataGrid, args, dynamicColumnContext);
+
+                foreach (var columnBehavior in ColumnBehaviorsAccessor.GetForDynamicColumn())
+                {
+                    columnBehavior.Attach(columnContext);
+                }
+
                 dataGrid.Columns.Add(textColumn);
                 dataGridColumns.Add(textColumn);
             }
         }
 
-        thisContextState.Columns = dataGridColumns.ToArray();
+        thisContextState.Columns = [..dataGridColumns];
     }
 
     private static ViewModelBase GetViewModel(DataGrid dataGrid)

@@ -11,39 +11,8 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
 public sealed class AttachingBehavior : Behavior<DataGrid>
 {
-    private static readonly IAutoGridColumnBehavior[] _columnBehaviors;
     private readonly Queue<AutoGridColumnContext> _contextsToPostProcess = new();
     private Lazy<AutoGridBuildContext> _autoGridBuildContext = new(() => throw new InvalidOperationException("AutoGridBuilder hasn't been initialized yet."));
-
-    static AttachingBehavior()
-    {
-        _columnBehaviors = [
-            // Column type changers:
-            new ColumnTextBehavior(),
-            new ColumnTagEditorBehavior(),
-            new ColumnButtonBehavior(),
-            new ColumnToggleButtonBehavior(),
-            new ColumnComboBoxBehavior(),
-            new ColumnAttachedViewBehavior(),
-
-            // Binding changers:
-            new ColumnConverterBehavior(),
-            new ColumnFormattingBehavior(),
-            new ColumnNullableBehavior(),
-
-            // Style changers:
-            new ColumnTooltipBehavior(),
-            new ColumnStylingBehavior(),
-            new ColumnValidationBehavior(),
-
-            // Misc:
-            new ColumnHeaderNameBehavior(),
-            new ColumnReadOnlyBehavior(),
-            new ColumnAutoWidthBehavior(),
-            new ColumnDisplayIndexBehavior(),
-            new ColumnVisibilityBehavior(),
-        ];
-    }
 
     protected override void OnAttached()
     {
@@ -144,7 +113,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>
             return;
         }
 
-        foreach (var columnBehavior in _columnBehaviors)
+        foreach (var columnBehavior in ColumnBehaviorsAccessor.GetAll())
         {
             columnBehavior.Attach(context);
         }

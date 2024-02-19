@@ -8,6 +8,11 @@ internal sealed class ColumnDisplayIndexBehavior : IAutoGridColumnBehavior
 
         if (index.HasValue)
         {
+            while (context.DataGrid.Columns.Any(x => x != context.Args.Column && x.DisplayIndex == index))
+            {
+                index++;
+            }
+
             context.Args.Column.DisplayIndex = index.Value;
         }
     }

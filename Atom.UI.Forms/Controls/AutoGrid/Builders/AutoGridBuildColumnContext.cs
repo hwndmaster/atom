@@ -19,7 +19,7 @@ internal abstract class AutoGridBuildColumnContext
             && textColumnContext.IsGrouped;
 
     public PropertyDescriptor Property { get; }
-    public string DisplayName { get; }
+    public string DisplayName { get; internal set; }
     public int? DisplayIndex { get; internal set; }
     public bool AutoWidth { get; init; }
     public bool IsReadOnly { get; init; }

@@ -3,6 +3,21 @@ using Genius.Atom.Infrastructure.Io;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
+public sealed class TestFileSystemWatcherFactory : IFileSystemWatcherFactory
+{
+    public TestFileSystemWatcher? InstanceToReturn { get; set; }
+    public TestFileSystemWatcher? RecentlyCreatedInstance { get; private set; }
+    public int InstancesCreated { get; private set; } = 0;
+
+    public IFileSystemWatcher? Create(string path, string filter = "*.*", bool increaseBuffer = false)
+    {
+        var instance = InstanceToReturn ?? new TestFileSystemWatcher(path, filter, increaseBuffer);
+        RecentlyCreatedInstance = instance;
+        InstancesCreated++;
+        return instance;
+    }
+}
+
 public sealed class TestFileSystemWatcher : IFileSystemWatcher
 {
     private readonly Subject<FileSystemEventArgs> _created = new();
@@ -10,6 +25,14 @@ public sealed class TestFileSystemWatcher : IFileSystemWatcher
     private readonly Subject<RenamedEventArgs> _renamed = new();
     private readonly Subject<FileSystemEventArgs> _deleted = new();
     private readonly Subject<ErrorEventArgs> _error = new();
+
+    public TestFileSystemWatcher(string path, string filter, bool increaseBuffer)
+    {
+        ListeningPath = path;
+        ListeningFilter = filter;
+        IsBufferIncreased = increaseBuffer;
+        IsListening = true;
+    }
 
     public IObservable<FileSystemEventArgs> Created => _created;
     public IObservable<FileSystemEventArgs> Changed => _changed;
@@ -44,7 +67,7 @@ public sealed class TestFileSystemWatcher : IFileSystemWatcher
 
     public void OnDeleted(string directory, string? name)
     {
-        _deleted.OnNext(new FileSystemEventArgs(WatcherChangeTypes.Changed, directory, name));
+        _deleted.OnNext(new FileSystemEventArgs(WatcherChangeTypes.Deleted, directory, name));
     }
 
     public void OnError(Exception exception)
@@ -67,5 +90,6 @@ public sealed class TestFileSystemWatcher : IFileSystemWatcher
 
     public void Dispose()
     {
+        StopListening();
     }
 }

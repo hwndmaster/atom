@@ -160,12 +160,12 @@ internal sealed class DiscriminatedTypeConverter<T> : JsonConverter<T>, IJsonCon
         while (true)
         {
             var nextVersionRecord = _typeDiscriminators.GetDiscriminatorByPreviousVersion(previousVersionRecord.Type);
-            if (nextVersionRecord is null || nextVersionRecord.VersionUpgrader is null)
+            if (nextVersionRecord is null)
             {
                 break;
             }
-            value = nextVersionRecord.VersionUpgrader.Upgrade(value);
-            previousVersionRecord = nextVersionRecord;
+            value = nextVersionRecord.Value.PreviousVersion.VersionUpgrader.Upgrade(value);
+            previousVersionRecord = nextVersionRecord.Value.Item1;
         }
 
         return value;
