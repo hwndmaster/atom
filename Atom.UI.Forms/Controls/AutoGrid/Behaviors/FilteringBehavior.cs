@@ -5,53 +5,74 @@ using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
 // TODO: Cover with unit tests
-internal sealed class FilteringBehavior
+internal sealed class FilteringBehavior : IDisposable
 {
-    public void Attach(DataGrid dataGrid, AutoGridBuildContext buildContext,
-        CollectionViewSource collectionViewSource)
-    {
-        var vm = GetViewModel(dataGrid);
+    private readonly Disposer _disposer = new();
+    private readonly DataGrid _dataGrid;
+    private readonly AutoGridBuildContext _buildContext;
+    private readonly CollectionViewSource _collectionViewSource;
+    private bool _isAttached = false;
+    private string _filter = string.Empty;
 
-        var filterContext = buildContext.FilterContextScope is null
+    public FilteringBehavior(DataGrid dataGrid, AutoGridBuildContext buildContext, CollectionViewSource collectionViewSource)
+    {
+        _dataGrid = dataGrid.NotNull();
+        _buildContext = buildContext.NotNull();
+        _collectionViewSource = collectionViewSource.NotNull();
+    }
+
+    public FilteringBehavior Attach()
+    {
+        if (_isAttached)
+            return this;
+        _isAttached = true;
+
+        if (_buildContext.FilterByProperties.Length == 0)
+            return this;
+
+        var vm = _dataGrid.GetViewModel();
+
+        var filterContext = _buildContext.FilterContextScope is null
             ? Array.Find(vm.GetType().GetProperties(), x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>().Any())
             : Array.Find(vm.GetType().GetProperties(), x => x.GetCustomAttributes(false).OfType<FilterContextAttribute>()
-                .Any(x => buildContext.FilterContextScope.Equals(x.Scope, StringComparison.Ordinal)));
+                .Any(x => _buildContext.FilterContextScope.Equals(x.Scope, StringComparison.Ordinal)));
 
-        if (filterContext is null || buildContext.FilterByProperties.Length == 0)
-            return;
+        if (filterContext is null)
+            return this;
 
-        string filter = string.Empty;
-        // TODO: Dispose event subscription when detached
-        vm.WhenChanged(filterContext.Name, (string s) => {
-            filter = s;
-            collectionViewSource.View.Refresh();
-        });
+        _disposer.Add(vm.WhenChanged(filterContext.Name, (string s) => {
+            _filter = s;
+            _collectionViewSource.View.Refresh();
+        }));
 
-        // TODO: Dispose event subscription when detached
-        collectionViewSource.Filter += (object sender, FilterEventArgs e) =>
+        _collectionViewSource.Filter += OnCollectionViewSourceFilter;
+        _disposer.Add(() => _collectionViewSource.Filter -= OnCollectionViewSourceFilter);
+
+        return this;
+    }
+
+    public void Dispose()
+    {
+        _disposer.Dispose();
+    }
+
+    private void OnCollectionViewSourceFilter(object sender, FilterEventArgs e)
+    {
+        if (string.IsNullOrEmpty(_filter))
         {
-            if (string.IsNullOrEmpty(filter))
+            return;
+        }
+
+        foreach (var filterProp in _buildContext.FilterByProperties)
+        {
+            var value = filterProp.Property.GetValue(e.Item);
+
+            if (AutoGridRowFilter.IsMatch(value, _filter, filterProp.ValueConverter))
             {
                 return;
             }
+        }
 
-            foreach (var filterProp in buildContext.FilterByProperties)
-            {
-                var value = filterProp.Property.GetValue(e.Item);
-
-                if (AutoGridRowFilter.IsMatch(value, filter, filterProp.ValueConverter))
-                {
-                    return;
-                }
-            }
-
-            e.Accepted = false;
-        };
-    }
-
-    private static ViewModelBase GetViewModel(DataGrid dataGrid)
-    {
-        return dataGrid.DataContext as ViewModelBase
-            ?? throw new InvalidCastException($"Cannot cast DataContext to {nameof(ViewModelBase)}");
+        e.Accepted = false;
     }
 }

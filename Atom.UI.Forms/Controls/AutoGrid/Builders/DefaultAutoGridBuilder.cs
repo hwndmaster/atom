@@ -33,55 +33,82 @@ internal sealed class DefaultAutoGridBuilder
 
     private AutoGridBuildColumnContext CreateColumnContext(PropertyDescriptor property)
     {
-        // TODO: Check if `property.DisplayName` is correct
         var displayName = property.Attributes.OfType<TitleAttribute>().FirstOrDefault()?.Title
             ?? Regex.Replace(property.DisplayName, "[A-Z]", " $0");
 
         if (AutoGridBuilderHelpers.IsCommandColumn(property))
         {
-            return new AutoGridBuildCommandColumnContext(property, displayName)
+            var baseFields = new AutoGridContextBuilderBaseFields(
+                DetectAutoWidth(property),
+                displayName,
+                DetectIsReadOnly(property),
+                DetectStyle(property),
+                null,
+                DetectToolTipPath(property),
+                DetectValueConverter(property, null),
+                null
+            );
+            return new AutoGridBuildCommandColumnContext(property, baseFields)
             {
-                AutoWidth = DetectAutoWidth(property),
-                Icon = DetectIcon(property),
-                IsReadOnly = DetectIsReadOnly(property),
-                Style = DetectStyle(property),
-                ToolTipPath = DetectToolTipPath(property),
-                ValueConverter = DetectValueConverter(property, null)
+                Icon = DetectIcon(property)
             };
         }
         else if (property.Attributes.OfType<SelectFromListAttribute>().Any())
         {
             var selectFromListAttr = property.Attributes.OfType<SelectFromListAttribute>().First();
-            return new AutoGridBuildComboBoxColumnContext(property, displayName,
-                selectFromListAttr.CollectionPropertyName, selectFromListAttr.FromOwnerContext)
+            var baseFields = new AutoGridContextBuilderBaseFields(
+                false,
+                displayName,
+                false,
+                DetectStyle(property),
+                null,
+                null,
+                null,
+                null
+            );
+            return new AutoGridBuildComboBoxColumnContext(property, baseFields)
             {
-                Style = DetectStyle(property)
+                CollectionPropertyName = selectFromListAttr.CollectionPropertyName,
+                FromOwnerContext = selectFromListAttr.FromOwnerContext
             };
         }
         else if (property.Attributes.OfType<AttachedViewAttribute>().Any())
         {
             var attachedViewAttr = property.Attributes.OfType<AttachedViewAttribute>().First();
-            return new AutoGridBuildViewColumnContext(property, displayName, attachedViewAttr.AttachedViewType)
+            var baseFields = new AutoGridContextBuilderBaseFields(
+                DetectAutoWidth(property),
+                displayName,
+                DetectIsReadOnly(property),
+                DetectStyle(property),
+                null,
+                null,
+                null,
+                null
+            );
+            return new AutoGridBuildViewColumnContext(property, baseFields)
             {
-                AutoWidth = DetectAutoWidth(property),
-                IsReadOnly = DetectIsReadOnly(property),
-                Style = DetectStyle(property)
+                AttachedViewType = attachedViewAttr.AttachedViewType
             };
         }
         else
         {
             var displayFormat = DetectDisplayFormat(property);
-            return new AutoGridBuildTextColumnContext(property, displayName)
+            var baseFields = new AutoGridContextBuilderBaseFields(
+                DetectAutoWidth(property),
+                displayName,
+                DetectIsReadOnly(property),
+                DetectStyle(property),
+                null,
+                DetectToolTipPath(property),
+                DetectValueConverter(property, displayFormat),
+                null
+            );
+            return new AutoGridBuildTextColumnContext(property, baseFields)
             {
-                AutoWidth = DetectAutoWidth(property),
                 DisplayFormat = displayFormat,
                 IconSource = DetectIconSource(property),
                 IsGrouped = DetectIsGrouped(property),
-                IsReadOnly = DetectIsReadOnly(property),
                 Filterable = DetectFilterable(property),
-                Style = DetectStyle(property),
-                ToolTipPath = DetectToolTipPath(property),
-                ValueConverter = DetectValueConverter(property, displayFormat)
             };
         }
     }

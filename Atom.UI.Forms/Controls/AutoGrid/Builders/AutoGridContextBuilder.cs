@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
@@ -54,6 +55,16 @@ public interface IAutoGridContextBuilder<TViewModel, TParentViewModel> : IAutoGr
     IAutoGridContextBuilder<TViewModel, TParentViewModel> WithFilterContextScope(string scopeName);
 
     /// <summary>
+    ///   Lets the datagrid to optionally enable grouping by switching <paramref name="switchPropertyAccessor"/>
+    ///   to show a value of <paramref name="valuePropertyAccessor"/>.
+    /// </summary>
+    /// <param name="switchPropertyAccessor">Points to a property which indicates whether to enable grouping or not.</param>
+    /// <param name="valuePropertyAccessor">Points to a property which contains a structured value shown in the group header.</param>
+    IAutoGridContextBuilder<TViewModel, TParentViewModel> WithOptionalGrouping(
+        Expression<Func<TParentViewModel, bool>> switchPropertyAccessor,
+        Expression<Func<TViewModel, IGroupableViewModel?>> valuePropertyAccessor);
+
+    /// <summary>
     ///   Defines the view model factory type which can be injected and used by the DataGrid when creating a new row.
     ///   NOTE: If the type isn't registered in the DI container, a parameterless constructor will be used then.
     /// </summary>
@@ -73,6 +84,17 @@ internal sealed class AutoGridContextBuilder<TViewModel, TParentViewModel>
     private bool _enableVirtualization = false;
     private bool _makeReadOnly = false;
     private string? _filterContextScope = null;
+
+    /// <summary>
+    ///   A property name in <see cref="TParentViewModel"/>.
+    /// </summary>
+    private string? _optionalGroupingSwitchProperty = null;
+
+    /// <summary>
+    ///   A property name in <see cref="TViewModel"/>.
+    /// </summary>
+    private string? _optionalGroupingValueProperty = null;
+
     private IFactory<TViewModel>? _recordFactory;
 
     public AutoGridContextBuilder(AutoGridContextBuilderColumns<TViewModel, TParentViewModel> columnsBuilder)
@@ -110,6 +132,15 @@ internal sealed class AutoGridContextBuilder<TViewModel, TParentViewModel>
         return this;
     }
 
+    public IAutoGridContextBuilder<TViewModel, TParentViewModel> WithOptionalGrouping(
+        Expression<Func<TParentViewModel, bool>> switchPropertyAccessor,
+        Expression<Func<TViewModel, IGroupableViewModel?>> valuePropertyAccessor)
+    {
+        _optionalGroupingSwitchProperty = ExpressionHelpers.GetPropertyName(switchPropertyAccessor);
+        _optionalGroupingValueProperty = ExpressionHelpers.GetPropertyName(valuePropertyAccessor);
+        return this;
+    }
+
     public IAutoGridContextBuilder<TViewModel, TParentViewModel> WithRecordFactory<TFactory>()
         where TFactory : IFactory<TViewModel>
     {
@@ -128,6 +159,8 @@ internal sealed class AutoGridContextBuilder<TViewModel, TParentViewModel>
             EnableVirtualization = _enableVirtualization,
             FilterContextScope = _filterContextScope,
             MakeReadOnly = _makeReadOnly,
+            OptionalGroupingSwitchProperty = _optionalGroupingSwitchProperty,
+            OptionalGroupingValueProperty = _optionalGroupingValueProperty
         };
     }
 }

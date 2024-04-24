@@ -7,12 +7,15 @@ internal sealed class BindingProxy : Freezable
 
     protected override Freezable CreateInstanceCore()
     {
-        return new BindingProxy();
+        return new BindingProxy()
+        {
+            Data = Data
+        };
     }
 
     public object Data
     {
-        get { return (object)GetValue(DataProperty); }
+        get { return GetValue(DataProperty); }
         set { SetValue(DataProperty, value); }
     }
 }

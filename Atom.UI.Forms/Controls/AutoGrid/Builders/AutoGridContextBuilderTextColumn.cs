@@ -74,21 +74,14 @@ internal sealed class AutoGridContextBuilderTextColumn<TViewModel, TParentViewMo
 
     internal override AutoGridBuildColumnContext Build()
     {
-        return new AutoGridBuildTextColumnContext(PropertyDescriptor, DetermineDisplayName())
+        return new AutoGridBuildTextColumnContext(PropertyDescriptor, GetBaseFields(valueConverterDisplayFormat: _displayFormat))
         {
-            AutoWidth = _autoWidth,
             DisplayFormat = _displayFormat,
             Filterable = _filterable,
             IsGrouped = _isGrouped,
-            IsReadOnly = _isReadOnly,
             IconSource = _iconSource,
-            Style = _style,
             TextHighlightingPatternPath = _textHighlightingPatternPath,
-            TextHighlightingUseRegexPath = _textHighlightingUseRegexPath,
-            ToolTip = _toolTip,
-            ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter(_displayFormat),
-            Visibility = _visibilityBinding,
+            TextHighlightingUseRegexPath = _textHighlightingUseRegexPath
         };
     }
 

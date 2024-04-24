@@ -106,9 +106,15 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel, TParentViewModel
             .ToArray();
     }
 
-    private IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddColumnInternal<T>(Func<PropertyDescriptor, T> createFunc, string propertyName, Action<T>? options = null)
+    private IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddColumnInternal<T>(
+        Func<PropertyDescriptor, T> createFunc, string propertyName, Action<T>? options = null, bool singleInstance = false)
         where T : IAutoGridContextBuilderColumn
     {
+        if (singleInstance && _columnBuilders.Any(x => x is T))
+        {
+            throw new InvalidOperationException($"There could be only one column registered of type {typeof(T).Name}");
+        }
+
         var propertyDescriptor = _propertyDescriptors.Find(propertyName, false).NotNull();
 
         var columnBuilder = createFunc(propertyDescriptor);

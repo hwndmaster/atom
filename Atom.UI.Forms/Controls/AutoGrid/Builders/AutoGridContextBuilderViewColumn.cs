@@ -24,11 +24,9 @@ internal sealed class AutoGridContextBuilderViewColumn<TViewModel, TParentViewMo
 
     internal override AutoGridBuildColumnContext Build()
     {
-        return new AutoGridBuildViewColumnContext(PropertyDescriptor, DetermineDisplayName(), _viewType.NotNull())
+        return new AutoGridBuildViewColumnContext(PropertyDescriptor, GetBaseFields())
         {
-            AutoWidth = _autoWidth,
-            IsReadOnly = _isReadOnly,
-            Style = _style
+            AttachedViewType = _viewType.NotNull()
         };
     }
 

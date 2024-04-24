@@ -41,7 +41,7 @@ internal sealed class ColumnTextBehavior : IAutoGridColumnBehavior
             if (buildTextColumn.TextHighlightingPatternPath is not null)
             {
                 // Using the DataGrid.DataContext, previously attached via a resource
-                var resource = context.DataGrid.FindResource("proxy");
+                var resource = context.DataGrid.GetBindingProxy();
 
                 Binding[] baseBindings = [
                     new Binding("Data." + buildTextColumn.TextHighlightingPatternPath)

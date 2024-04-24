@@ -10,7 +10,7 @@ internal sealed class ColumnVisibilityBehavior : IAutoGridColumnBehavior
         if (context.BuildColumn.Visibility is not null)
         {
             // Using the DataGrid.DataContext, previously attached via a resource
-            var resource = context.DataGrid.FindResource("proxy");
+            var resource = context.DataGrid.GetBindingProxy();
             BindingOperations.SetBinding(context.Args.Column, DataGridColumn.VisibilityProperty,
                 new Binding("Data." + context.BuildColumn.Visibility)
                 {

@@ -32,17 +32,10 @@ internal sealed class AutoGridContextBuilderCommandColumn<TViewModel, TParentVie
 
     internal override AutoGridBuildColumnContext Build()
     {
-        return new AutoGridBuildCommandColumnContext(PropertyDescriptor, DetermineDisplayName())
+        return new AutoGridBuildCommandColumnContext(PropertyDescriptor, GetBaseFields())
         {
-            AutoWidth = _autoWidth,
             Icon = _icon,
-            IconSize = _iconSize,
-            IsReadOnly = _isReadOnly,
-            Style = _style,
-            ToolTip = _toolTip,
-            ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter(null),
-            Visibility = _visibilityBinding,
+            IconSize = _iconSize
         };
     }
 

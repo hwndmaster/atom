@@ -113,30 +113,26 @@ public static class Properties
 
     private static void ItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
+        var disposer = new Disposer();
         var dataGrid = (DataGrid)d;
         var buildContext = AutoGridBuildContext.CreateLazy(dataGrid).Value;
 
-        if (buildContext.GroupByProperties.Length == 0 && buildContext.FilterByProperties.Length == 0)
+        var collectionViewSource = e.NewValue is CollectionViewSource cvs
+            ? cvs
+            : new CollectionViewSource
+            {
+                Source = e.NewValue
+            };
+
+        disposer.Add(new GroupingBehavior(dataGrid, buildContext, collectionViewSource).Attach());
+        disposer.Add(new FilteringBehavior(dataGrid, buildContext, collectionViewSource).Attach());
+
+        d.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
+
+        /* TODO: Cannot use Unloaded event since it is being triggered when switching tabs
+        dataGrid.Unloaded += (object _, RoutedEventArgs _) =>
         {
-            d.SetValue(DataGrid.ItemsSourceProperty, e.NewValue is CollectionViewSource cvs
-                ? cvs.View
-                : e.NewValue);
-        }
-        else
-        {
-            var collectionViewSource = e.NewValue is CollectionViewSource cvs
-                ? cvs
-                : new CollectionViewSource
-                {
-                    Source = e.NewValue
-                };
-
-            new GroupingBehavior().Attach(dataGrid, buildContext, collectionViewSource);
-            new FilteringBehavior().Attach(dataGrid, buildContext, collectionViewSource);
-
-            d.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
-        }
-
-        new DynamicColumnsBehavior().Attach(dataGrid, buildContext);
+            disposer.Dispose();
+        };*/
     }
 }

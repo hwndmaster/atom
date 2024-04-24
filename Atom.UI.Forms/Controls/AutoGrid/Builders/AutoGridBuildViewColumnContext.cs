@@ -4,11 +4,10 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 internal sealed class AutoGridBuildViewColumnContext : AutoGridBuildColumnContext
 {
-    public AutoGridBuildViewColumnContext(PropertyDescriptor property, string displayName, Type attachedViewType)
-        : base(property, displayName)
+    public AutoGridBuildViewColumnContext(PropertyDescriptor property, AutoGridContextBuilderBaseFields baseFields)
+        : base(property, baseFields)
     {
-        AttachedViewType = attachedViewType;
     }
 
-    public Type AttachedViewType { get; }
+    public required Type AttachedViewType { get; init; }
 }

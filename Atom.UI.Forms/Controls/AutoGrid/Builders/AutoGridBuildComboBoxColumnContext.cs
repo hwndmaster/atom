@@ -4,14 +4,11 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 internal sealed class AutoGridBuildComboBoxColumnContext : AutoGridBuildColumnContext
 {
-    public AutoGridBuildComboBoxColumnContext(PropertyDescriptor property, string displayName,
-        string collectionPropertyName, bool fromOwnerContext)
-        : base(property, displayName)
+    public AutoGridBuildComboBoxColumnContext(PropertyDescriptor property, AutoGridContextBuilderBaseFields baseFields)
+        : base(property, baseFields)
     {
-        CollectionPropertyName = collectionPropertyName.NotNull();
-        FromOwnerContext = fromOwnerContext;
     }
 
-    public string CollectionPropertyName { get; }
-    public bool FromOwnerContext { get; }
+    public required string CollectionPropertyName { get; init; }
+    public required bool FromOwnerContext { get; init; }
 }

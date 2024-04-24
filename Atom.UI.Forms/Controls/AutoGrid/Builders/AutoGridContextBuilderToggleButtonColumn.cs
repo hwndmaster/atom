@@ -26,17 +26,10 @@ internal sealed class AutoGridContextBuilderToggleButtonColumn<TViewModel, TPare
 
     internal override AutoGridBuildColumnContext Build()
     {
-        return new AutoGridBuildToggleButtonColumnContext(PropertyDescriptor, DetermineDisplayName())
+        return new AutoGridBuildToggleButtonColumnContext(PropertyDescriptor, GetBaseFields())
         {
-            AutoWidth = _autoWidth,
             IconForTrue = _iconForTrue,
-            IconForFalse = _iconForFalse,
-            IsReadOnly = _isReadOnly,
-            Style = _style,
-            ToolTip = _toolTip,
-            ToolTipPath = _toolTipPath,
-            ValueConverter = DetermineValueConverter(null),
-            Visibility = _visibilityBinding,
+            IconForFalse = _iconForFalse
         };
     }
 

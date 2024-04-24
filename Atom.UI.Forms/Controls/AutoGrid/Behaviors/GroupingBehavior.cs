@@ -7,58 +7,109 @@ using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
 // TODO: Cover with unit tests
-internal sealed class GroupingBehavior
+internal sealed class GroupingBehavior : IDisposable
 {
-    public void Attach(DataGrid dataGrid, AutoGridBuildContext buildContext, CollectionViewSource collectionViewSource)
-    {
-        if (buildContext.GroupByProperties.Length == 0)
-            return;
+    private readonly Disposer _disposer = new();
+    private readonly DataGrid _dataGrid;
+    private readonly AutoGridBuildContext _buildContext;
+    private readonly CollectionViewSource _collectionViewSource;
 
-        if (collectionViewSource.Source is IEnumerable enumerable)
+    public GroupingBehavior(DataGrid dataGrid, AutoGridBuildContext buildContext, CollectionViewSource collectionViewSource)
+    {
+        _dataGrid = dataGrid.NotNull();
+        _buildContext = buildContext.NotNull();
+        _collectionViewSource = collectionViewSource.NotNull();
+    }
+
+    public GroupingBehavior Attach()
+    {
+        if (_buildContext.GroupByProperties.Length > 0)
+        {
+            InitializePredefinedColumnsGrouping();
+        }
+        else if (_buildContext.OptionalGroupingValueProperty is not null)
+        {
+            InitializeOptionalGrouping();
+        }
+
+        return this;
+    }
+
+    public void Dispose()
+    {
+        _disposer.Dispose();
+    }
+
+    private void InitializeOptionalGrouping()
+    {
+        var vm = _dataGrid.GetViewModel();
+        _disposer.Add(vm.WhenChanged(_buildContext.OptionalGroupingSwitchProperty!, (bool doGrouping) => {
+            _collectionViewSource.GroupDescriptions.Clear();
+            if (!doGrouping)
+                return;
+            _collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(_buildContext.OptionalGroupingValueProperty));
+        }));
+
+        EnableStructuredGroupStyle();
+    }
+
+    private void InitializePredefinedColumnsGrouping()
+    {
+        if (_collectionViewSource.Source is IEnumerable enumerable)
         {
             // Attach current items
-            AttachToPropertyChangedEvents(buildContext, collectionViewSource, enumerable);
+            AttachToPropertyChangedEvents(enumerable);
 
             // Ensure all new items will be attached
-            var observableCollection = collectionViewSource.Source as ITypedObservableCollection;
+            var observableCollection = _collectionViewSource.Source as ITypedObservableCollection;
             if (observableCollection is not null)
             {
-                // TODO: Dispose event subscription when detached
-                // TODO: Use ObservableExtensions.WhenCollectionChanged
-                observableCollection.CollectionChanged += (sender, args) => {
-                    if (args.Action == NotifyCollectionChangedAction.Add)
+                _disposer.Add(observableCollection.WhenCollectionChanged()
+                    .Subscribe(args =>
                     {
-                        AttachToPropertyChangedEvents(buildContext, collectionViewSource, args.NewItems!);
-                    }
-                };
+                        if (args.Action == NotifyCollectionChangedAction.Add)
+                        {
+                            AttachToPropertyChangedEvents(args.NewItems!);
+                        }
+                    }));
             }
         }
 
-        foreach (var groupByProp in buildContext.GroupByProperties)
+        foreach (var groupByProp in _buildContext.GroupByProperties)
         {
-            collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(groupByProp.Property.Name));
+            _collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(groupByProp.Property.Name));
         }
 
-        if (buildContext.GroupByProperties.Any(x => AutoGridBuilderHelpers.IsGroupableColumn(x.Property)))
+        if (_buildContext.GroupByProperties.Any(x => AutoGridBuilderHelpers.IsGroupableColumn(x.Property)))
         {
-            dataGrid.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.GroupableViewModel"));
-            dataGrid.SetValue(Grid.IsSharedSizeScopeProperty, true);
+            EnableStructuredGroupStyle();
         }
         else
         {
-            dataGrid.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.String"));
+            EnableSimpleGroupStyle();
         }
     }
 
-    private static void AttachToPropertyChangedEvents(AutoGridBuildContext buildContext, CollectionViewSource collectionViewSource, IEnumerable items)
+    private void AttachToPropertyChangedEvents(IEnumerable items)
     {
         foreach (var childViewModel in items.OfType<ViewModelBase>())
         {
-            foreach (var groupByProp in buildContext.GroupByProperties)
+            foreach (var groupByProp in _buildContext.GroupByProperties)
             {
-                childViewModel.WhenChanged(groupByProp.Property.Name, (object _) =>
-                    collectionViewSource.View.Refresh());
+                _disposer.Add(childViewModel.WhenChanged(groupByProp.Property.Name, (object _) =>
+                    _collectionViewSource.View.Refresh()));
             }
         }
+    }
+
+    private void EnableStructuredGroupStyle()
+    {
+        _dataGrid.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.GroupableViewModel"));
+        _dataGrid.SetValue(Grid.IsSharedSizeScopeProperty, true);
+    }
+
+    private void EnableSimpleGroupStyle()
+    {
+        _dataGrid.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.String"));
     }
 }

@@ -187,6 +187,24 @@ public abstract class ViewModelBase : IViewModel
     }
 
     /// <summary>
+    ///   Returns a property value if it exists in the property bag, otherwise it returns a default value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the property.</typeparam>
+    /// <param name="defaultValue">A function which returns a default property value, when requested.</param>
+    /// <param name="propertyName">The property name. If the method is called within the property getter it hasn't to be specified.</param>
+    /// <returns>The property value from the property bag.</returns>
+    [return: NotNullIfNotNull("defaultValue")]
+    protected TValue GetOrDefault<TValue>([AllowNull] Func<TValue> defaultValue, [CallerMemberName] string? propertyName = null)
+    {
+        Guard.NotNull(defaultValue, nameof(defaultValue));
+        Guard.NotNull(propertyName, nameof(propertyName));
+
+        var result = GetPropertyBag().GetOrAdd(propertyName, _ => defaultValue());
+
+        return (TValue)result!;
+    }
+
+    /// <summary>
     ///   Sets the value to the specified property and raises an event if value has been changed.
     /// </summary>
     /// <typeparam name="TValue">The type of the property.</typeparam>

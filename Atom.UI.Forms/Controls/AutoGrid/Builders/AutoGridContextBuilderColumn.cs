@@ -62,7 +62,6 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
         return BuilderInstance;
     }
 
-
     public TBuilder WithDisplayName(string displayName)
     {
         _displayName = displayName;
@@ -146,6 +145,14 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
         }
 
         return null;
+    }
+
+    protected AutoGridContextBuilderBaseFields GetBaseFields(bool omitDisplayName = false, string? valueConverterDisplayFormat = null)
+    {
+        var displayName = omitDisplayName ? null : DetermineDisplayName();
+        var valueConverter = DetermineValueConverter(valueConverterDisplayFormat);
+
+        return new AutoGridContextBuilderBaseFields(_autoWidth, displayName, _isReadOnly, _style, _toolTip, _toolTipPath, valueConverter, _visibilityBinding);
     }
 
     protected abstract TBuilder BuilderInstance { get; }

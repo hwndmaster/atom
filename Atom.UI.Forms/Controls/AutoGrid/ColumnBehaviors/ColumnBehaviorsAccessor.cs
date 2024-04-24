@@ -31,7 +31,6 @@ internal static class ColumnBehaviorsAccessor
             new ColumnHeaderNameBehavior(),
             new ColumnReadOnlyBehavior(),
             new ColumnAutoWidthBehavior(),
-            new ColumnDisplayIndexBehavior(),
             new ColumnVisibilityBehavior(),
         ];
     }

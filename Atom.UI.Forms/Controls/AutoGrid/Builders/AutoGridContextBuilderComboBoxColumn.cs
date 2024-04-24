@@ -28,12 +28,10 @@ internal sealed class AutoGridContextBuilderComboBoxColumn<TViewModel, TParentVi
     {
         Guard.NotNull(_collectionPropertyName, message: "Call .WithListSource() before calling Build().");
 
-        return new AutoGridBuildComboBoxColumnContext(PropertyDescriptor, DetermineDisplayName(),
-            _collectionPropertyName, _fromOwnerContext)
+        return new AutoGridBuildComboBoxColumnContext(PropertyDescriptor, GetBaseFields())
         {
-            AutoWidth = _autoWidth,
-            IsReadOnly = _isReadOnly,
-            Style = _style
+            CollectionPropertyName = _collectionPropertyName,
+            FromOwnerContext = _fromOwnerContext
         };
     }
 

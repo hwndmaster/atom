@@ -61,6 +61,8 @@ internal sealed class AutoGridBuildContext
     public bool EnableVirtualization { get; init; }
     public string? FilterContextScope { get; init; }
     public bool MakeReadOnly { get; init; }
+    public string? OptionalGroupingSwitchProperty { get; init; }
+    public string? OptionalGroupingValueProperty { get; init; }
 
     // Calculatable properties:
     public AutoGridBuildColumnContext[] GroupByProperties => _groupByPropertiesLazy.Value;

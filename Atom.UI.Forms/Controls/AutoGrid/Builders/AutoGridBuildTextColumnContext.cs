@@ -4,8 +4,8 @@ namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 internal sealed class AutoGridBuildTextColumnContext : AutoGridBuildColumnContext
 {
-    public AutoGridBuildTextColumnContext(PropertyDescriptor property, string displayName)
-        : base(property, displayName)
+    public AutoGridBuildTextColumnContext(PropertyDescriptor property, AutoGridContextBuilderBaseFields baseFields)
+        : base(property, baseFields)
     {
     }
 

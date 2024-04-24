@@ -26,16 +26,9 @@ internal sealed class AutoGridContextBuilderDynamicColumn<TViewModel, TParentVie
 
     internal override AutoGridBuildColumnContext Build()
     {
-        return new AutoGridBuildDynamicColumnContext(PropertyDescriptor)
+        return new AutoGridBuildDynamicColumnContext(PropertyDescriptor, GetBaseFields(omitDisplayName: true))
         {
-            AutoWidth = _autoWidth,
-            ColumnsPropertyName = _columnsPropertyName,
-            IsReadOnly = _isReadOnly,
-            Style = _style,
-            ToolTip = _toolTip,
-            ToolTipPath = _toolTipPath,
-            Visibility = _visibilityBinding,
-            ValueConverter = DetermineValueConverter(null),
+            ColumnsPropertyName = _columnsPropertyName
         };
     }
 
