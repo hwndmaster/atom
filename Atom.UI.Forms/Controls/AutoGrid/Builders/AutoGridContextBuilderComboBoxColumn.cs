@@ -9,7 +9,7 @@ public interface IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewMo
 
 internal sealed class AutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> : AutoGridContextBuilderColumn<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>, TViewModel, TParentViewModel>, IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>
 {
-    private string? _collectionPropertyName;
+    private string? _collectionPropertyPath;
     private bool _fromOwnerContext;
 
     public AutoGridContextBuilderComboBoxColumn(PropertyDescriptor propertyDescriptor)
@@ -17,20 +17,20 @@ internal sealed class AutoGridContextBuilderComboBoxColumn<TViewModel, TParentVi
     {
     }
 
-    public IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> WithListSource(string collectionPropertyName, bool fromOwnerContext)
+    public IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel> WithListSource(string collectionPropertyPath, bool fromOwnerContext)
     {
-        _collectionPropertyName = collectionPropertyName.NotNull();
+        _collectionPropertyPath = collectionPropertyPath.NotNull();
         _fromOwnerContext = fromOwnerContext;
         return this;
     }
 
     internal override AutoGridBuildColumnContext Build()
     {
-        Guard.NotNull(_collectionPropertyName, message: "Call .WithListSource() before calling Build().");
+        Guard.NotNull(_collectionPropertyPath, message: "Call .WithListSource() before calling Build().");
 
         return new AutoGridBuildComboBoxColumnContext(PropertyDescriptor, GetBaseFields())
         {
-            CollectionPropertyName = _collectionPropertyName,
+            CollectionPropertyName = _collectionPropertyPath,
             FromOwnerContext = _fromOwnerContext
         };
     }

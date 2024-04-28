@@ -124,8 +124,8 @@ public static class Properties
                 Source = e.NewValue
             };
 
-        disposer.Add(new GroupingBehavior(dataGrid, buildContext, collectionViewSource).Attach());
-        disposer.Add(new FilteringBehavior(dataGrid, buildContext, collectionViewSource).Attach());
+        new GroupingBehavior(dataGrid, buildContext, collectionViewSource).Attach().DisposeWith(disposer);
+        new FilteringBehavior(dataGrid, buildContext, collectionViewSource).Attach().DisposeWith(disposer);
 
         d.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
 

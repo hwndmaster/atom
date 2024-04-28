@@ -44,11 +44,10 @@ public abstract class ViewModelBase : IViewModel
     /// <returns>The validation errors for the property or entity.</returns>
     public IEnumerable GetErrors(string? propertyName)
     {
-        return string.IsNullOrWhiteSpace(propertyName)
-            ? _errors.SelectMany(entry => entry.Value)
-            : _errors.TryGetValue(propertyName, out List<string>? errors)
-                ? errors
-                : new List<string>();
+        if (string.IsNullOrWhiteSpace(propertyName))
+            return _errors.SelectMany(entry => entry.Value);
+
+        return _errors.TryGetValue(propertyName, out List<string>? errors) ? errors : [];
     }
 
     public bool TryGetPropertyValue(string propertyName, out object? value)
@@ -102,14 +101,14 @@ public abstract class ViewModelBase : IViewModel
     {
         if (!_validationRules.TryGetValue(propertyName, out List<PropertyValidation>? validationRules))
         {
-            validationRules = new List<PropertyValidation>();
+            validationRules = [];
             _validationRules.Add(propertyName, validationRules);
         }
 
         if (shouldValidatePropertyName is not null
-            && !validationRules.Any(x => x.ShouldValidatePropertyName == shouldValidatePropertyName))
+            && !validationRules.Exists(x => x.ShouldValidatePropertyName == shouldValidatePropertyName))
         {
-            this.WhenChanged(shouldValidatePropertyName, () =>
+            WhenChangedNoDispose(shouldValidatePropertyName, () =>
             {
                 TryGetPropertyValue(propertyName, out var value);
                 ValidateProperty(propertyName, value);
@@ -131,7 +130,7 @@ public abstract class ViewModelBase : IViewModel
         {
             AddValidationRule(propertyName, validationRule);
 
-            this.WhenChanged(propertyName, () =>
+            WhenChangedNoDispose(propertyName, () =>
             {
                 var linkedProperties = propertyNames.Where(x => !x.Equals(propertyName, StringComparison.Ordinal));
                 foreach (var linkedProperty in linkedProperties)
@@ -179,7 +178,7 @@ public abstract class ViewModelBase : IViewModel
     [return: NotNullIfNotNull("defaultValue")]
     protected TValue GetOrDefault<TValue>([AllowNull] TValue defaultValue = default, [CallerMemberName] string? propertyName = null)
     {
-        Guard.NotNull(propertyName, nameof(propertyName));
+        Guard.NotNull(propertyName);
 
         var result = GetPropertyBag().GetOrAdd(propertyName, _ => defaultValue);
 
@@ -196,8 +195,8 @@ public abstract class ViewModelBase : IViewModel
     [return: NotNullIfNotNull("defaultValue")]
     protected TValue GetOrDefault<TValue>([AllowNull] Func<TValue> defaultValue, [CallerMemberName] string? propertyName = null)
     {
-        Guard.NotNull(defaultValue, nameof(defaultValue));
-        Guard.NotNull(propertyName, nameof(propertyName));
+        Guard.NotNull(defaultValue);
+        Guard.NotNull(propertyName);
 
         var result = GetPropertyBag().GetOrAdd(propertyName, _ => defaultValue());
 
@@ -212,7 +211,7 @@ public abstract class ViewModelBase : IViewModel
     /// <param name="propertyName">The property name. If the method is called within the property getter it hasn't to be specified.</param>
     protected void RaiseAndSetIfChanged<TValue>(TValue propertyValue, Action<TValue, TValue>? valueChangedHandler = null, [CallerMemberName] string? propertyName = null)
     {
-        Guard.NotNull(propertyName, nameof(propertyName));
+        Guard.NotNull(propertyName);
 
         var isInitial = !GetPropertyBag().TryGetValue(propertyName, out object? oldValue);
 
@@ -275,6 +274,15 @@ public abstract class ViewModelBase : IViewModel
 
             AddError(propertyName, rule.ValidationRule.Validate(value, CultureInfo.CurrentCulture));
         }
+    }
+
+    protected void WhenChangedNoDispose(string propertyName, Action handler)
+    {
+        // It is safe to handle a property changed event within the view model without disposing the subscription.
+
+#pragma warning disable IDISP004 // Don't ignore created IDisposable
+        this.WhenChanged(propertyName, handler);
+#pragma warning restore IDISP004 // Don't ignore created IDisposable
     }
 
     private void AddError(string propertyName, ValidationResult validationResult)

@@ -43,12 +43,12 @@ internal sealed class GroupingBehavior : IDisposable
     private void InitializeOptionalGrouping()
     {
         var vm = _dataGrid.GetViewModel();
-        _disposer.Add(vm.WhenChanged(_buildContext.OptionalGroupingSwitchProperty!, (bool doGrouping) => {
+        vm.WhenChanged(_buildContext.OptionalGroupingSwitchProperty!, (bool doGrouping) => {
             _collectionViewSource.GroupDescriptions.Clear();
             if (!doGrouping)
                 return;
             _collectionViewSource.GroupDescriptions.Add(new PropertyGroupDescription(_buildContext.OptionalGroupingValueProperty));
-        }));
+        }).DisposeWith(_disposer);
 
         EnableStructuredGroupStyle();
     }
@@ -64,14 +64,14 @@ internal sealed class GroupingBehavior : IDisposable
             var observableCollection = _collectionViewSource.Source as ITypedObservableCollection;
             if (observableCollection is not null)
             {
-                _disposer.Add(observableCollection.WhenCollectionChanged()
+                observableCollection.WhenCollectionChanged()
                     .Subscribe(args =>
                     {
                         if (args.Action == NotifyCollectionChangedAction.Add)
                         {
                             AttachToPropertyChangedEvents(args.NewItems!);
                         }
-                    }));
+                    }).DisposeWith(_disposer);
             }
         }
 
@@ -96,8 +96,9 @@ internal sealed class GroupingBehavior : IDisposable
         {
             foreach (var groupByProp in _buildContext.GroupByProperties)
             {
-                _disposer.Add(childViewModel.WhenChanged(groupByProp.Property.Name, (object _) =>
-                    _collectionViewSource.View.Refresh()));
+                childViewModel.WhenChanged(groupByProp.Property.Name, (object _) =>
+                    _collectionViewSource.View.Refresh())
+                    .DisposeWith(_disposer);
             }
         }
     }

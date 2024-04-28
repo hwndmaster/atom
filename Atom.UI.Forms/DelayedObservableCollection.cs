@@ -10,8 +10,7 @@ namespace Genius.Atom.UI.Forms;
 // NOTE: The delay and suspension notifications functionality has originally been taken from:
 //       https://github.com/ENikS/DelayedObservableCollection/blob/master/DelayedObservableCollection/DelayedObservableCollection.cs
 
-public class DelayedObservableCollection<T> : Collection<T>,
-    INotifyCollectionChanged, INotifyPropertyChanged, IDisposable
+public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
 {
     private const string _countString = "Count";
 
@@ -22,7 +21,6 @@ public class DelayedObservableCollection<T> : Collection<T>,
     private const string _indexerName = "Item[]";
 
     private readonly ReentryMonitor _monitor = new();
-    private readonly NotificationInfo? _notifyInfo;
 
     /// <summary>
     /// Indicates if modification of container allowed during change notification.
@@ -65,6 +63,11 @@ public class DelayedObservableCollection<T> : Collection<T>,
         }
     }
 
+    protected DelayedObservableCollection(IList<T> list, bool onlyPropogate)
+        : base(list)
+    {
+    }
+
     /// <summary>
     ///   Initializes a new instance of the DelayedObservableCollection class that contains
     ///   elements copied from the specified collection and has sufficient capacity
@@ -86,76 +89,34 @@ public class DelayedObservableCollection<T> : Collection<T>,
         }
     }
 
-    /// <summary>
-    /// Constructor that configures the container to delay or disable notifications.
-    /// </summary>
-    /// <param name="parent">Reference to an original collection whose events are being postponed</param>
-    /// <param name="notify">Specifies if notifications needs to be delayed or disabled</param>
-    public DelayedObservableCollection(DelayedObservableCollection<T> parent, bool notify)
-        : base(parent.Items)
-    {
-        _notifyInfo = new NotificationInfo
-        {
-            RootCollection = parent
-        };
-
-        if (notify)
-        {
-            CollectionChanged = _notifyInfo.Initialize();
-        }
-    }
-
-    /// <summary>
-    ///   A destructor
-    /// </summary>
-    ~DelayedObservableCollection()
-    {
-        Dispose(false);
-    }
-
     /// <inheritdoc cref="INotifyPropertyChanged.PropertyChanged" />
     event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged
     {
         add
         {
-            if (_notifyInfo is null)
+            if (PropertyChanged is null)
             {
-                if (PropertyChanged is null)
+                FireCountAndIndexerChanged = delegate
                 {
-                    FireCountAndIndexerChanged = delegate
-                    {
-                        OnPropertyChanged(new PropertyChangedEventArgs(_countString));
-                        OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
-                    };
-                    FireIndexerChanged = delegate
-                    {
-                        OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
-                    };
-                }
+                    OnPropertyChanged(new PropertyChangedEventArgs(_countString));
+                    OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
+                };
+                FireIndexerChanged = delegate
+                {
+                    OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
+                };
+            }
 
-                PropertyChanged += value;
-            }
-            else
-            {
-                _notifyInfo.RootCollection.PropertyChanged += value;
-            }
+            PropertyChanged += value;
         }
-
         remove
         {
-            if (_notifyInfo is null)
-            {
-                PropertyChanged -= value;
+            PropertyChanged -= value;
 
-                if (PropertyChanged is null)
-                {
-                    FireCountAndIndexerChanged = delegate { };
-                    FireIndexerChanged = delegate { };
-                }
-            }
-            else
+            if (PropertyChanged is null)
             {
-                _notifyInfo.RootCollection.PropertyChanged -= value;
+                FireCountAndIndexerChanged = delegate { };
+                FireIndexerChanged = delegate { };
             }
         }
     }
@@ -165,32 +126,16 @@ public class DelayedObservableCollection<T> : Collection<T>,
     {
         add
         {
-            if (_notifyInfo is null)
-            {
-                if (value is null)
-                    return;
+            if (value is null)
+                return;
 
-                CollectionChanged += value;
-                _disableReentry = CollectionChanged.GetInvocationList().Length > 1;
-            }
-            else
-            {
-                _notifyInfo.RootCollection.CollectionChanged += value;
-            }
+            CollectionChanged += value;
+            _disableReentry = CollectionChanged.GetInvocationList().Length > 1;
         }
-
         remove
         {
-            if (_notifyInfo is null)
-            {
-                CollectionChanged -= value;
-
-                _disableReentry = CollectionChanged?.GetInvocationList().Length > 1;
-            }
-            else
-            {
-                _notifyInfo.RootCollection.CollectionChanged -= value;
-            }
+            CollectionChanged -= value;
+            _disableReentry = CollectionChanged?.GetInvocationList().Length > 1;
         }
     }
 
@@ -228,9 +173,9 @@ public class DelayedObservableCollection<T> : Collection<T>,
     ///   do other type of operation you can allocate another wrapper by calling .DelayNotifications() on
     ///   either original object or any delayed instances.
     /// </summary>
-    public DelayedObservableCollection<T> DelayNotifications()
+    public virtual DelayedObservableCollectionSession DelayNotifications()
     {
-        return new DelayedObservableCollection<T>((_notifyInfo is null) ? this : _notifyInfo.RootCollection, true);
+        return new DelayedObservableCollectionSession(this, true);
     }
 
     /// <summary>
@@ -238,9 +183,9 @@ public class DelayedObservableCollection<T> : Collection<T>,
     ///   Calling methods of this instance will modify original collection
     ///   but will not generate any notifications.
     /// </summary>
-    public DelayedObservableCollection<T> DisableNotifications()
+    public virtual DelayedObservableCollectionSession DisableNotifications()
     {
-        return new DelayedObservableCollection<T>((_notifyInfo is null) ? this : _notifyInfo.RootCollection, false);
+        return new DelayedObservableCollectionSession(this, false);
     }
 
     public void ReplaceItems(IEnumerable<T> items)
@@ -380,66 +325,7 @@ public class DelayedObservableCollection<T> : Collection<T>,
         }
     }
 
-    /// <summary>
-    ///   Called by the application code to fire all delayed notifications.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    ///   Fires notification with all accumulated events
-    /// </summary>
-    /// <param name="reason">True is called by App code. False if called from GC.</param>
-    protected virtual void Dispose(bool reason)
-    {
-        // Fire delayed notifications
-        if (_notifyInfo is not null)
-        {
-            if (_notifyInfo.HasEventArgs)
-            {
-                if (_notifyInfo.RootCollection.PropertyChanged is not null)
-                {
-                    if (_notifyInfo.IsCountChanged)
-                        _notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(_countString));
-
-                    _notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
-                }
-
-                using (_notifyInfo.RootCollection.BlockReentrancy())
-                {
-                    NotifyCollectionChangedEventArgs args = _notifyInfo.EventArgs;
-
-                    if (_notifyInfo.RootCollection.CollectionChanged is not null)
-                    {
-                        foreach (Delegate delegateItem in _notifyInfo.RootCollection.CollectionChanged.GetInvocationList())
-                        {
-                            if (delegateItem.Target is ListCollectionView
-                                && (
-                                    (args.Action == NotifyCollectionChangedAction.Add && args.NewItems?.Count > 1)
-                                    || (args.Action == NotifyCollectionChangedAction.Remove && args.OldItems?.Count > 1)))
-                            {
-                                // To prevent "Range actions are not supported." NotSupportedException
-                                // in ListCollectionView we change the eventual event to Action == Reset
-                                // Ref source: https://referencesource.microsoft.com/#PresentationFramework/src/Framework/System/Windows/Data/ListCollectionView.cs,2532
-                                var argsForLcv = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
-                                delegateItem.DynamicInvoke(new object[] { _notifyInfo.RootCollection, argsForLcv });
-                                continue;
-                            }
-                            delegateItem.DynamicInvoke(new object[] { _notifyInfo.RootCollection, args });
-                        }
-                    }
-                }
-
-                // Reset and reuse if necessary
-                CollectionChanged = _notifyInfo.Initialize();
-            }
-        }
-    }
-
-    private class ReentryMonitor : IDisposable
+    private sealed class ReentryMonitor : IDisposable
     {
         private int _referenceCount;
 
@@ -456,127 +342,236 @@ public class DelayedObservableCollection<T> : Collection<T>,
         public bool IsNotifying => _referenceCount != 0;
     }
 
-    private class NotificationInfo
+    public sealed class DelayedObservableCollectionSession : DelayedObservableCollection<T>,
+        INotifyPropertyChanged, INotifyCollectionChanged, IDisposable
     {
-        private NotifyCollectionChangedAction? _action;
-        private IList _newItems = Array.Empty<object>();
-        private IList _oldItems = Array.Empty<object>();
-        private int _newIndex;
-        private int _oldIndex;
+        private readonly NotificationInfo _notifyInfo;
 
-        public NotifyCollectionChangedEventHandler Initialize()
+        /// <summary>
+        /// Constructor that configures the container to delay or disable notifications.
+        /// </summary>
+        /// <param name="parent">Reference to an original collection whose events are being postponed</param>
+        /// <param name="notify">Specifies if notifications needs to be delayed or disabled</param>
+        public DelayedObservableCollectionSession(DelayedObservableCollection<T> parent, bool notify)
+            : base(parent.Items, true)
         {
-            _action = null;
-            _newItems = Array.Empty<object>();
-            _oldItems = Array.Empty<object>();
-
-            return (sender, args) =>
+            _notifyInfo = new NotificationInfo
             {
-                DelayedObservableCollection<T>? wrapper = sender as DelayedObservableCollection<T>;
-                Debug.Assert(wrapper is not null, "Calling object must be DelayedObservableCollection<T>");
-                Debug.Assert(wrapper._notifyInfo is not null, "Calling object must be Delayed wrapper.");
-
-                // Setup
-                _action = args.Action;
-
-                switch (_action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        _newItems = new List<T>();
-                        IsCountChanged = true;
-                        wrapper.CollectionChanged = (s, e) =>
-                        {
-                            AssertActionType(e);
-                            if (e.NewItems is not null)
-                            {
-                                foreach (T item in e.NewItems)
-                                    _newItems.Add(item);
-                            }
-                        };
-                        wrapper.CollectionChanged(sender, args);
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        _oldItems = new List<T>();
-                        IsCountChanged = true;
-                        wrapper.CollectionChanged = (s, e) =>
-                        {
-                            AssertActionType(e);
-                            if (e.OldItems is not null)
-                            {
-                                foreach (T item in e.OldItems)
-                                    _oldItems.Add(item);
-                            }
-                        };
-                        wrapper.CollectionChanged(sender, args);
-                        break;
-
-                    case NotifyCollectionChangedAction.Replace:
-                        _newItems = new List<T>();
-                        _oldItems = new List<T>();
-                        wrapper.CollectionChanged = (s, e) =>
-                        {
-                            AssertActionType(e);
-                            if (e.NewItems is not null)
-                            {
-                                foreach (T item in e.NewItems)
-                                    _newItems.Add(item);
-                            }
-
-                            if (e.OldItems is not null)
-                            {
-                                foreach (T item in e.OldItems)
-                                    _oldItems.Add(item);
-                            }
-                        };
-                        wrapper.CollectionChanged(sender, args);
-                        break;
-                    case NotifyCollectionChangedAction.Move:
-                        _newIndex = args.NewStartingIndex;
-                        _newItems = args.NewItems ?? Array.Empty<object>();
-                        _oldIndex = args.OldStartingIndex;
-                        _oldItems = args.OldItems ?? Array.Empty<object>();
-                        wrapper.CollectionChanged = (s, e)
-                            => throw new InvalidOperationException($"Due to design of {nameof(NotifyCollectionChangedEventArgs)} combination of multiple Move operations is not possible");
-                        break;
-                    case NotifyCollectionChangedAction.Reset:
-                        IsCountChanged = true;
-                        wrapper.CollectionChanged = (s, e) => AssertActionType(e);
-                        break;
-                }
+                RootCollection = parent
             };
-        }
 
-        private void AssertActionType(NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action != _action)
+            if (notify)
             {
-                throw new InvalidOperationException(
-                    string.Format("Attempting to perform {0} during {1}. Mixed actions on the same delayed interface are not allowed.",
-                    e.Action, _action));
+                CollectionChanged = _notifyInfo.Initialize();
             }
         }
 
-        public required DelayedObservableCollection<T> RootCollection { get; init; }
-
-        public bool IsCountChanged { get; private set; }
-
-        public NotifyCollectionChangedEventArgs EventArgs
+        public override DelayedObservableCollectionSession DelayNotifications()
         {
-            get
+            return new DelayedObservableCollectionSession(_notifyInfo.RootCollection, true);
+        }
+
+        public override DelayedObservableCollectionSession DisableNotifications()
+        {
+            return new DelayedObservableCollectionSession(_notifyInfo.RootCollection, false);
+        }
+
+        /// <summary>
+        ///   Called by the application code to fire all delayed notifications.
+        /// </summary>
+        public void Dispose()
+        {
+            var notifyInfo = _notifyInfo;
+
+            // Fire delayed notifications
+            if (notifyInfo.HasEventArgs)
             {
-                return _action switch
+                if (notifyInfo.RootCollection.PropertyChanged is not null)
                 {
-                    NotifyCollectionChangedAction.Reset => new NotifyCollectionChangedEventArgs(_action.Value),
-                    NotifyCollectionChangedAction.Add => new NotifyCollectionChangedEventArgs(_action.Value, _newItems),
-                    NotifyCollectionChangedAction.Remove => new NotifyCollectionChangedEventArgs(_action.Value, _oldItems),
-                    NotifyCollectionChangedAction.Move => new NotifyCollectionChangedEventArgs(_action.Value, _oldItems?[0], _newIndex, _oldIndex),
-                    NotifyCollectionChangedAction.Replace => new NotifyCollectionChangedEventArgs(_action.Value, _newItems, _oldItems),
-                    _ => throw new NotSupportedException($"The {_action} action is not supported."),
+                    if (notifyInfo.IsCountChanged)
+                        notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(_countString));
+
+                    notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
+                }
+
+                using (notifyInfo.RootCollection.BlockReentrancy())
+                {
+                    NotifyCollectionChangedEventArgs args = notifyInfo.EventArgs;
+
+                    if (notifyInfo.RootCollection.CollectionChanged is not null)
+                    {
+                        foreach (Delegate delegateItem in notifyInfo.RootCollection.CollectionChanged.GetInvocationList())
+                        {
+                            if (delegateItem.Target is ListCollectionView
+                                && (
+                                    (args.Action == NotifyCollectionChangedAction.Add && args.NewItems?.Count > 1)
+                                    || (args.Action == NotifyCollectionChangedAction.Remove && args.OldItems?.Count > 1)))
+                            {
+                                // To prevent "Range actions are not supported." NotSupportedException
+                                // in ListCollectionView we change the eventual event to Action == Reset
+                                // Ref source: https://referencesource.microsoft.com/#PresentationFramework/src/Framework/System/Windows/Data/ListCollectionView.cs,2532
+                                var argsForLcv = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+                                delegateItem.DynamicInvoke(notifyInfo.RootCollection, argsForLcv);
+                                continue;
+                            }
+                            delegateItem.DynamicInvoke(notifyInfo.RootCollection, args);
+                        }
+                    }
+                }
+
+                // Reset and reuse if necessary
+                CollectionChanged = notifyInfo.Initialize();
+            }
+        }
+
+        /// <inheritdoc cref="INotifyPropertyChanged.PropertyChanged" />
+        event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged
+        {
+            add
+            {
+                _notifyInfo.RootCollection.PropertyChanged += value;
+            }
+            remove
+            {
+                _notifyInfo.RootCollection.PropertyChanged -= value;
+            }
+        }
+
+        /// <inheritdoc cref="INotifyCollectionChanged.CollectionChanged" />
+        event NotifyCollectionChangedEventHandler? INotifyCollectionChanged.CollectionChanged
+        {
+            add
+            {
+                _notifyInfo.RootCollection.CollectionChanged += value;
+            }
+            remove
+            {
+                _notifyInfo.RootCollection.CollectionChanged -= value;
+            }
+        }
+
+        private sealed class NotificationInfo
+        {
+            private NotifyCollectionChangedAction? _action;
+            private IList _newItems = Array.Empty<object>();
+            private IList _oldItems = Array.Empty<object>();
+            private int _newIndex;
+            private int _oldIndex;
+
+            public NotifyCollectionChangedEventHandler Initialize()
+            {
+                _action = null;
+                _newItems = Array.Empty<object>();
+                _oldItems = Array.Empty<object>();
+
+                return (sender, args) =>
+                {
+                    DelayedObservableCollectionSession? wrapper = sender as DelayedObservableCollectionSession;
+                    Debug.Assert(wrapper is not null, "Calling object must be DelayedObservableCollection<T>");
+                    Debug.Assert(wrapper._notifyInfo is not null, "Calling object must be Delayed wrapper.");
+
+                    // Setup
+                    _action = args.Action;
+
+                    switch (_action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            _newItems = new List<T>();
+                            IsCountChanged = true;
+                            wrapper.CollectionChanged = (s, e) =>
+                            {
+                                AssertActionType(e);
+                                if (e.NewItems is not null)
+                                {
+                                    foreach (T item in e.NewItems)
+                                        _newItems.Add(item);
+                                }
+                            };
+                            wrapper.CollectionChanged(sender, args);
+                            break;
+
+                        case NotifyCollectionChangedAction.Remove:
+                            _oldItems = new List<T>();
+                            IsCountChanged = true;
+                            wrapper.CollectionChanged = (s, e) =>
+                            {
+                                AssertActionType(e);
+                                if (e.OldItems is not null)
+                                {
+                                    foreach (T item in e.OldItems)
+                                        _oldItems.Add(item);
+                                }
+                            };
+                            wrapper.CollectionChanged(sender, args);
+                            break;
+
+                        case NotifyCollectionChangedAction.Replace:
+                            _newItems = new List<T>();
+                            _oldItems = new List<T>();
+                            wrapper.CollectionChanged = (s, e) =>
+                            {
+                                AssertActionType(e);
+                                if (e.NewItems is not null)
+                                {
+                                    foreach (T item in e.NewItems)
+                                        _newItems.Add(item);
+                                }
+
+                                if (e.OldItems is not null)
+                                {
+                                    foreach (T item in e.OldItems)
+                                        _oldItems.Add(item);
+                                }
+                            };
+                            wrapper.CollectionChanged(sender, args);
+                            break;
+                        case NotifyCollectionChangedAction.Move:
+                            _newIndex = args.NewStartingIndex;
+                            _newItems = args.NewItems ?? Array.Empty<object>();
+                            _oldIndex = args.OldStartingIndex;
+                            _oldItems = args.OldItems ?? Array.Empty<object>();
+                            wrapper.CollectionChanged = (s, e)
+                                => throw new InvalidOperationException($"Due to design of {nameof(NotifyCollectionChangedEventArgs)} combination of multiple Move operations is not possible");
+                            break;
+                        case NotifyCollectionChangedAction.Reset:
+                            IsCountChanged = true;
+                            wrapper.CollectionChanged = (s, e) => AssertActionType(e);
+                            break;
+                    }
                 };
             }
-        }
 
-        public bool HasEventArgs => _action.HasValue;
+            private void AssertActionType(NotifyCollectionChangedEventArgs e)
+            {
+                if (e.Action != _action)
+                {
+                    throw new InvalidOperationException(
+                        string.Format("Attempting to perform {0} during {1}. Mixed actions on the same delayed interface are not allowed.",
+                        e.Action, _action));
+                }
+            }
+
+            public required DelayedObservableCollection<T> RootCollection { get; init; }
+
+            public bool IsCountChanged { get; private set; }
+
+            public NotifyCollectionChangedEventArgs EventArgs
+            {
+                get
+                {
+                    return _action switch
+                    {
+                        NotifyCollectionChangedAction.Reset => new NotifyCollectionChangedEventArgs(_action.Value),
+                        NotifyCollectionChangedAction.Add => new NotifyCollectionChangedEventArgs(_action.Value, _newItems),
+                        NotifyCollectionChangedAction.Remove => new NotifyCollectionChangedEventArgs(_action.Value, _oldItems),
+                        NotifyCollectionChangedAction.Move => new NotifyCollectionChangedEventArgs(_action.Value, _oldItems?[0], _newIndex, _oldIndex),
+                        NotifyCollectionChangedAction.Replace => new NotifyCollectionChangedEventArgs(_action.Value, _newItems, _oldItems),
+                        _ => throw new NotSupportedException($"The {_action} action is not supported."),
+                    };
+                }
+            }
+
+            public bool HasEventArgs => _action.HasValue;
+        }
     }
 }

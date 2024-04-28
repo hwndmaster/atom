@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Data.Tests.Persistence;
 
-public sealed partial class JsonPersisterTests
+public sealed class JsonPersisterTests
 {
     private readonly Fixture _fixture = new();
     private readonly TestServiceProvider _serviceProvider = new();

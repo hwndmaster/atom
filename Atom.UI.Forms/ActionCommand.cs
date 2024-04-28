@@ -10,10 +10,10 @@ public interface IActionCommand : ICommand
     IObservable<bool> Executed { get; }
 }
 
-public interface IActionCommand<T> : IActionCommand
+public interface IActionCommand<in T> : IActionCommand
 {
     bool CanExecute(T parameter);
-    Task Execute(T parameter);
+    Task ExecuteAsync(T parameter);
 }
 
 public sealed class ActionCommand : ActionCommand<object?>
@@ -72,12 +72,12 @@ public class ActionCommand<T> : IActionCommand<T>
 
     public ActionCommand(Func<T, Task> asyncAction, Predicate<T>? canExecute)
     {
-        _asyncAction = asyncAction.NotNull(nameof(asyncAction));
+        _asyncAction = asyncAction.NotNull();
         _canExecute = canExecute;
     }
 
     public bool CanExecute(T parameter) => CanExecuteInternal(parameter);
-    public Task Execute(T parameter) => ExecuteInternal(parameter);
+    public Task ExecuteAsync(T parameter) => ExecuteInternalAsync(parameter);
 
     public bool CanExecute(object? parameter)
     {
@@ -92,15 +92,17 @@ public class ActionCommand<T> : IActionCommand<T>
         Task task;
 
         if (parameter is T value)
-            task = ExecuteInternal(value);
+            task = ExecuteInternalAsync(value);
         else
-            task = ExecuteInternal(default!);
+            task = ExecuteInternalAsync(default!);
 
+#pragma warning disable VSTHRD110 // Observe result of async calls
         task.ContinueWith(t =>
         {
             var logger = Module.ServiceProvider.GetRequiredService<ILogger<ActionCommand>>();
-            logger.LogError(t.Exception, $"ActionCommand execution failure. Parameter = '{parameter}'");
-        }, TaskContinuationOptions.OnlyOnFaulted);
+            logger.LogError(t.Exception, "ActionCommand execution failure. Parameter = '{Parameter}'", parameter);
+        }, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);
+#pragma warning restore VSTHRD110 // Observe result of async calls
     }
 
     private bool CanExecuteInternal(T parameter)
@@ -113,7 +115,7 @@ public class ActionCommand<T> : IActionCommand<T>
         return true;
     }
 
-    private async Task ExecuteInternal(T parameter)
+    private async Task ExecuteInternalAsync(T parameter)
     {
         try
         {

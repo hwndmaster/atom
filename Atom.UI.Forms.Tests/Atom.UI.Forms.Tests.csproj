@@ -9,4 +9,8 @@
     <ProjectReference Include="..\Atom.UI.Forms.TestingUtil\Atom.UI.Forms.TestingUtil.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Xunit.StaFact" />
+  </ItemGroup>
+
 </Project>

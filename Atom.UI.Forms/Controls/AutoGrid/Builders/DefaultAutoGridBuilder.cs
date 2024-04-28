@@ -119,10 +119,10 @@ internal sealed class DefaultAutoGridBuilder
         if (converterAttr is not null)
         {
             var instance = Activator.CreateInstance(converterAttr.ValueConverterType) as IValueConverter;
-            return instance.NotNull(nameof(instance));
+            return instance.NotNull();
         }
 
-        if (converterAttr is null && !property.PropertyType.IsValueType)
+        if (!property.PropertyType.IsValueType)
         {
             return new PropertyValueStringConverter(displayFormat);
         }

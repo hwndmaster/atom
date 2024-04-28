@@ -11,4 +11,7 @@ internal record AutoGridContextBuilderBaseFields(
     string? ToolTip,
     string? ToolTipPath,
     IValueConverter? ValueConverter,
-    string? VisibilityBinding);
+    string? VisibilityBinding)
+{
+    public static readonly AutoGridContextBuilderBaseFields Default = new(false, null, false, null, null, null, null, null);
+}

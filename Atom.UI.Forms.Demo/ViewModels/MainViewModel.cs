@@ -7,16 +7,15 @@ namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private readonly IAtomViewModelFactory _vmFactory;
-
     public MainViewModel(IAtomViewModelFactory vmFactory, TagsContext tagsContext,
         IFactory<SampleData> sampleDataFactory, SampleDataAutoGridBuilder autoGridBuilder)
     {
-        _vmFactory = vmFactory.NotNull();
+        Guard.NotNull(vmFactory);
+
         AutoGridBuilder = autoGridBuilder.NotNull();
         var sampleDataFactoryImpl = (SampleDataFactory)sampleDataFactory;
 
-        TagsForControl1 = _vmFactory.CreateTagEditorViewModel(tagsContext.TagsObservables);
+        TagsForControl1 = vmFactory.CreateTagEditorViewModel(tagsContext.TagsObservables);
 
         TagsForControl1.AddSelected(tagsContext.TagsObservables[0]);
         TagsForControl1.AddSelected(tagsContext.TagsObservables[1]);

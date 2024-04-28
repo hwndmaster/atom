@@ -56,7 +56,7 @@ public static class ViewModelExtensions
     /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
     /// <typeparam name="TProperty">The type of the property.</typeparam>
     /// <param name="viewModel">The view model.</param>
-    /// <param name="propertyAccessor">An expression which points to the property.</param>
+    /// <param name="propertyName">The property name.</param>
     /// <returns>An observable.</returns>
     public static IObservable<TProperty?> WhenChanged<TViewModel, TProperty>(this TViewModel viewModel,
         string propertyName)

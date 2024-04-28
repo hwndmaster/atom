@@ -123,8 +123,8 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
                     });
                 }
 
-                var lastStartIndex = matches.Count > 0 ? matches[^1].Index + matches[^1].Length : 0;
-                if (matches.Count > 0 && lastStartIndex != text.Length - 1)
+                var lastStartIndex = matches[^1].Index + matches[^1].Length;
+                if (lastStartIndex != text.Length - 1)
                 {
                     textBlock.Inlines.Add(new Run(text.Substring(lastStartIndex)));
                 }
@@ -156,6 +156,7 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
             }
             catch (Exception)
             {
+                // Regex is invalid, just ignore
             }
 
             _regexCache.Add(key, regex);

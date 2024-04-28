@@ -30,7 +30,7 @@ internal class DataGridColumnBuilder
 
     private DataGridColumnBuilder(string valuePath)
     {
-        _valuePath = valuePath.NotNull(nameof(valuePath));
+        _valuePath = valuePath.NotNull();
     }
 
     public static DataGridColumnBuilder ForValuePath(string valuePath)

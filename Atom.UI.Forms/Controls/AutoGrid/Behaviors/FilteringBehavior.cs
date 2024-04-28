@@ -4,14 +4,13 @@ using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-// TODO: Cover with unit tests
 internal sealed class FilteringBehavior : IDisposable
 {
     private readonly Disposer _disposer = new();
     private readonly DataGrid _dataGrid;
     private readonly AutoGridBuildContext _buildContext;
     private readonly CollectionViewSource _collectionViewSource;
-    private bool _isAttached = false;
+    private bool _isAttached;
     private string _filter = string.Empty;
 
     public FilteringBehavior(DataGrid dataGrid, AutoGridBuildContext buildContext, CollectionViewSource collectionViewSource)
@@ -40,10 +39,10 @@ internal sealed class FilteringBehavior : IDisposable
         if (filterContext is null)
             return this;
 
-        _disposer.Add(vm.WhenChanged(filterContext.Name, (string s) => {
+        vm.WhenChanged(filterContext.Name, (string s) => {
             _filter = s;
             _collectionViewSource.View.Refresh();
-        }));
+        }).DisposeWith(_disposer);
 
         _collectionViewSource.Filter += OnCollectionViewSourceFilter;
         _disposer.Add(() => _collectionViewSource.Filter -= OnCollectionViewSourceFilter);
