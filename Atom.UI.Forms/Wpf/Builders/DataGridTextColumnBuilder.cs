@@ -150,6 +150,7 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
                 return regex;
             }
 
+#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception
             try
             {
                 regex = new Regex(pattern, RegexOptions.IgnoreCase);
@@ -158,6 +159,7 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
             {
                 // Regex is invalid, just ignore
             }
+#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception
 
             _regexCache.Add(key, regex);
 

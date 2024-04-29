@@ -20,6 +20,56 @@
         "reveal": "silent"
       },
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test coverage",
+      "command": "reportgenerator",
+      "type": "process",
+      "args": [
+        "-reports:TestResults\\**\\coverage.cobertura.xml",
+        "-reporttypes:lcov",
+        "-targetdir:TestCoverage",
+      ],
+      "dependsOn": [
+        "test coverage (collect)"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "test coverage (collect)",
+      "hide": true,
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "test",
+        "--no-restore",
+        "--no-build",
+        "--collect:\"Code Coverage;Format=Cobertura;CoverageFileName=coverage.xml\"",
+        "--results-directory:.\\TestResults",
+        "--blame-hang-timeout:30000"
+      ],
+      "dependsOn": [
+        "test coverage (cleanup)"
+      ],
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test coverage (cleanup)",
+      "hide": true,
+      "type": "shell",
+      "command": "if (Test-Path TestResults) { Remove-Item TestResults -recurse }",
+      "presentation": {
+        "reveal": "silent"
+      },
     }
   ]
 }

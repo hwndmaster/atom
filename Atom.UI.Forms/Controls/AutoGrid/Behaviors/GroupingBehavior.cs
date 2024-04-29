@@ -3,22 +3,25 @@ using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-// TODO: Cover with unit tests
 internal sealed class GroupingBehavior : IDisposable
 {
     private readonly Disposer _disposer = new();
     private readonly DataGrid _dataGrid;
     private readonly AutoGridBuildContext _buildContext;
     private readonly CollectionViewSource _collectionViewSource;
+    private readonly IWpfApplication _wpfApplication;
 
     public GroupingBehavior(DataGrid dataGrid, AutoGridBuildContext buildContext, CollectionViewSource collectionViewSource)
     {
         _dataGrid = dataGrid.NotNull();
         _buildContext = buildContext.NotNull();
         _collectionViewSource = collectionViewSource.NotNull();
+
+        _wpfApplication = Module.ServiceProvider.GetRequiredService<IWpfApplication>();
     }
 
     public GroupingBehavior Attach()
@@ -61,7 +64,7 @@ internal sealed class GroupingBehavior : IDisposable
             AttachToPropertyChangedEvents(enumerable);
 
             // Ensure all new items will be attached
-            var observableCollection = _collectionViewSource.Source as ITypedObservableCollection;
+            var observableCollection = _collectionViewSource.Source as INotifyCollectionChanged;
             if (observableCollection is not null)
             {
                 observableCollection.WhenCollectionChanged()
@@ -105,12 +108,12 @@ internal sealed class GroupingBehavior : IDisposable
 
     private void EnableStructuredGroupStyle()
     {
-        _dataGrid.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.GroupableViewModel"));
+        _dataGrid.GroupStyle.Add(_wpfApplication.FindResource<GroupStyle>("Atom.AutoGrid.Group.GroupableViewModel"));
         _dataGrid.SetValue(Grid.IsSharedSizeScopeProperty, true);
     }
 
     private void EnableSimpleGroupStyle()
     {
-        _dataGrid.GroupStyle.Add((GroupStyle)Application.Current.FindResource("Atom.AutoGrid.Group.String"));
+        _dataGrid.GroupStyle.Add(_wpfApplication.FindResource<GroupStyle>("Atom.AutoGrid.Group.String"));
     }
 }

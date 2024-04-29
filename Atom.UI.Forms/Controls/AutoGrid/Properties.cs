@@ -102,7 +102,7 @@ public static class Properties
 
             grid.CurrentCell = new DataGridCellInfo(cell);
 
-            Application.Current.Dispatcher.BeginInvoke(() => grid.BeginEdit(),
+            Application.Current.Dispatcher.Invoke(() => grid.BeginEdit(),
                 DispatcherPriority.ApplicationIdle, null);
         }
         else

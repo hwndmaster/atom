@@ -1,11 +1,7 @@
 namespace Genius.Atom.UI.Forms.TestingUtil;
 
-public class TestUiDispatcher : IUiDispatcher
+public sealed class TestUiDispatcher : IUiDispatcher
 {
-    protected TestUiDispatcher()
-    {
-    }
-
     public Task BeginInvoke(Action action)
     {
         action();

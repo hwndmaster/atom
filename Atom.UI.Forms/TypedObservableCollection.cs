@@ -9,7 +9,17 @@ public interface ITypedObservableCollection : INotifyCollectionChanged
 }
 
 public sealed class TypedObservableCollection<TContract, TType> : DelayedObservableCollection<TContract>, ITypedObservableCollection, ITypedList
+    where TType : TContract
 {
+    public TypedObservableCollection()
+    {
+    }
+
+    public TypedObservableCollection(IList<TContract> items)
+        : base(items)
+    {
+    }
+
     public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[]? listAccessors)
     {
         return TypeDescriptor.GetProperties(typeof(TType));

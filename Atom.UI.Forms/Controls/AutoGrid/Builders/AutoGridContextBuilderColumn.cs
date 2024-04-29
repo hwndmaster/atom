@@ -139,7 +139,7 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
                 .NotNull();
         }
 
-        if (_valueConverterType is null && PropertyDescriptor.PropertyType.IsValueType)
+        if (PropertyDescriptor.PropertyType.IsValueType)
         {
             return new PropertyValueStringConverter(displayFormat);
         }
