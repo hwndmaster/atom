@@ -12,6 +12,7 @@ _/
 *.userosscache
 *.sln.docstates
 experiments.dib
+lcov.info
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

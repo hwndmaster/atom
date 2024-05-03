@@ -6,7 +6,7 @@ using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms;
 
-public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
+public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>, IDisposable
 {
     public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register(
         nameof(SelectedItems),
@@ -16,6 +16,11 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>
 
     private CompositeDisposable _subscriptions = new();
     private bool _isUpdating = false;
+
+    public void Dispose()
+    {
+        _subscriptions.Dispose();
+    }
 
     protected override void OnAttached()
     {

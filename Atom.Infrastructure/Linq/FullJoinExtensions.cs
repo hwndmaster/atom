@@ -181,7 +181,6 @@ public static class FullJoinExtensions
             }
             else
             {
-                se.Dispose();
                 yield return firstSelector(fe);
             }
         }

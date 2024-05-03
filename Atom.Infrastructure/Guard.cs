@@ -7,8 +7,8 @@ public static class Guard
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNull<T>([NotNull] T? value,
-        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null,
-        string? message = null)
+        string? message = null,
+        [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {
         if (value is null)
             throw new ArgumentNullException(parameterName, message);
@@ -16,7 +16,7 @@ public static class Guard
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNullOrEmpty(string value,
-        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
+        [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {
         if (string.IsNullOrEmpty(value))
             throw new ArgumentNullException(parameterName);
@@ -24,7 +24,7 @@ public static class Guard
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void NotNullOrWhitespace(string value,
-        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null)
+        [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentNullException(parameterName);
@@ -42,10 +42,10 @@ public static class GuardExtensions
 {
     [return: NotNull]
     public static T NotNull<T>(this T value,
-        [CallerArgumentExpression(parameterName: "value")] string? parameterName = null,
-        string? message = null)
+        string? message = null,
+        [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {
-        Guard.NotNull(value, parameterName, message);
+        Guard.NotNull(value, message, parameterName);
 
         return value!;
     }

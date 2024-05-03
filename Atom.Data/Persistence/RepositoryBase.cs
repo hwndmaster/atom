@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Data.Persistence;
 
-public interface IRepository<TEntity>
+public interface IRepository<in TEntity>
     where TEntity: EntityBase
 {
     Task DeleteAsync(Guid entityId);
@@ -101,7 +101,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         var entity = _entities.Find(x => x.Id == entityId);
         if (entity is null)
         {
-            _logger.LogWarning("Cannot find entity '{entityId}' to delete", entityId);
+            _logger.LogWarning("Cannot find entity '{EntityId}' to delete", entityId);
             return;
         }
 
@@ -138,7 +138,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
             {
                 addedEntities.Add(entity.Id);
                 _entities.Add(entity);
-                _logger.LogTrace("New entity '{entity}' with id '{entityId}' added", entity, entity.Id);
+                _logger.LogTrace("New entity '{Entity}' with id '{EntityId}' added", entity, entity.Id);
             }
             else
             {
@@ -164,7 +164,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
                 updatedEntities, deletedEntities));
         }
 
-        _logger.LogInformation("Entities of type {typeName} updated.", typeof(TEntity).Name);
+        _logger.LogInformation("Entities of type {TypeName} updated.", typeof(TEntity).Name);
     }
 
     protected IObservable<IReadOnlyList<TEntity>> Loaded => _loaded;

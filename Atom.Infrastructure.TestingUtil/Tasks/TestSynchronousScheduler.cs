@@ -11,8 +11,8 @@ public sealed class TestSynchronousScheduler : ISynchronousScheduler
         _origin.Schedule(action);
     }
 
-    public void ScheduleAsync(Func<Task> asyncAction)
+    public void Schedule(Func<Task> asyncAction)
     {
-        _origin.ScheduleAsync(asyncAction);
+        _origin.Schedule(asyncAction);
     }
 }

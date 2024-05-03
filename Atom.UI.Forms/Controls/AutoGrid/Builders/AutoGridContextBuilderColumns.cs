@@ -8,6 +8,8 @@ public interface IAutoGridContextBuilderColumns<TViewModel, TParentViewModel>
     where TParentViewModel : IViewModel
 {
     IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddAll();
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddComboBox<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>>? options = null);
+    IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddComboBox(string propertyName, Action<IAutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>>? options = null);
     IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddCommand<TProperty>(Expression<Func<TViewModel, TProperty>> propertyAccessor, Action<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>>? options = null)
         where TProperty : IActionCommand;
     IAutoGridContextBuilderColumns<TViewModel, TParentViewModel> AddCommand(string propertyName, Action<IAutoGridContextBuilderCommandColumn<TViewModel, TParentViewModel>>? options = null);
@@ -41,7 +43,9 @@ internal sealed class AutoGridContextBuilderColumns<TViewModel, TParentViewModel
         _columnBuilders.AddRange(
             _propertyDescriptors
                 .Cast<PropertyDescriptor>()
-                .Where(pd => !AutoGridBuilderHelpers.IsIgnorableProperty(pd.Name))
+                .Where(pd =>
+                    !AutoGridBuilderHelpers.IsIgnorableProperty(pd.Name)
+                    && !pd.Attributes.OfType<BrowsableAttribute>().Any(x => !x.Browsable))
                 .Select(pd => AutoGridBuilderHelpers.CreateContextBuilderColumn<TViewModel, TParentViewModel>(pd))
         );
 

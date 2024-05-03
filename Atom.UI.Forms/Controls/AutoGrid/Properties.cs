@@ -1,10 +1,10 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Threading;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.Wpf;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
@@ -102,8 +102,8 @@ public static class Properties
 
             grid.CurrentCell = new DataGridCellInfo(cell);
 
-            Application.Current.Dispatcher.Invoke(() => grid.BeginEdit(),
-                DispatcherPriority.ApplicationIdle, null);
+            var dispatcher = Module.ServiceProvider.GetRequiredService<IUiDispatcher>();
+            dispatcher.Invoke(() => grid.BeginEdit());
         }
         else
         {

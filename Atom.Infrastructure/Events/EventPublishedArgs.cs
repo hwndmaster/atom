@@ -1,8 +1,8 @@
 namespace Genius.Atom.Infrastructure.Events;
 
-internal sealed class EventPublishedArgs : EventArgs
+internal sealed class EventPublishedEventArgs : EventArgs
 {
-    public EventPublishedArgs(IEventMessage @event)
+    public EventPublishedEventArgs(IEventMessage @event)
     {
         Guard.NotNull(@event);
 

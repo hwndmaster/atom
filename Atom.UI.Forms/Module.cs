@@ -36,7 +36,7 @@ public static class Module
         // Misc:
         services.AddTransient<IAtomViewModelFactory, ViewModelFactory>();
         services.AddTransient<IUserInteraction, UserInteraction>();
-        services.AddSingleton<IUiDispatcher>(new UiDispatcher(application));
+        services.AddSingleton<IUiDispatcher, UiDispatcher>();
         services.AddSingleton<IWpfApplication>(new WpfApplication(application));
 
         // Third-party:

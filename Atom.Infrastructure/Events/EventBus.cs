@@ -5,7 +5,7 @@ namespace Genius.Atom.Infrastructure.Events;
 
 public interface IEventBus
 {
-    void Publish(IEventMessage @event);
+    void Publish(IEventMessage eventMessage);
     IObservable<T> WhenFired<T>()
         where T : IEventMessage;
     IObservable<Unit> WhenFired<T1, T2>()
@@ -19,22 +19,22 @@ public interface IEventBus
 
 internal sealed class EventBus : IEventBus
 {
-    private event EventHandler<EventPublishedArgs>? EventAdded;
-    private readonly IObservable<EventPublishedArgs> _mainObservable;
+    private event EventHandler<EventPublishedEventArgs>? EventAdded;
+    private readonly IObservable<EventPublishedEventArgs> _mainObservable;
 
     public EventBus()
     {
-        _mainObservable = Observable.FromEventPattern<EventPublishedArgs>(
+        _mainObservable = Observable.FromEventPattern<EventPublishedEventArgs>(
             x => this.EventAdded += x,
             x => this.EventAdded -= x)
             .Select(x => x.EventArgs);
     }
 
-    public void Publish(IEventMessage message)
+    public void Publish(IEventMessage eventMessage)
     {
-        Guard.NotNull(message);
+        Guard.NotNull(eventMessage);
 
-        EventAdded?.Invoke(this, new EventPublishedArgs(message));
+        EventAdded?.Invoke(this, new EventPublishedEventArgs(eventMessage));
     }
 
     public IObservable<T> WhenFired<T>()

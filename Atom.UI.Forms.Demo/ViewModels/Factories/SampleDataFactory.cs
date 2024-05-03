@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Genius.Atom.UI.Forms.Demo.ViewModels;
 
 internal class SampleDataFactory : IFactory<SampleData>

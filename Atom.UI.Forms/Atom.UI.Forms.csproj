@@ -28,6 +28,7 @@
     <PackageReference Include="MahApps.Metro" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
     <PackageReference Include="ReactiveUI.WPF" />
     <PackageReference Include="Serilog.Enrichers.Thread" />
     <PackageReference Include="Serilog.Expressions" />

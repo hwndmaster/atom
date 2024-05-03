@@ -1,6 +1,6 @@
 namespace Genius.Atom.Infrastructure;
 
-public interface IFactory<T>
+public interface IFactory<out T>
 {
     T Create();
 }

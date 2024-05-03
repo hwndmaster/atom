@@ -1,6 +1,5 @@
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
-// TODO: Cover with unit tests
 public sealed class DynamicColumnEntriesViewModel : ViewModelBase
 {
     private readonly Func<IReadOnlyList<string>> _entriesRetrievalFunc;

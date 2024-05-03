@@ -131,7 +131,7 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
         // in WPF 4.5 they have a new static property which exposes this object off the BindingExpression.
         //
         // Could also check against this object, but not any safer than the string really.
-        //var disconnectedItemSingleton = typeof(System.Windows.Data.BindingExpressionBase).GetField("DisconnectedItem", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+        // var disconnectedItemSingleton = typeof(System.Windows.Data.BindingExpressionBase).GetField("DisconnectedItem", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
         if (item.DataContext?.ToString() == "{DisconnectedItem}")
             return;
 

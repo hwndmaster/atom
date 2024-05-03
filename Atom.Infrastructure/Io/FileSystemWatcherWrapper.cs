@@ -15,12 +15,9 @@ public interface IFileSystemWatcher : IDisposable
 public sealed class FileSystemWatcherWrapper : IFileSystemWatcher
 {
     private readonly FileSystemWatcher _watcher;
-    private readonly ILogger<FileSystemWatcherWrapper> _logger;
 
-    public FileSystemWatcherWrapper(ILogger<FileSystemWatcherWrapper> logger, string path, string filter = "*.*", bool increaseBuffer = false)
+    public FileSystemWatcherWrapper(string path, string filter = "*.*", bool increaseBuffer = false)
     {
-        _logger = logger.NotNull();
-
         _watcher = new FileSystemWatcher
         {
             EnableRaisingEvents = false,

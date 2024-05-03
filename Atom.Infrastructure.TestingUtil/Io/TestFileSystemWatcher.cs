@@ -91,5 +91,11 @@ public sealed class TestFileSystemWatcher : IFileSystemWatcher
     public void Dispose()
     {
         StopListening();
+
+        _created.Dispose();
+        _changed.Dispose();
+        _renamed.Dispose();
+        _deleted.Dispose();
+        _error.Dispose();
     }
 }

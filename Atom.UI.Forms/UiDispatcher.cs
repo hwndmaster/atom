@@ -1,94 +1,72 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Windows.Threading;
+using Microsoft.VisualStudio.Threading;
 
 namespace Genius.Atom.UI.Forms;
 
 public interface IUiDispatcher
 {
     /// <summary>
-    ///   Executes the specified action asynchronously on the thread that the Dispatcher was created on.
-    /// </summary>
-    /// <param name="action">An action delegate to invoke through the dispatcher.</param>
-    /// <returns>An operation representing the queued delegate to be invoked.</returns>
-    Task BeginInvoke(Action action);
-
-    /// <summary>
     ///   Executes the specified action synchronously on the thread that the Dispatcher was created on.
     /// </summary>
     /// <param name="action">An action delegate to invoke through the dispatcher.</param>
-    /// <param name="cancellationToken">
-    ///   A cancellation token that can be used to cancel the operation.
-    ///   If the operation has not started, it will be aborted when the
-    ///   cancellation token is canceled. If the operation has started,
-    ///   the operation can cooperate with the cancellation request.
-    /// </param>
-    void Invoke(Action action, CancellationToken? cancellationToken = null);
+    void Invoke(Action action);
 
     /// <summary>
     ///   Executes the specified action asynchronously on the thread that the Dispatcher was created on.
     /// </summary>
     /// <param name="action">An action delegate to invoke through the dispatcher.</param>
-    /// <param name="cancellationToken">
-    ///     A cancellation token that can be used to cancel the operation.
-    ///     If the operation has not started, it will be aborted when the
-    ///     cancellation token is canceled. If the operation has started,
-    ///     the operation can cooperate with the cancellation request.
-    /// </param>
     /// <returns>An operation representing the queued delegate to be invoked.</returns>
-    /// <SecurityNote>
-    ///     Critical: This code causes arbitrary delegate to execute asynchronously, also calls critical code.
-    ///     Safe: Executing the delegate asynchronously is OK because we capture the ExecutionContext.
-    /// </SecurityNote>
-    Task InvokeAsync(Action action, CancellationToken? cancellationToken = null);
+    Task InvokeAsync(Action action);
 
     /// <summary>
     ///   Executes the specified Func<TResult> asynchronously on the thread that the Dispatcher was created on.
     /// </summary>
     /// <param name="action">A Func<TResult> delegate to invoke through the dispatcher.</param>
-    /// <param name="cancellationToken">
-    ///   A cancellation token that can be used to cancel the operation.
-    ///   If the operation has not started, it will be aborted when the
-    ///   cancellation token is canceled.  If the operation has started,
-    ///   the operation can cooperate with the cancellation request.
-    /// </param>
     /// <returns>An operation representing the queued delegate to be invoked.</returns>
-    /// <SecurityNote>
-    ///   Critical: This code causes arbitrary delegate to execute asynchronously, also calls critical code.
-    ///   Safe: Executing the delegate asynchronously is OK because we capture the ExecutionContext inside the DispatcherOperation.
-    /// </SecurityNote>
-    Task<T> InvokeAsync<T>(Func<T> func, CancellationToken? cancellationToken = null);
+    Task<T> InvokeAsync<T>(Func<T> func);
 }
 
 [ExcludeFromCodeCoverage]
-internal sealed class UiDispatcher : IUiDispatcher
+internal sealed class UiDispatcher : IUiDispatcher, IDisposable
 {
-    private readonly Application _application;
+    private readonly JoinableTaskContext _joinableTaskContext;
+    private readonly JoinableTaskFactory _joinableTaskFactory;
 
-    public UiDispatcher(Application application)
+    public UiDispatcher()
     {
-        _application = application.NotNull();
+        _joinableTaskContext = new JoinableTaskContext();
+        _joinableTaskFactory = new JoinableTaskFactory(_joinableTaskContext);
     }
 
-    public Task BeginInvoke(Action action)
+    public void Invoke(Action action)
     {
-        var invocation = _application.Dispatcher.BeginInvoke(action);
-        return invocation.Task;
+        _joinableTaskFactory.Run(async () =>
+        {
+            await _joinableTaskFactory.SwitchToMainThreadAsync();
+            action();
+        });
     }
 
-    public void Invoke(Action action, CancellationToken? cancellationToken = null)
+    public async Task InvokeAsync(Action action)
     {
-        _application.Dispatcher.Invoke(action, DispatcherPriority.Normal, cancellationToken ?? CancellationToken.None);
+        await _joinableTaskFactory.RunAsync(async () =>
+        {
+            await _joinableTaskFactory.SwitchToMainThreadAsync();
+            action();
+        });
     }
 
-    public Task InvokeAsync(Action action, CancellationToken? cancellationToken = null)
+    public async Task<T> InvokeAsync<T>(Func<T> func)
     {
-        var invocation = _application.Dispatcher.InvokeAsync(action, DispatcherPriority.Normal, cancellationToken ?? CancellationToken.None);
-        return invocation.Task;
+        return await _joinableTaskFactory.RunAsync(async () =>
+        {
+            await _joinableTaskFactory.SwitchToMainThreadAsync();
+            return func();
+        });
     }
 
-    public Task<T> InvokeAsync<T>(Func<T> func, CancellationToken? cancellationToken = null)
+    public void Dispose()
     {
-        var invocation = _application.Dispatcher.InvokeAsync(func, DispatcherPriority.Normal, cancellationToken ?? CancellationToken.None);
-        return invocation.Task;
+        _joinableTaskContext.Dispose();
     }
 }

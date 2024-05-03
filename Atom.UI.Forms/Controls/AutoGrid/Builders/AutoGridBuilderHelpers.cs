@@ -20,6 +20,13 @@ internal static class AutoGridBuilderHelpers
                 .IsGrouped();
         }
 
+        if (property.Attributes.OfType<SelectFromListAttribute>().Any())
+        {
+            var selectFromList = property.Attributes.OfType<SelectFromListAttribute>().First();
+            return new AutoGridContextBuilderComboBoxColumn<TViewModel, TParentViewModel>(property)
+                .WithListSource(selectFromList.CollectionPropertyName, selectFromList.FromOwnerContext);
+        }
+
         return new AutoGridContextBuilderTextColumn<TViewModel, TParentViewModel>(property);
     }
 

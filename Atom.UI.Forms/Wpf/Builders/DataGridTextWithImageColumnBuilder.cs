@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
+using MahApps.Metro.Controls;
 using WpfAnimatedGif;
 
 namespace Genius.Atom.UI.Forms.Wpf.Builders;
@@ -57,7 +58,6 @@ internal sealed class DataGridTextWithImageColumnBuilder : DataGridTextColumnBui
     public override DataGridTemplateColumn Build()
     {
         var column = CreateColumn();
-        var binding = CreateBinding();
 
         var stackPanelFactory = new FrameworkElementFactory(typeof(StackPanel));
         stackPanelFactory.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
@@ -66,8 +66,14 @@ internal sealed class DataGridTextWithImageColumnBuilder : DataGridTextColumnBui
 
         if (_imageIsPath)
         {
-            imageFactory.SetBinding(ImageBehavior.AnimatedSourceProperty, new Binding(_imageSource) { Converter = new ImageSourceConverter() });
-            imageFactory.SetBinding(UIElement.VisibilityProperty, new Binding(_imageSource) { Converter = new NotNullToVisibilityConverter() });
+            imageFactory.SetBinding(ImageBehavior.AnimatedSourceProperty, new Binding(_imageSource)
+            {
+                Converter = new ImageSourceConverter()
+            });
+            imageFactory.SetBinding(UIElement.VisibilityProperty, new Binding(_imageSource)
+            {
+                Converter = new NotNullToVisibilityConverter()
+            });
         }
         else
         {
@@ -81,10 +87,13 @@ internal sealed class DataGridTextWithImageColumnBuilder : DataGridTextColumnBui
 
         if (_imageVisibilityFlagPath is not null)
         {
-            imageFactory.SetValue(UIElement.VisibilityProperty, new Binding(_imageVisibilityFlagPath) { Converter = new BooleanToVisibilityConverter() });
+            imageFactory.SetValue(UIElement.VisibilityProperty, new Binding(_imageVisibilityFlagPath)
+            {
+                Converter = new BooleanToVisibilityConverter()
+            });
         }
 
-        if (_imageSize != 0)
+        if (!_imageSize.IsZero())
         {
             imageFactory.SetValue(FrameworkElement.HeightProperty, _imageSize);
             imageFactory.SetValue(FrameworkElement.WidthProperty, _imageSize);

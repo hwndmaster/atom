@@ -4,7 +4,7 @@ public abstract class FileSystemDetails
 {
     protected readonly IFileService _fileService;
 
-    internal protected FileSystemDetails(string fullPath,
+    protected FileSystemDetails(string fullPath,
         FileAttributes attributes,
         DateTime creationTime,
         DateTime creationTimeUtc,

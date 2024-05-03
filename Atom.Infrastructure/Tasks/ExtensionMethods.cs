@@ -12,9 +12,11 @@ public static class ExtensionMethods
     /// <param name="task">The task.</param>
     public static void RunAndForget(this Task task)
     {
+#pragma warning disable VSTHRD110 // Observe result of async calls
         task.NotNull().ContinueWith(HandleException, CancellationToken.None,
             TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
             TaskScheduler.Default);
+#pragma warning restore VSTHRD110 // Observe result of async calls
     }
 
     private static void HandleException(Task task)
@@ -29,7 +31,9 @@ public static class ExtensionMethods
                     logger.LogError(ex, "Error occurred while running a task.");
                 }
             }
+#pragma warning disable S2486 // Generic exceptions should not be ignored
             catch {}
+#pragma warning restore S2486 // Generic exceptions should not be ignored
 
             return true;
         });

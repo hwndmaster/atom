@@ -22,7 +22,7 @@ public sealed class TestServiceProvider : IServiceProvider, IDisposable
         if (isTestImplementation)
         {
             _serviceCollection.AddSingleton<TImplementation>();
-            _serviceCollection.AddSingleton<TService>((sp) => sp.GetService<TImplementation>());
+            _serviceCollection.AddSingleton<TService>((sp) => sp.GetRequiredService<TImplementation>());
         }
         else
         {

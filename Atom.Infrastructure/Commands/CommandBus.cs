@@ -26,16 +26,16 @@ internal sealed class CommandBus : ICommandBus
     public Task SendAsync(ICommandMessage command)
     {
         var handlerType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
-        return InvokeCommandHandlerProcess(command, handlerType);
+        return InvokeCommandHandlerProcessAsync(command, handlerType);
     }
 
     public Task<TResult> SendAsync<TResult>(ICommandMessageExchange<TResult> command)
     {
         var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
-        return (Task<TResult>)InvokeCommandHandlerProcess(command, handlerType);
+        return (Task<TResult>)InvokeCommandHandlerProcessAsync(command, handlerType);
     }
 
-    private Task InvokeCommandHandlerProcess(ICommandMessage command, Type handlerType)
+    private Task InvokeCommandHandlerProcessAsync(ICommandMessage command, Type handlerType)
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var service = scope.ServiceProvider.GetService(handlerType);
@@ -54,7 +54,9 @@ internal sealed class CommandBus : ICommandBus
         var result = method.Invoke(service, new object[] { command });
         if (result is Task taskResult)
         {
+#pragma warning disable IDISP013 // Await in using
             return taskResult;
+#pragma warning restore IDISP013 // Await in using
         }
 
         throw new InvalidOperationException("Command Handler process has failed due to unknown error.");

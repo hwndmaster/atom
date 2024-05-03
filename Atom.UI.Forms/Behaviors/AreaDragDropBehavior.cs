@@ -33,7 +33,7 @@ public sealed class AreaDragDropBehavior : Behavior<UIElement>
 
     #region DataFormatProperty
     public static readonly DependencyProperty DataFormatProperty =
-        DependencyProperty.Register(nameof(DataFormat), typeof(string), typeof(AreaDragDropBehavior)); //, new PropertyMetadata(OnDataFormatsChanged));
+        DependencyProperty.Register(nameof(DataFormat), typeof(string), typeof(AreaDragDropBehavior));
     public string DataFormat
     {
         get { return (string)GetValue(DataFormatProperty); }

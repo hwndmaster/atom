@@ -1,7 +1,9 @@
 {
     "files.exclude": {
         "**/bin/": true,
-        "**/obj/": true
+        "**/obj/": true,
+        "TestResults/": true,
+        "TestCoverage/": true
     },
     "dotnet-test-explorer.testArguments": "/p:CollectCoverage=true /p:CoverletOutputFormat=\\\"lcov\\\" /p:CoverletOutput=../lcov",
     "coverage-gutters.coverageFileNames": [

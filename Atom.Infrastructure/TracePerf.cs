@@ -28,6 +28,9 @@ public sealed class TracePerf
     public void StopAndReport()
     {
         _sw.Stop();
+
+#pragma warning disable S6670 // "Trace.Write" and "Trace.WriteLine" should not be used
         Trace.WriteLine($"[TracePerf] {_name} - {_message} took {_sw.ElapsedMilliseconds} ms");
+#pragma warning restore S6670 // "Trace.Write" and "Trace.WriteLine" should not be used
     }
 }

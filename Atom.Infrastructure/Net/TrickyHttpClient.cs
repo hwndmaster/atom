@@ -6,7 +6,7 @@ namespace Genius.Atom.Infrastructure.Net;
 
 public interface ITrickyHttpClient
 {
-    Task<string?> DownloadContent(string url, CancellationToken cancel);
+    Task<string?> DownloadContentAsync(string url, CancellationToken cancel);
 }
 
 internal sealed class TrickyHttpClient : ITrickyHttpClient
@@ -22,7 +22,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
         _logger = logger;
     }
 
-    public async Task<string?> DownloadContent(string url, CancellationToken cancel)
+    public async Task<string?> DownloadContentAsync(string url, CancellationToken cancel)
     {
         Guard.NotNull(url);
 
@@ -33,7 +33,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
         try
         {
             await Task.Delay(DELAY_MS, cancel);
-            return await DownloadInternal(url, cancel);
+            return await DownloadInternalAsync(url, cancel);
         }
         finally
         {
@@ -41,7 +41,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
         }
     }
 
-    private async Task<string?> DownloadInternal(string url, CancellationToken cancel)
+    private async Task<string?> DownloadInternalAsync(string url, CancellationToken cancel)
     {
         var handler = new HttpClientHandler()
         {
@@ -50,7 +50,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
 
         for (var irepeat = 1; irepeat <= MAX_REPEATS; irepeat++)
         {
-            var httpClient = new HttpClient(handler);
+            using var httpClient = new HttpClient(handler);
 
             // To confuse the hosts
             httpClient.DefaultRequestHeaders.Add("X-Cookies-Accepted", "1");
@@ -59,7 +59,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
             httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
             httpClient.DefaultRequestHeaders.Add("User-Agent", CreateRandomUserAgent());
 
-            var response = await httpClient.GetAsync(url, cancel);
+            using var response = await httpClient.GetAsync(url, cancel);
             if (!response.IsSuccessStatusCode)
             {
                 if (response.StatusCode == HttpStatusCode.TooManyRequests)
@@ -69,7 +69,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
                 }
 
                 // Something went wrong
-                _logger.LogError($"Failed to fetch '{url}'. Error Code = {response.StatusCode}");
+                _logger.LogError("Failed to fetch '{Url}'. Error Code = {ResponseStatusCode}", url, response.StatusCode);
                 return null;
             }
 

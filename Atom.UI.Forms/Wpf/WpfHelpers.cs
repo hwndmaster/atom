@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using MahApps.Metro.Controls;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms.Wpf;
 
@@ -28,7 +29,6 @@ public static class WpfHelpers
         {
             BindingOperations.SetBinding(child, Flyout.DataContextProperty,
                 new Binding(sourcePath) { Source = owner.DataContext });
-            //: TypeDescriptor.GetProperties(owner.DataContext).Find(sourcePath, false).GetValue(owner.DataContext);
         }
         BindingOperations.SetBinding(child, Flyout.IsOpenProperty, new Binding(isOpenBindingPath) { Source = owner.DataContext });
         ((IAddChild) flyout).AddChild(child);
@@ -43,21 +43,6 @@ public static class WpfHelpers
             SelectedValueBinding = new Binding(valuePath)
         };
     }
-
-    // TODO: Not used yet
-    /*internal static void AutoFitColumn(DataGridColumn column, IEnumerable items)
-    {
-        var childControl = column.FindChild<Control>();
-        var maxWidth = column.MinWidth;
-        foreach (var item in items)
-        {
-            if (item is null)
-                continue;
-            maxWidth = Math.Max(maxWidth, MeasureString(item.ToString().NotNull(), childControl).Width);
-        }
-
-        column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
-    }*/
 
     internal static void EnableSingleClickEditMode(DataGridColumn column)
     {
@@ -144,10 +129,8 @@ public static class WpfHelpers
             var comboBox = cell.FindChild<ComboBox>();
             if (comboBox is not null)
             {
-                cell.Dispatcher.Invoke(
-                    new Action(delegate {
-                        comboBox.IsDropDownOpen = true;
-                    }));
+                var dispatcher = Module.ServiceProvider.GetRequiredService<IUiDispatcher>();
+                dispatcher.Invoke(() => comboBox.IsDropDownOpen = true);
             }
         }
     }

@@ -9,9 +9,9 @@ public interface IFileSystemWatcherFactory
 
 internal sealed class FileSystemWatcherFactory : IFileSystemWatcherFactory
 {
-    private readonly ILogger<FileSystemWatcherWrapper> _logger;
+    private readonly ILogger<FileSystemWatcherFactory> _logger;
 
-    public FileSystemWatcherFactory(ILogger<FileSystemWatcherWrapper> logger)
+    public FileSystemWatcherFactory(ILogger<FileSystemWatcherFactory> logger)
     {
         _logger = logger.NotNull();
     }
@@ -20,7 +20,7 @@ internal sealed class FileSystemWatcherFactory : IFileSystemWatcherFactory
     {
         try
         {
-            return new FileSystemWatcherWrapper(_logger, path, filter, increaseBuffer);
+            return new FileSystemWatcherWrapper(path, filter, increaseBuffer);
         }
         catch (Exception ex)
         {
