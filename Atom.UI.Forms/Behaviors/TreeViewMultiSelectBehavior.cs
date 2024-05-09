@@ -8,6 +8,8 @@ using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms;
 
+#pragma warning disable S125 // Sections of code should not be commented out
+
 // NOTE: This implementation was originally taken here:
 //       https://github.com/markjulmar/mvvmhelpers/blob/master/Julmar.Wpf.Helpers/Julmar.Wpf.Behaviors/Interactivity/MultiSelectTreeViewBehavior.cs
 // UPD 2022-Dec-28: Added binding between ObservableCollection<> and IsSelected property.

@@ -15,9 +15,10 @@ public sealed class TestFileServiceTests
         var sample = _fixture.CreateMany<byte>().ToArray();
 
         // Act
-        var stream = _sut.CreateFile(@"C:\Test\file.ext");
-        stream.Write(sample, 0, sample.Length);
-        stream.Dispose();
+        using (var stream = _sut.CreateFile(@"C:\Test\file.ext"))
+        {
+            stream.Write(sample, 0, sample.Length);
+        }
 
         // Verify
         Assert.Equal(sample, _sut.Files.Single().Content);

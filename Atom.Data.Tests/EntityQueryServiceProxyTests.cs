@@ -28,12 +28,6 @@ public sealed class EntityQueryServiceProxyTests
         Assert.Equal(queryService.Entities.Values.Last(), actualFindById);
     }
 
-    public Task<IEntity?> Get(object queryService, Guid id)
-    {
-        var result = (queryService as IQueryService<SampleEntity>)!.FindByIdAsync(id);
-        return Task.FromResult<IEntity?>(result!.GetAwaiter().GetResult());
-    }
-
     private class SampleEntity : EntityBase
     {
     }

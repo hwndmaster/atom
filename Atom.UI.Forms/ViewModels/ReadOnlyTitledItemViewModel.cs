@@ -1,6 +1,8 @@
 namespace Genius.Atom.UI.Forms;
 
+#pragma warning disable S4035 // Classes implementing "IEquatable<T>" should be sealed
 public class ReadOnlyTitledItemViewModel : ViewModelBase, ITitledItemViewModel, IEquatable<ReadOnlyTitledItemViewModel>
+#pragma warning restore S4035 // Classes implementing "IEquatable<T>" should be sealed
 {
     public ReadOnlyTitledItemViewModel(Guid id, string name)
     {

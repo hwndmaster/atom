@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
+using Genius.Atom.Infrastructure.Threading;
 using Genius.Atom.UI.Forms.Validation;
 
 namespace Genius.Atom.UI.Forms;
@@ -21,6 +22,7 @@ public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 /// </summary>
 public abstract class ViewModelBase : IViewModel
 {
+    private readonly JoinableTaskHelper _joinableTask = new();
     private readonly Dictionary<string, List<string>> _errors = new();
     private readonly Dictionary<string, List<PropertyValidation>> _validationRules = new();
     private ConcurrentDictionary<string, object?>? _propertyBag;
@@ -246,6 +248,40 @@ public abstract class ViewModelBase : IViewModel
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    protected void WhenChangedNoDispose(string propertyName, Action handler)
+    {
+        // It is safe to handle a property changed event within the view model without disposing the subscription.
+
+#pragma warning disable IDISP004 // Don't ignore created IDisposable
+        this.WhenChanged(propertyName, handler);
+#pragma warning restore IDISP004 // Don't ignore created IDisposable
+    }
+
+    protected void WhenAnyChangedNoDispose(string[] propertyNames, Action handler)
+    {
+        // It is safe to handle a property changed event within the view model without disposing the subscription.
+
+#pragma warning disable IDISP004 // Don't ignore created IDisposable
+        this.WhenAnyChanged(propertyNames)
+            .Subscribe(x => handler());
+#pragma warning restore IDISP004 // Don't ignore created IDisposable
+    }
+
+    protected void WhenAnyChangedNoDispose(string[] propertyNames, Func<Task> handler)
+    {
+        // It is safe to handle a property changed event within the view model without disposing the subscription.
+
+#pragma warning disable IDISP004 // Don't ignore created IDisposable
+        this.WhenAnyChanged(propertyNames)
+            .Subscribe(_ => {
+                _joinableTask.Factory.Run(async () =>
+                {
+                    await handler();
+                });
+            });
+#pragma warning restore IDISP004 // Don't ignore created IDisposable
+    }
+
     private void OnErrorsChanged(string propertyName)
     {
         ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
@@ -274,15 +310,6 @@ public abstract class ViewModelBase : IViewModel
 
             AddError(propertyName, rule.ValidationRule.Validate(value, CultureInfo.CurrentCulture));
         }
-    }
-
-    protected void WhenChangedNoDispose(string propertyName, Action handler)
-    {
-        // It is safe to handle a property changed event within the view model without disposing the subscription.
-
-#pragma warning disable IDISP004 // Don't ignore created IDisposable
-        this.WhenChanged(propertyName, handler);
-#pragma warning restore IDISP004 // Don't ignore created IDisposable
     }
 
     private void AddError(string propertyName, ValidationResult validationResult)

@@ -12,12 +12,12 @@ dotnet_diagnostic.CA2213.severity = warning # Disposable fields should be dispos
 dotnet_diagnostic.CA2215.severity = warning # Dispose methods should call base class dispose
 dotnet_diagnostic.CS8509.severity = warning # The switch expression does not handle all possible values of its input type (it is not exhaustive)
 dotnet_diagnostic.IDISP007.severity = none # Don't dispose injected
+dotnet.diagnostic.IDISP025.severity = none # Class with no virtual dispose method should be sealed
 dotnet_diagnostic.RCS1075.severity = suggestion # Avoid empty catch clause that catches System.Exception
 dotnet_diagnostic.RCS1090.severity = suggestion # Add call to 'ConfigureAwait' (or vice versa)
 
 # CA1001: Subject<T> to ignore
 dotnet_code_quality.CA1001.excluded_symbol_names = T:System.Reactive.Subjects.Subject*
 
-## TODO: Investigate why this rule doesn't work:
-##[**/*Tests.cs]
-##dotnet_diagnostic.VSTHRD200.severity = none # Use "Async" suffix for async methods
+[**/*Tests.cs]
+dotnet_diagnostic.VSTHRD200.severity = none # Use "Async" suffix for async methods

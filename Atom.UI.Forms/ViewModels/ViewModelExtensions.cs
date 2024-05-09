@@ -120,9 +120,24 @@ public static class ViewModelExtensions
     {
         var propNames = propertyAccessors.Select(x => ExpressionHelpers.GetPropertyName(x)).ToArray();
 
+        return WhenAnyChanged(viewModel, propNames);
+    }
+
+    /// <summary>
+    ///   Returns an observable which is triggered every time when any of the view model properties
+    ///   defined in the <paramref name="propertyNames"/> parameter have changed in the instance
+    ///   of <paramref name="viewModel"/>.
+    /// </summary>
+    /// <typeparam name="TViewModel">The concrete type of the view model.</typeparam>
+    /// <param name="viewModel">The view model.</param>
+    /// <param name="propertyNames">The names of the properties.</param>
+    /// <returns>An observable.</returns>
+    public static IObservable<Unit> WhenAnyChanged<TViewModel>(this TViewModel viewModel, string[] propertyNames)
+        where TViewModel : IViewModel
+    {
         return Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
                 h => viewModel.PropertyChanged += h, h => viewModel.PropertyChanged -= h)
-            .Where(x => propNames.Length == 0 || propNames.Contains(x.EventArgs.PropertyName))
+            .Where(x => propertyNames.Length == 0 || propertyNames.Contains(x.EventArgs.PropertyName))
             .Select(_ => Unit.Default);
     }
 

@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.VisualStudio.Threading;
+using Genius.Atom.Infrastructure.Threading;
 
 namespace Genius.Atom.UI.Forms;
 
@@ -29,44 +29,37 @@ public interface IUiDispatcher
 [ExcludeFromCodeCoverage]
 internal sealed class UiDispatcher : IUiDispatcher, IDisposable
 {
-    private readonly JoinableTaskContext _joinableTaskContext;
-    private readonly JoinableTaskFactory _joinableTaskFactory;
-
-    public UiDispatcher()
-    {
-        _joinableTaskContext = new JoinableTaskContext();
-        _joinableTaskFactory = new JoinableTaskFactory(_joinableTaskContext);
-    }
+    private readonly JoinableTaskHelper _joinableTask = new();
 
     public void Invoke(Action action)
     {
-        _joinableTaskFactory.Run(async () =>
+        _joinableTask.Factory.Run(async () =>
         {
-            await _joinableTaskFactory.SwitchToMainThreadAsync();
+            await _joinableTask.Factory.SwitchToMainThreadAsync();
             action();
         });
     }
 
     public async Task InvokeAsync(Action action)
     {
-        await _joinableTaskFactory.RunAsync(async () =>
+        await _joinableTask.Factory.RunAsync(async () =>
         {
-            await _joinableTaskFactory.SwitchToMainThreadAsync();
+            await _joinableTask.Factory.SwitchToMainThreadAsync();
             action();
         });
     }
 
     public async Task<T> InvokeAsync<T>(Func<T> func)
     {
-        return await _joinableTaskFactory.RunAsync(async () =>
+        return await _joinableTask.Factory.RunAsync(async () =>
         {
-            await _joinableTaskFactory.SwitchToMainThreadAsync();
+            await _joinableTask.Factory.SwitchToMainThreadAsync();
             return func();
         });
     }
 
     public void Dispose()
     {
-        _joinableTaskContext.Dispose();
+        _joinableTask.Dispose();
     }
 }

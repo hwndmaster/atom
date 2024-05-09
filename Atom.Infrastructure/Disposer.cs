@@ -43,7 +43,7 @@ public sealed class Disposer : IDisposable
             disposables = _disposeActions.ToArray();
             _disposeActions.Clear();
         }
-        for (var i = disposables.Length - 1; i > 0; i--)
+        for (var i = disposables.Length - 1; i >= 0; i--)
         {
             disposables[i].Dispose();
         }

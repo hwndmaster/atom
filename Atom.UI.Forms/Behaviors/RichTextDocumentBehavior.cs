@@ -3,7 +3,7 @@ using System.Windows.Documents;
 
 namespace Genius.Atom.UI.Forms;
 
-public sealed class RichTextDocumentBehavior
+public static class RichTextDocumentBehavior
 {
     public static readonly DependencyProperty BindableDocumentProperty = DependencyProperty.RegisterAttached(
         "BindableDocument",

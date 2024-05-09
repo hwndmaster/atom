@@ -10,7 +10,7 @@ public sealed class DynamicColumnEntriesViewModel : ViewModelBase
         _entriesRetrievalFunc = entriesRetrievalFunc.NotNull();
     }
 
-    private string Get(int index)
+    private string? Get(int index)
     {
         if (_entries is null)
         {
@@ -19,11 +19,12 @@ public sealed class DynamicColumnEntriesViewModel : ViewModelBase
 
         if (index > _entries.Count - 1)
         {
-            throw new IndexOutOfRangeException($"Entries contains {_entries.Count} items. Requested item at {index}.");
+            // The entry has no values for the dynamic columns.
+            return null;
         }
 
         return _entries[index];
     }
 
-    public string this[int index] => Get(index);
+    public string? this[int index] => Get(index);
 }

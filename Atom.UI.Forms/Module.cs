@@ -52,7 +52,7 @@ public static class Module
         serviceProvider
             .GetService<Microsoft.Extensions.Logging.ILoggerFactory>()
             .NotNull()
-            .AddProvider(new EventBasedLoggerProvider(serviceProvider.GetService<IEventBus>().NotNull()));
+            .AddProvider(serviceProvider.GetRequiredService<EventBasedLoggerProvider>());
     }
 
     private static IConfiguration LoadConfiguration(IServiceCollection serviceCollection)

@@ -156,7 +156,7 @@ internal sealed class DynamicColumnsBehavior : IDisposable
             _dataGrid.Columns.Add(dynamicColumn);
 
             if (state.BuildContext.DisplayIndex is not null)
-                dynamicColumn.DisplayIndex = state.BuildContext.DisplayIndex.Value;
+                dynamicColumn.DisplayIndex = Math.Min(_dataGrid.Columns.Count - 1, state.BuildContext.DisplayIndex.Value);
         }
     }
 }

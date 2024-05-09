@@ -1,3 +1,4 @@
+using Genius.Atom.Infrastructure.Threading;
 using Microsoft.VisualStudio.Threading;
 
 namespace Genius.Atom.Infrastructure.Tasks;
@@ -11,8 +12,7 @@ public interface ISynchronousScheduler
 internal sealed class SynchronousScheduler : IDisposable, ISynchronousScheduler
 {
     private readonly Queue<Action> _actions = new();
-    private readonly JoinableTaskContext _joinableTaskContext;
-    private readonly JoinableTaskFactory _joinableTaskFactory;
+    private readonly JoinableTaskHelper _joinableTask = new();
     private readonly InternalSynchronizationContext _synchronizationContext;
     private bool _running = false;
     private int _asyncRunning = 0;
@@ -21,8 +21,6 @@ internal sealed class SynchronousScheduler : IDisposable, ISynchronousScheduler
     public SynchronousScheduler()
     {
         _synchronizationContext = new(this);
-        _joinableTaskContext = new JoinableTaskContext();
-        _joinableTaskFactory = new JoinableTaskFactory(_joinableTaskContext);
     }
 
     public void Schedule(Action action)
@@ -58,7 +56,7 @@ internal sealed class SynchronousScheduler : IDisposable, ISynchronousScheduler
             {
                 Interlocked.Increment(ref _asyncRunning);
 
-                _joinableTaskFactory.Run(async () =>
+                _joinableTask.Factory.Run(async () =>
                     await asyncAction().ConfigureAwait(true)
                 );
             }
@@ -128,7 +126,7 @@ internal sealed class SynchronousScheduler : IDisposable, ISynchronousScheduler
             _actions.Clear();
         }
 
-        _joinableTaskContext.Dispose();
+        _joinableTask.Dispose();
     }
 
 

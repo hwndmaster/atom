@@ -4,6 +4,11 @@
     <PackageId>$(AssemblyName)</PackageId>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <!-- This option is needed to let pet-projects to copy Atom.Infrastructure' dependencies to their TargetDir in debug mode -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.Reactive" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />

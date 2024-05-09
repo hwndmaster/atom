@@ -45,7 +45,7 @@ public sealed class PropertyValueStringConverter : IValueConverter
     {
         if (value is null)
             return null;
-        if (targetType.IsAssignableFrom(value.GetType()))
+        if (targetType.IsInstanceOfType(value))
             return value;
 
         try
