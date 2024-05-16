@@ -5,6 +5,19 @@ namespace Genius.Atom.Infrastructure.Tests;
 public sealed class DisposerTests
 {
     [Fact]
+    public void Dispose_SwitchesIsDisposed()
+    {
+        // Arrange
+        var disposer = new Disposer();
+
+        // Act
+        disposer.Dispose();
+
+        // Verify
+        Assert.True(disposer.IsDisposed);
+    }
+
+    [Fact]
     public void DisposeAction()
     {
         // Arrange

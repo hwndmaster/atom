@@ -1,4 +1,5 @@
 
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -26,14 +27,12 @@ public static class ExtensionMethods
             try
             {
                 var logger = Module.ServiceProvider.GetService<ILogger>();
-                if (logger is not null)
-                {
-                    logger.LogError(ex, "Error occurred while running a task.");
-                }
+                logger?.LogError(ex, "Error occurred while running a task.");
             }
-#pragma warning disable S2486 // Generic exceptions should not be ignored
-            catch {}
-#pragma warning restore S2486 // Generic exceptions should not be ignored
+            catch (Exception ex2)
+            {
+                Trace.TraceError(ex2.Message);
+            }
 
             return true;
         });

@@ -5,6 +5,7 @@ using Genius.Atom.Infrastructure.Io;
 using Genius.Atom.Infrastructure.Logging;
 using Genius.Atom.Infrastructure.Net;
 using Genius.Atom.Infrastructure.Tasks;
+using Genius.Atom.Infrastructure.Threading;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Infrastructure;
@@ -20,14 +21,29 @@ public static class Module
     {
         services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         services.AddSingleton(typeof(IFactory<>), typeof(ServiceFactory<>));
-        services.AddSingleton<ICommandBus, CommandBus>();
         services.AddSingleton<IDateTime, SystemDateTime>();
+
+        // Commands
+        services.AddSingleton<ICommandBus, CommandBus>();
+
+        // Events
         services.AddSingleton<IEventBus, EventBus>();
+
+        // Logging
         services.AddTransient<EventBasedLoggerProvider>();
+
+        // Net
+        services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
+
+        // IO
         services.AddSingleton<IFileService, FileService>();
         services.AddTransient<IFileSystemWatcherFactory, FileSystemWatcherFactory>();
-        services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
+
+        // Tasks
         services.AddTransient<ISynchronousScheduler, SynchronousScheduler>();
+
+        // Threading
+        services.AddTransient<JoinableTaskHelper>();
     }
 
     public static void Initialize(IServiceProvider serviceProvider)

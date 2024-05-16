@@ -1,7 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Extensions.DependencyInjection;
@@ -113,10 +112,7 @@ public static class Properties
 
     private static void ItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var disposer = new Disposer();
         var dataGrid = (DataGrid)d;
-        var buildContext = AutoGridBuildContext.CreateLazy(dataGrid).Value;
-
         var collectionViewSource = e.NewValue is CollectionViewSource cvs
             ? cvs
             : new CollectionViewSource
@@ -124,15 +120,7 @@ public static class Properties
                 Source = e.NewValue
             };
 
-        new GroupingBehavior(dataGrid, buildContext, collectionViewSource).Attach().DisposeWith(disposer);
-        new FilteringBehavior(dataGrid, buildContext, collectionViewSource).Attach().DisposeWith(disposer);
-
-        d.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
-
-        /* TODO: Cannot use Unloaded event since it is being triggered when switching tabs
-        dataGrid.Unloaded += (object _, RoutedEventArgs _) =>
-        {
-            disposer.Dispose();
-        };*/
+        AttachingBehavior.FindMeFor(dataGrid)
+            .SetupItemsSource(collectionViewSource);
     }
 }

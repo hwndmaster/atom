@@ -23,8 +23,8 @@ public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 public abstract class ViewModelBase : IViewModel
 {
     private readonly JoinableTaskHelper _joinableTask = new();
-    private readonly Dictionary<string, List<string>> _errors = new();
-    private readonly Dictionary<string, List<PropertyValidation>> _validationRules = new();
+    private readonly Dictionary<string, List<string>> _errors = [];
+    private readonly Dictionary<string, List<PropertyValidation>> _validationRules = [];
     private ConcurrentDictionary<string, object?>? _propertyBag;
     private bool _suspendDirtySet = false;
 
@@ -321,7 +321,7 @@ public abstract class ViewModelBase : IViewModel
 
         if (!_errors.TryGetValue(propertyName, out var errors))
         {
-            errors = new List<string>();
+            errors = [];
             _errors.Add(propertyName, errors);
         }
 

@@ -1,13 +1,33 @@
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Genius.Atom.Infrastructure.Tasks;
+using Genius.Atom.Infrastructure.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.Threading;
 
 namespace Genius.Atom.UI.Forms;
 
 public static class ObservableExtensions
 {
+    /// <summary>
+    ///   Subscribes an asynchronous element handler to an observable sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the source sequence.</typeparam>
+    /// <param name="source">Observable sequence to subscribe to.</param>
+    /// <param name="onNext">Action to invoke for each element in the observable sequence.</param>
+    /// <returns><see cref="IDisposable"/> object used to unsubscribe from the observable sequence.</returns>
+    public static IDisposable Subscribe<T>(this IObservable<T> source, Func<T, Task> onNext)
+    {
+        return source.Subscribe(value =>
+        {
+            var joinableTaskHelper = Module.ServiceProvider.GetRequiredService<JoinableTaskHelper>();
+            joinableTaskHelper.Factory.Run(async () =>
+            {
+                await onNext(value);
+                joinableTaskHelper.Dispose();
+            });
+        });
+    }
+
     /// <summary>
     ///   Subscribes an element handler to an observable sequence to be performed on UI thread.
     /// </summary>
