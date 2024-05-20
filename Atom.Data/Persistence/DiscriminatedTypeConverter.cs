@@ -133,7 +133,8 @@ internal sealed class DiscriminatedTypeConverter<T> : JsonConverter<T>, IJsonCon
         var modifiedOptions = GetModifiedOptions(options, valueType);
         using (var document = JsonSerializer.SerializeToDocument(value, valueType, modifiedOptions))
         {
-            foreach (var property in document.RootElement.EnumerateObject())
+            using var properties = document.RootElement.EnumerateObject();
+            foreach (var property in properties)
             {
                 property.WriteTo(writer);
             }

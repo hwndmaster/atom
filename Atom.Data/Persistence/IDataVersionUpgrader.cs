@@ -1,6 +1,6 @@
 namespace Genius.Atom.Data.Persistence;
 
-public interface IDataVersionUpgrader<TFrom, TTo>
+public interface IDataVersionUpgrader<in TFrom, out TTo>
     where TFrom : class
     where TTo : class
 {

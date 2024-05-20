@@ -14,17 +14,17 @@ public interface IRepository<in TEntity>
     Task StoreAsync(params TEntity[] entities);
 }
 
-public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
+public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposable
     where TEntity: EntityBase
 {
+    private readonly Disposer _disposer = new();
+    private readonly ReaderWriterLockSlim _initializationLocker = new();
     protected readonly IEventBus _eventBus;
     protected readonly ILogger _logger;
     protected readonly IJsonPersister _persister;
     protected readonly Subject<IReadOnlyList<TEntity>> _loaded = new();
 
     private List<TEntity>? _entities;
-    private readonly ReaderWriterLockSlim _initializationLocker = new();
-
     private readonly string FILENAME = @$".\Data\{typeof(TEntity).Name}.json";
 
     protected RepositoryBase(IEventBus eventBus, IJsonPersister persister, ILogger logger)
@@ -32,6 +32,14 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>
         _eventBus = eventBus;
         _logger = logger;
         _persister = persister;
+
+        _loaded.DisposeWith(_disposer);
+        _initializationLocker.DisposeWith(_disposer);
+    }
+
+    public void Dispose()
+    {
+        _disposer.Dispose();
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()

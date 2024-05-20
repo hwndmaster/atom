@@ -27,7 +27,7 @@ internal interface ITypeDiscriminatorsInternal : ITypeDiscriminators
 internal sealed record TypePreviousVersion(Type PreviousVersionType, DataVersionUpgraderProxy VersionUpgrader);
 internal sealed record TypeDiscriminatorRecord(string Discriminator, Type Type, List<TypePreviousVersion> PreviousVersions, int Version);
 
-internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminatorsInternal
+internal sealed class TypeDiscriminators : ITypeDiscriminatorsInternal
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<TypeDiscriminators> _logger;
@@ -82,10 +82,10 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
             throw new InvalidOperationException($"The discriminator for type '{previousVersionType.FullName}' is not registered.");
         }
 
-        //if (previousVersionRecord.Version >= version)
-        //{
-        //    throw new InvalidOperationException($"The previous version '{previousVersionRecord.Version}' must be less than the passing one '{version}'.");
-        //}
+        ///if (previousVersionRecord.Version >= version)
+        ///{
+        ///    throw new InvalidOperationException($"The previous version '{previousVersionRecord.Version}' must be less than the passing one '{version}'.");
+        ///}
 
         var versionUpgrader = _serviceProvider.GetRequiredService<TVersionUpgrader>();
         var versionUpgraderProxy = DataVersionUpgraderProxy.Create(versionUpgrader);
@@ -133,7 +133,7 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
 
         foreach (var record in _discriminatorsByTypeName.Values)
         {
-            var previousVersion = record.PreviousVersions.FirstOrDefault(x => x.PreviousVersionType == type);
+            var previousVersion = record.PreviousVersions.Find(x => x.PreviousVersionType == type);
             if (previousVersion is not null)
             {
                 return (record, previousVersion);
@@ -156,7 +156,7 @@ internal sealed class TypeDiscriminators : ITypeDiscriminators, ITypeDiscriminat
 
     private void AddMapping(TypeDiscriminatorRecord record)
     {
-        _logger.LogTrace("Type '{type}' mapped as '{discriminator}' version '{version}'",
+        _logger.LogTrace("Type '{Type}' mapped as '{Discriminator}' version '{Version}'",
             record.Type.FullName, record.Discriminator, record.Version);
 
         _discriminatorsByDiscriminatorAndVersion.Add(CreateDiscriminatorQualifiedName(record.Discriminator, record.Version), record);

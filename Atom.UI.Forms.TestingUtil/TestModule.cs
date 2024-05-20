@@ -15,7 +15,7 @@ public static class TestModule
 
         _serviceProvider.AddSingleton<IEventBus, TestEventBus>(isTestImplementation: true);
         _serviceProvider.AddSingleton<IWpfApplication, TestWpfApplication>(isTestImplementation: true);
-        _serviceProvider.RegisterInstance(Mock.Of<Microsoft.Extensions.Logging.ILoggerFactory>());
+        _serviceProvider.RegisterInstance(A.Fake<Microsoft.Extensions.Logging.ILoggerFactory>());
 
         Module.Initialize(_serviceProvider);
         _isInitialized = true;

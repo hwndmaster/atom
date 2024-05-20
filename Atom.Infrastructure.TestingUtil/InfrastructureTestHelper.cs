@@ -1,4 +1,4 @@
-using AutoFixture.AutoMoq;
+using AutoFixture.AutoFakeItEasy;
 
 namespace Genius.Atom.Infrastructure.TestingUtil;
 
@@ -6,15 +6,15 @@ public static class InfrastructureTestHelper
 {
     public static IDateTime CreateDateTime(DateTime dateTime)
     {
-        Mock<IDateTime> mock = new();
-        mock.Setup(x => x.Now).Returns(dateTime);
-        return mock.Object;
+        var fake = A.Fake<IDateTime>();
+        A.CallTo(() => fake.Now).Returns(dateTime);
+        return fake;
     }
 
     public static Fixture CreateFixture(int recursionDepth = 2, bool useMutableValueTypeGenerator = false)
     {
         var fixture = new Fixture();
-        fixture.Customize(new AutoMoqCustomization());
+        fixture.Customize(new AutoFakeItEasyCustomization());
         fixture.Behaviors.Add(new OmitOnRecursionBehavior(recursionDepth));
 
         if (useMutableValueTypeGenerator)

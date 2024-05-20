@@ -11,8 +11,8 @@ dotnet_diagnostic.CA1001.severity = warning # Types that own disposable fields s
 dotnet_diagnostic.CA2213.severity = warning # Disposable fields should be disposed
 dotnet_diagnostic.CA2215.severity = warning # Dispose methods should call base class dispose
 dotnet_diagnostic.CS8509.severity = warning # The switch expression does not handle all possible values of its input type (it is not exhaustive)
-dotnet_diagnostic.IDISP007.severity = none # Don't dispose injected
-dotnet.diagnostic.IDISP025.severity = none # Class with no virtual dispose method should be sealed
+dotnet_diagnostic.IDISP007.severity = suggestion # Don't dispose injected
+dotnet_diagnostic.IDISP025.severity = suggestion # Class with no virtual dispose method should be sealed
 dotnet_diagnostic.RCS1075.severity = suggestion # Avoid empty catch clause that catches System.Exception
 dotnet_diagnostic.RCS1090.severity = suggestion # Add call to 'ConfigureAwait' (or vice versa)
 

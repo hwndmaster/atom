@@ -13,7 +13,7 @@ public sealed class JsonPersisterTests
 
     public JsonPersisterTests()
     {
-        _typeDiscriminators = new(_serviceProvider, Mock.Of<ILogger<TypeDiscriminators>>());
+        _typeDiscriminators = new(_serviceProvider, A.Fake<ILogger<TypeDiscriminators>>());
     }
 
     [Fact]
