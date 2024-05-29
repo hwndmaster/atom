@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.UI.Forms.Wpf.Builders;
 
@@ -67,14 +68,16 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
     }
 
     // TODO: Cover with unit tests
-    private sealed class HighlightedTextConverter : IMultiValueConverter
+    internal sealed class HighlightedTextConverter : IMultiValueConverter
     {
         private readonly record struct Match(int Index, int Length);
         private static Dictionary<int, Regex?> _regexCache = new();
-        private static Lazy<Style> _runHighlightStyle = new(() => (Style)Application.Current.Resources["Atom.Run.Highlight"]);
+        private static Lazy<Style> _runHighlightStyle;
 
-        public HighlightedTextConverter()
+        static HighlightedTextConverter()
         {
+            _runHighlightStyle = new Lazy<Style>(() => Module.ServiceProvider.GetRequiredService<IWpfApplication>()
+                .FindResource<Style>("Atom.Run.Highlight").NotNull());
         }
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

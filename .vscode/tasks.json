@@ -52,6 +52,7 @@
         "--no-build",
         "--collect:\"Code Coverage;Format=Cobertura;CoverageFileName=coverage.xml\"",
         "--results-directory:.\\TestResults",
+        "--settings:.runsettings",
         "--blame-hang-timeout:30000"
       ],
       "dependsOn": [

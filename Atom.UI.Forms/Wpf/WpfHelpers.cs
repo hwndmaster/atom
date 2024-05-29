@@ -14,6 +14,13 @@ namespace Genius.Atom.UI.Forms.Wpf;
 [ExcludeFromCodeCoverage]
 public static class WpfHelpers
 {
+    /// <summary>
+    ///   Adds a flyout popup to the window, which <paramref name="owner"/> relates to.
+    /// </summary>
+    /// <typeparam name="T">The type of the flyout control to popup.</typeparam>
+    /// <param name="owner">The owner control, to which data context it binds and which window will be used as a container.</param>
+    /// <param name="isOpenBindingPath">The name of the property, which represents a boolean value indicating whether the flyout is visible or not.</param>
+    /// <param name="sourcePath">The name of the property, which is used as a data context for the flyout.</param>
     public static void AddFlyout<T>(FrameworkElement owner, string isOpenBindingPath, string? sourcePath = null)
         where T: Flyout, new()
     {
@@ -60,6 +67,12 @@ public static class WpfHelpers
         column.CellStyle.Setters.Add(new EventSetter(UIElement.PreviewTextInputEvent, del2));
     }
 
+    /// <summary>
+    ///   Checks if the specified <paramref name="dataGrid"/> has a context menu defined, and
+    ///   adds one if it was not.
+    /// </summary>
+    /// <param name="dataGrid">The data grid.</param>
+    /// <returns>The context menu, whether determined in the <paramref name="dataGrid"/> or created in place.</returns>
     public static ContextMenu EnsureDataGridRowContextMenu(DataGrid dataGrid)
     {
         if (dataGrid.RowStyle?.Setters
@@ -76,8 +89,13 @@ public static class WpfHelpers
         return contextMenu;
     }
 
-    // TODO: Not used yet
-    internal static Size MeasureString(string candidate, Control refElement)
+    /// <summary>
+    ///   Returns a size of the candidate text, measured for the specified <paramref name="refElement"/>.
+    /// </summary>
+    /// <param name="candidate">The candidate text.</param>
+    /// <param name="refElement">The reference control.</param>
+    /// <returns>The size of the candidate text.</returns>
+    public static Size MeasureString(string candidate, Control refElement)
     {
         var formattedText = new FormattedText(
             candidate,
@@ -85,7 +103,7 @@ public static class WpfHelpers
             FlowDirection.LeftToRight,
             new Typeface(refElement.FontFamily, refElement.FontStyle, refElement.FontWeight, refElement.FontStretch),
             refElement.FontSize,
-            Brushes.Black,
+            refElement.Foreground,
             new NumberSubstitution(),
             1);
 
