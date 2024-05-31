@@ -1,7 +1,5 @@
 namespace Genius.Atom.Infrastructure.Tests;
 
-#pragma warning disable IDISP017 // Prefer using
-
 public sealed class DisposerTests
 {
     [Fact]
@@ -66,7 +64,9 @@ public sealed class DisposerTests
         Assert.Equal([2, 1], disposedOrder);
     }
 
+#pragma warning disable S3881 // "IDisposable" should be implemented correctly
     class DisposableObject : IDisposable
+#pragma warning restore S3881 // "IDisposable" should be implemented correctly
     {
         public bool IsDisposed { get; private set; }
 

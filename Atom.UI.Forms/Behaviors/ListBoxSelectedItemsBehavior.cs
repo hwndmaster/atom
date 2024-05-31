@@ -15,7 +15,7 @@ public sealed class ListBoxSelectedItemsBehavior : Behavior<ListBox>, IDisposabl
         new PropertyMetadata(OnSelectedItemsPropertyChanged));
 
     private CompositeDisposable _subscriptions = new();
-    private bool _isUpdating = false;
+    private bool _isUpdating;
 
     public void Dispose()
     {

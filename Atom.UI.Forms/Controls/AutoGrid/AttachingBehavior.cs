@@ -23,6 +23,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>, IDisposable
 
     public void SetupItemsSource(CollectionViewSource collectionViewSource)
     {
+        Guard.NotNull(collectionViewSource);
+
         new GroupingBehavior(AssociatedObject, _autoGridBuildContext.Value, collectionViewSource).Attach().DisposeWith(_disposer);
         new FilteringBehavior(AssociatedObject, _autoGridBuildContext.Value, collectionViewSource).Attach().DisposeWith(_disposer);
         AssociatedObject.SetValue(DataGrid.ItemsSourceProperty, collectionViewSource.View);
@@ -84,8 +86,8 @@ public sealed class AttachingBehavior : Behavior<DataGrid>, IDisposable
 
         var rowStyle = CreateRowStyle();
 
-        new SelectableBehavior().Attach(AssociatedObject, rowStyle);
-        new EditableBehavior().Attach(AssociatedObject, rowStyle);
+        SelectableBehavior.Attach(AssociatedObject, rowStyle);
+        EditableBehavior.Attach(AssociatedObject, rowStyle);
 
         AssociatedObject.RowStyle = rowStyle;
     }

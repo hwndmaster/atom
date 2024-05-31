@@ -36,7 +36,7 @@ internal sealed class EventBasedLogger : ILogger
 
     private static string CreateShortNameFrom(string name)
     {
-        if (name.StartsWith("Genius."))
+        if (name.StartsWith("Genius.", StringComparison.Ordinal))
         {
             return string.Join('.', name.Split('.').Skip(3));
         }

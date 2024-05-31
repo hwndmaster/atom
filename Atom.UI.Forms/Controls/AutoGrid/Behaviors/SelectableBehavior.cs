@@ -3,10 +3,9 @@ using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-// TODO: Cover with unit tests
-internal sealed class SelectableBehavior
+internal static class SelectableBehavior
 {
-    public void Attach(DataGrid dataGrid, Style rowStyle)
+    public static void Attach(DataGrid dataGrid, Style rowStyle)
     {
         var listItemType = Helpers.GetListItemType(dataGrid.ItemsSource);
         if (dataGrid.SelectionMode == DataGridSelectionMode.Extended &&
@@ -16,7 +15,7 @@ internal sealed class SelectableBehavior
         }
     }
 
-    private void BindIsSelected(Style style)
+    private static void BindIsSelected(Style style)
     {
         var binding = new Binding(nameof(ISelectable.IsSelected));
         style.Setters.Add(new Setter(DataGrid.IsSelectedProperty, binding));

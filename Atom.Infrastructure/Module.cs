@@ -15,7 +15,7 @@ public static class Module
 {
     private static IServiceProvider? _serviceProvider;
     internal static IServiceProvider ServiceProvider
-        => _serviceProvider ?? throw new NullReferenceException("Call Genius.Atom.Infrastructure.Module.Initialize(serviceProvider) in your application initialization.");
+        => _serviceProvider ?? throw new InvalidOperationException("Call Genius.Atom.Infrastructure.Module.Initialize(serviceProvider) in your application initialization.");
 
     public static void Configure(IServiceCollection services)
     {

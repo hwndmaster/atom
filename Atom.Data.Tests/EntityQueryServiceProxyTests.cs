@@ -11,7 +11,7 @@ public sealed class EntityQueryServiceProxyTests
     public async Task CreateForType_ProducesCorrectQueryServiceInstance()
     {
         // Arrange
-        var serviceProvider = new TestServiceProvider();
+        using var serviceProvider = new TestServiceProvider();
         var queryService = new SampleEntityQueryService();
         serviceProvider.RegisterInstance<IQueryService<SampleEntity>>(queryService);
         var type = typeof(SampleEntity);

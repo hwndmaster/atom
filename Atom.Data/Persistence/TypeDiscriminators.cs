@@ -180,7 +180,7 @@ internal sealed class TypeDiscriminators : ITypeDiscriminatorsInternal
         var interfaces = record.Type.GetInterfaces().NotNull();
         foreach (var @interface in interfaces)
         {
-            if (@interface.Namespace?.StartsWith("System.") == true)
+            if (@interface.Namespace?.StartsWith("System.", StringComparison.Ordinal) == true)
             {
                 continue;
             }

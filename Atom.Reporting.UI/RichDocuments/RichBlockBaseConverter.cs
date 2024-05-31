@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Genius.Atom.Reporting.RichDocuments;
@@ -6,8 +7,11 @@ namespace Genius.Atom.Reporting.UI.RichDocuments;
 
 public abstract class RichBlockBaseConverter
 {
-    protected void ConvertBlockBaseProperties(RichBlockBase source, TextElement target)
+    protected static void ConvertBlockBaseProperties([NotNull] RichBlockBase source, [NotNull] TextElement target)
     {
+        Guard.NotNull(source);
+        Guard.NotNull(target);
+
         if (source.BackgroundColor is not null)
         {
             target.Background = new SolidColorBrush(source.BackgroundColor.Value.ToWpfColor());

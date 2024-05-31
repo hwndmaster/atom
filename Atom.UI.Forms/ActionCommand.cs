@@ -124,8 +124,10 @@ public class ActionCommand<T> : IActionCommand<T>
             if (task is Task<bool> taskBool)
             {
 #pragma warning disable VSTHRD103 // Call async methods when in an async method
+#pragma warning disable CA1849 // Call async methods when in an async method
                 // Already awaited two lines above
                 _executed.OnNext(taskBool.Result);
+#pragma warning restore CA1849 // Call async methods when in an async method
 #pragma warning restore VSTHRD103 // Call async methods when in an async method
             }
             else

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Data.Tests.Persistence;
 
-public sealed class JsonPersisterTests
+public sealed class JsonPersisterTests : IDisposable
 {
     private readonly Fixture _fixture = new();
     private readonly TestServiceProvider _serviceProvider = new();
@@ -14,6 +14,11 @@ public sealed class JsonPersisterTests
     public JsonPersisterTests()
     {
         _typeDiscriminators = new(_serviceProvider, A.Fake<ILogger<TypeDiscriminators>>());
+    }
+
+    public void Dispose()
+    {
+        _serviceProvider.Dispose();
     }
 
     [Fact]

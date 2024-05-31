@@ -31,7 +31,7 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
 {
     private TreeViewItem? _anchorItem;
     private IDisposable? _subscription;
-    private bool _updateSuspended = false;
+    private bool _updateSuspended;
 
     /// <summary>
     ///   Selected Items collection.
@@ -61,6 +61,8 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
     /// </summary>
     public static bool GetIsSelected(DependencyObject obj)
     {
+        Guard.NotNull(obj);
+
         return (bool)obj.GetValue(IsSelectedProperty);
     }
 
@@ -69,6 +71,8 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
     /// </summary>
     public static void SetIsSelected(DependencyObject obj, bool value)
     {
+        Guard.NotNull(obj);
+
         obj.SetValue(IsSelectedProperty, value);
 
         if (!value && (bool)obj.GetValue(TreeViewItem.IsSelectedProperty))

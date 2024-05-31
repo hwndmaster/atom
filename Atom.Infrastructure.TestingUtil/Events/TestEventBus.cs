@@ -9,10 +9,10 @@ public sealed class TestEventBus : IEventBus
     private readonly List<IEventMessage> _publishedEvents = new();
     private readonly EventBus _origin = new();
 
-    public void Publish(IEventMessage @event)
+    public void Publish(IEventMessage eventMessage)
     {
-        _publishedEvents.Add(@event);
-        _origin.Publish(@event);
+        _publishedEvents.Add(eventMessage);
+        _origin.Publish(eventMessage);
     }
 
     public IObservable<T> WhenFired<T>() where T : IEventMessage
@@ -38,6 +38,8 @@ public sealed class TestEventBus : IEventBus
     public void AssertSingleEvent<T>(Func<T, bool> condition)
         where T : IEventMessage
     {
+        Guard.NotNull(condition);
+
         var @event = GetSingleEvent<T>();
         Assert.True(condition(@event));
     }
@@ -45,6 +47,8 @@ public sealed class TestEventBus : IEventBus
     public void AssertSingleEvent<T>(params Action<T>[] actionToAssert)
         where T : IEventMessage
     {
+        Guard.NotNull(actionToAssert);
+
         var @event = GetSingleEvent<T>();
         foreach (var action in actionToAssert)
         {

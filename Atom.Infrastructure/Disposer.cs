@@ -28,7 +28,7 @@ public sealed class Disposer : IDisposable
     {
         if (_isDisposed)
         {
-            disposableAction.Dispose();
+            disposableAction?.Dispose();
             return;
         }
         _disposeActions.Add(disposableAction);
@@ -45,7 +45,7 @@ public sealed class Disposer : IDisposable
         }
         for (var i = disposables.Length - 1; i >= 0; i--)
         {
-            disposables[i].Dispose();
+            disposables[i]?.Dispose();
         }
     }
 }

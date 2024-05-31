@@ -66,7 +66,7 @@ internal sealed class BehaviorTestContext
             }
         };
 
-        BuildContext = new AutoGridBuildContext(columns, new DefaultFactory<object>(() => throw new Exception()));
+        BuildContext = new AutoGridBuildContext(columns, new DefaultFactory<object>(() => throw new InvalidOperationException()));
     }
 
     public void InitializeBuildContextForOptionalGrouping()
@@ -79,7 +79,7 @@ internal sealed class BehaviorTestContext
             new AutoGridBuildTextColumnContext(properties[1], AutoGridContextBuilderBaseFields.Default)
         };
 
-        BuildContext = new AutoGridBuildContext(columns, new DefaultFactory<object>(() => throw new Exception()))
+        BuildContext = new AutoGridBuildContext(columns, new DefaultFactory<object>(() => throw new InvalidOperationException()))
         {
             OptionalGroupingSwitchProperty = nameof(DummyViewModel.DoGrouping),
             OptionalGroupingValueProperty = nameof(DummyItemViewModel.GroupableField3)

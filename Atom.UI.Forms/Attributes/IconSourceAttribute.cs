@@ -26,5 +26,5 @@ public sealed class IconSourceAttribute : Attribute
 
     public string IconPropertyPath { get; }
     public double? FixedSize { get; }
-    public bool HideText { get; } = false;
+    public bool HideText { get; }
 }

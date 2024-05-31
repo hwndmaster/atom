@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows.Data;
 
 namespace Genius.Atom.UI.Forms;
@@ -57,6 +58,8 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
     public DelayedObservableCollection(List<T> list)
         : base(list)
     {
+        Guard.NotNull(list);
+
         foreach (T item in list)
         {
             Items.Add(item);
@@ -190,6 +193,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
 
     public void ReplaceItems(IEnumerable<T> items)
     {
+        Guard.NotNull(items);
         Clear();
 
         using var delayed = DelayNotifications();
@@ -353,7 +357,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
         /// <param name="parent">Reference to an original collection whose events are being postponed</param>
         /// <param name="notify">Specifies if notifications needs to be delayed or disabled</param>
         public DelayedObservableCollectionSession(DelayedObservableCollection<T> parent, bool notify)
-            : base(parent.Items, true)
+            : base(parent.NotNull().Items, true)
         {
             _notifyInfo = new NotificationInfo
             {
@@ -546,8 +550,9 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
                 if (e.Action != _action)
                 {
                     throw new InvalidOperationException(
-                        string.Format("Attempting to perform {0} during {1}. Mixed actions on the same delayed interface are not allowed.",
-                        e.Action, _action));
+                        string.Format(CultureInfo.CurrentCulture,
+                            "Attempting to perform {0} during {1}. Mixed actions on the same delayed interface are not allowed.",
+                            e.Action, _action));
                 }
             }
 

@@ -15,7 +15,7 @@ public interface ITagEditorViewModel : IComparable
 
 internal sealed class TagEditorViewModel : ViewModelBase, ITagEditorViewModel, IHasDirtyFlag
 {
-    private bool _dirtyPaused = false;
+    private bool _dirtyPaused;
 
     public TagEditorViewModel(ObservableCollection<ITagItemViewModel> allTags)
     {

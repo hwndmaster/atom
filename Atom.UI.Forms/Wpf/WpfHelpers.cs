@@ -24,6 +24,8 @@ public static class WpfHelpers
     public static void AddFlyout<T>(FrameworkElement owner, string isOpenBindingPath, string? sourcePath = null)
         where T: Flyout, new()
     {
+        Guard.NotNull(owner);
+
         var parentWindow = Window.GetWindow(owner);
         object obj = parentWindow.FindName("flyoutsControl");
         var flyout = (FlyoutsControl) obj;
@@ -75,6 +77,8 @@ public static class WpfHelpers
     /// <returns>The context menu, whether determined in the <paramref name="dataGrid"/> or created in place.</returns>
     public static ContextMenu EnsureDataGridRowContextMenu(DataGrid dataGrid)
     {
+        Guard.NotNull(dataGrid);
+
         if (dataGrid.RowStyle?.Setters
             .OfType<Setter>()
             .FirstOrDefault(x => x.Property == FrameworkElement.ContextMenuProperty)
@@ -97,6 +101,8 @@ public static class WpfHelpers
     /// <returns>The size of the candidate text.</returns>
     public static Size MeasureString(string candidate, Control refElement)
     {
+        Guard.NotNull(refElement);
+
         var formattedText = new FormattedText(
             candidate,
             CultureInfo.CurrentCulture,

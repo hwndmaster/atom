@@ -45,21 +45,25 @@ public static class Properties
 
     public static object GetItemsSource(DependencyObject element)
     {
+        Guard.NotNull(element);
         return element.GetValue(ItemsSourceProperty);
     }
 
     public static void SetItemsSource(DependencyObject element, object value)
     {
+        Guard.NotNull(element);
         element.SetValue(ItemsSourceProperty, value);
     }
 
     public static IAutoGridBuilder? GetAutoGridBuilder(DependencyObject element)
     {
+        Guard.NotNull(element);
         return (IAutoGridBuilder?)element.GetValue(AutoGridBuilderProperty);
     }
 
     public static void SetAutoGridBuilder(DependencyObject element, IAutoGridBuilder? value)
     {
+        Guard.NotNull(element);
         element.SetValue(AutoGridBuilderProperty, value);
     }
 

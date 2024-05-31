@@ -11,8 +11,8 @@ public static class ExpressionHelpers
 
         if (propertyLambda.Body is not MemberExpression body)
         {
-            var ubody = (UnaryExpression)propertyLambda.Body;
-            body = (MemberExpression)ubody.Operand;
+            var unaryBody = (UnaryExpression)propertyLambda.Body;
+            body = (MemberExpression)unaryBody.Operand;
         }
 
         return body.NotNull().Member.Name;
@@ -26,6 +26,7 @@ public static class ExpressionHelpers
     /// <returns>The wrapped expression.</returns>
     public static MethodCallExpression WrapTaskExpressionWithResult(Expression expression)
     {
+        Guard.NotNull(expression);
         var taskType = expression.Type;
 
         if (!typeof(Task).IsAssignableFrom(taskType)
@@ -55,8 +56,10 @@ public static class ExpressionHelpers
     /// <returns>The wrapped expression.</returns>
     public static MethodCallExpression WrapWithTaskFromResult(Expression expression, Type? targetType = null)
     {
+        Guard.NotNull(expression);
+
         return Expression.Call(typeof(Task), nameof(Task.FromResult),
-            new [] { targetType ?? expression.Type }, expression);
+            [targetType ?? expression.Type], expression);
     }
 
     /// <summary>

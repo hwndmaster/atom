@@ -16,9 +16,9 @@ public sealed class AreaDragDropBehavior : Behavior<UIElement>
     public static readonly DependencyProperty IsDraggingProperty = DependencyProperty.RegisterAttached(
         "IsDragging", typeof(bool), typeof(AreaDragDropBehavior), new PropertyMetadata(default(bool)));
     public static void SetIsDragging(DependencyObject element, bool value)
-        => element.SetValue(IsDraggingProperty, value);
+        => element.NotNull().SetValue(IsDraggingProperty, value);
     public static bool GetIsDragging(DependencyObject element)
-        => (bool)element.GetValue(IsDraggingProperty);
+        => (bool)element.NotNull().GetValue(IsDraggingProperty);
     #endregion
 
     #region DropAreasProperty

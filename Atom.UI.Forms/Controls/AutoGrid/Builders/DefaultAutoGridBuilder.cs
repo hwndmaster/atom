@@ -31,7 +31,7 @@ internal sealed class DefaultAutoGridBuilder
         return new AutoGridBuildContext(columns, recordFactory);
     }
 
-    private AutoGridBuildColumnContext CreateColumnContext(PropertyDescriptor property)
+    private static AutoGridBuildColumnContext CreateColumnContext(PropertyDescriptor property)
     {
         var displayName = property.Attributes.OfType<TitleAttribute>().FirstOrDefault()?.Title
             ?? Regex.Replace(property.DisplayName, "[A-Z]", " $0");
@@ -113,7 +113,7 @@ internal sealed class DefaultAutoGridBuilder
         }
     }
 
-    private IValueConverter? DetectValueConverter(PropertyDescriptor property, string? displayFormat)
+    private static IValueConverter? DetectValueConverter(PropertyDescriptor property, string? displayFormat)
     {
         var converterAttr = property.Attributes.OfType<ValueConverterAttribute>().FirstOrDefault();
         if (converterAttr is not null)

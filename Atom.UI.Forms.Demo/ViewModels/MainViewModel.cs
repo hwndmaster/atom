@@ -10,6 +10,8 @@ public class MainViewModel : ViewModelBase
     public MainViewModel(IAtomViewModelFactory vmFactory, TagsContext tagsContext,
         IFactory<SampleData> sampleDataFactory, SampleDataAutoGridBuilder autoGridBuilder)
     {
+        Guard.NotNull(sampleDataFactory);
+        Guard.NotNull(tagsContext);
         Guard.NotNull(vmFactory);
 
         AutoGridBuilder = autoGridBuilder.NotNull();

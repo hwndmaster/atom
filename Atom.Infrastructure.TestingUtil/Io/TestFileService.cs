@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Genius.Atom.Infrastructure.Io;
 
@@ -67,12 +68,16 @@ public sealed partial class TestFileService : IFileService
 
     public bool FileExists(string path)
     {
+        Guard.NotNull(path);
+
         var key = CreatePathKey(path);
         return _files.ContainsKey(key);
     }
 
     public DirectoryDetails GetDirectoryDetails(string path)
     {
+        Guard.NotNull(path);
+
         var key = CreatePathKey(path);
         if (!_dirs.TryGetValue(key, out var dirContext))
         {
@@ -96,6 +101,8 @@ public sealed partial class TestFileService : IFileService
 
     public FileDetails GetFileDetails(string fullPath)
     {
+        Guard.NotNull(fullPath);
+
         var key = CreatePathKey(fullPath);
         if (!_files.TryGetValue(key, out var fileContext))
         {
@@ -112,6 +119,8 @@ public sealed partial class TestFileService : IFileService
 
     public Stream OpenRead(string path)
     {
+        Guard.NotNull(path);
+
         var key = CreatePathKey(path);
         if (!_files.TryGetValue(key, out var fileContext))
         {
@@ -126,6 +135,8 @@ public sealed partial class TestFileService : IFileService
 
     public bool PathExists(string path)
     {
+        Guard.NotNull(path);
+
         var key = CreatePathKey(path);
         return _files.ContainsKey(key)
             || _dirs.ContainsKey(key);
@@ -133,6 +144,8 @@ public sealed partial class TestFileService : IFileService
 
     public byte[] ReadBytesFromFile(string path)
     {
+        Guard.NotNull(path);
+
         var key = CreatePathKey(path);
         if (!_files.TryGetValue(key, out var fileContext))
         {
@@ -150,6 +163,9 @@ public sealed partial class TestFileService : IFileService
 
     public string ReadTextFromFile(string path, Encoding encoding)
     {
+        Guard.NotNull(path);
+        Guard.NotNull(encoding);
+
         var key = CreatePathKey(path);
         if (!_files.TryGetValue(key, out var fileContext))
         {
@@ -174,6 +190,9 @@ public sealed partial class TestFileService : IFileService
 
     public void WriteTextToFile(string path, string content, Encoding encoding)
     {
+        Guard.NotNull(path);
+        Guard.NotNull(encoding);
+
         var key = CreatePathKey(path);
 
         var contentBytes = encoding.GetBytes(content);
@@ -192,7 +211,7 @@ public sealed partial class TestFileService : IFileService
             this);
 
     private string CreatePathKey(string path)
-        => _ignoreCase ? path.ToLower() : path;
+        => _ignoreCase ? path.ToLower(CultureInfo.CurrentCulture) : path;
 
     public ICollection<DirectoryContext> Directories => _dirs.Values;
     public ICollection<FileContext> Files => _files.Values;

@@ -9,9 +9,9 @@ public abstract class RichBlockConverter : RichBlockBaseConverter, IRichBlockCon
     public abstract bool CanConvert(RichBlock block);
     public abstract Block Convert(RichBlock block);
 
-    protected void ConvertBlockProperties(RichBlock source, Block target)
+    protected static void ConvertBlockProperties(RichBlock source, Block target)
     {
-        base.ConvertBlockBaseProperties(source, target);
+        ConvertBlockBaseProperties(source, target);
 
         if (source.BorderColor is not null)
         {

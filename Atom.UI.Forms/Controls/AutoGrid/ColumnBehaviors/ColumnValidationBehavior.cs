@@ -17,7 +17,7 @@ internal sealed class ColumnValidationBehavior : IAutoGridColumnBehavior
             return;
         }
 
-        //columnBinding.ValidatesOnDataErrors = true;
+        ///columnBinding.ValidatesOnDataErrors = true;
         columnBinding.ValidatesOnNotifyDataErrors = true;
         columnBinding.NotifyOnValidationError = true;
         if (context.Args.Column is DataGridTextColumn textColumn)

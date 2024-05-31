@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Genius.Atom.Infrastructure.Io;
 
 public abstract class FileSystemDetails
@@ -25,9 +27,9 @@ public abstract class FileSystemDetails
         LastWriteTimeUtc = lastWriteTimeUtc;
     }
 
-    protected FileSystemDetails(string fullPath, FileSystemInfo info, IFileService fileService)
+    protected FileSystemDetails(string fullPath, [NotNull] FileSystemInfo info, IFileService fileService)
         : this(fullPath,
-            info.Attributes,
+            info.NotNull().Attributes,
             info.CreationTime,
             info.CreationTimeUtc,
             info.LastAccessTime,

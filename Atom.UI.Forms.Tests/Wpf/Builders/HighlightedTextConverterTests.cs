@@ -51,7 +51,7 @@ public sealed class HighlightedTextConverterTests
         // Verify
         Assert.NotNull(result);
         Assert.Single(result.Inlines);
-        Assert.Equal("Lorem Ipsum", ((Run)result.Inlines.First()).Text);
+        Assert.Equal("Lorem Ipsum", ((Run)result.Inlines.FirstInline).Text);
         Assert.Equal("Lorem Ipsum", result.Text);
     }
 

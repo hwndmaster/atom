@@ -14,9 +14,9 @@ internal sealed class SynchronousScheduler : IDisposable, ISynchronousScheduler
     private readonly Queue<Action> _actions = new();
     private readonly JoinableTaskHelper _joinableTask = new();
     private readonly InternalSynchronizationContext _synchronizationContext;
-    private bool _running = false;
-    private int _asyncRunning = 0;
-    private bool _disposed = false;
+    private bool _running;
+    private int _asyncRunning;
+    private bool _disposed;
 
     public SynchronousScheduler()
     {

@@ -13,11 +13,13 @@ public static class RichTextDocumentBehavior
 
     public static FlowDocument GetBindableDocument(DependencyObject element)
     {
+        Guard.NotNull(element);
         return (FlowDocument)element.GetValue(BindableDocumentProperty);
     }
 
     public static void SetBindableDocument(DependencyObject element, FlowDocument value)
     {
+        Guard.NotNull(element);
         element.SetValue(BindableDocumentProperty, value);
     }
 

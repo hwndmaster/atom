@@ -39,10 +39,10 @@ internal sealed class FilteringBehavior : IDisposable
         if (filterContext is null)
             return this;
 
-        vm.WhenChanged(filterContext.Name, (string s) => {
+        _disposer.Add(vm.WhenChanged(filterContext.Name, (string s) => {
             _filter = s;
             _collectionViewSource.View.Refresh();
-        }).DisposeWith(_disposer);
+        }));
 
         _collectionViewSource.Filter += OnCollectionViewSourceFilter;
         _disposer.Add(() => _collectionViewSource.Filter -= OnCollectionViewSourceFilter);

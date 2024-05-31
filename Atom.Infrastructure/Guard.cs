@@ -15,7 +15,7 @@ public static class Guard
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void NotNullOrEmpty(string value,
+    public static void NotNullOrEmpty([NotNull] string value,
         [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {
         if (string.IsNullOrEmpty(value))
@@ -23,7 +23,7 @@ public static class Guard
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void NotNullOrWhitespace(string value,
+    public static void NotNullOrWhitespace([NotNull] string value,
         [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -41,7 +41,7 @@ public static class Guard
 public static class GuardExtensions
 {
     [return: NotNull]
-    public static T NotNull<T>(this T value,
+    public static T NotNull<T>([NotNull] this T value,
         string? message = null,
         [CallerArgumentExpression(parameterName: nameof(value))] string? parameterName = null)
     {

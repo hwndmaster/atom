@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Net;
 using Microsoft.Extensions.Logging;
 
@@ -43,7 +44,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
 
     private async Task<string?> DownloadInternalAsync(string url, CancellationToken cancel)
     {
-        var handler = new HttpClientHandler()
+        using var handler = new HttpClientHandler()
         {
             AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
         };
@@ -64,7 +65,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
             {
                 if (response.StatusCode == HttpStatusCode.TooManyRequests)
                 {
-                    await Task.Delay(DELAY_MS * (irepeat + 1));
+                    await Task.Delay(DELAY_MS * (irepeat + 1), cancel);
                     continue;
                 }
 
@@ -73,7 +74,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
                 return null;
             }
 
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync(cancel);
         }
 
         return null;
@@ -92,7 +93,7 @@ internal sealed class TrickyHttpClient : ITrickyHttpClient
 
         if (browser == "Chrome")
         {
-            var webkit = Randomizer.RandomInt(500, 599).ToString();
+            var webkit = Randomizer.RandomInt(500, 599).ToString(CultureInfo.CurrentCulture);
             var version = $"{Randomizer.RandomInt(0, 24)}.0{Randomizer.RandomInt(0, 1500)}.{Randomizer.RandomInt(0, 999)}";
 
             return $"Mozilla/5.0 ({os}) AppleWebKit{webkit}.0 (KHTML, live Gecko) Chrome/{version} Safari/{webkit}";

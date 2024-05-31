@@ -35,8 +35,8 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
     where TBuilder : IAutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>
 {
     private string? _displayName;
-    protected bool _autoWidth = false;
-    protected bool _isReadOnly = false;
+    protected bool _autoWidth;
+    protected bool _isReadOnly;
     protected StylingRecord? _style;
     protected string? _toolTip;
     protected string? _toolTipPath;

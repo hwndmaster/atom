@@ -67,7 +67,6 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
         return new DataTemplate { VisualTree = textFactory };
     }
 
-    // TODO: Cover with unit tests
     internal sealed class HighlightedTextConverter : IMultiValueConverter
     {
         private readonly record struct Match(int Index, int Length);

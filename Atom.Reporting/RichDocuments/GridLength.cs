@@ -67,7 +67,7 @@ public readonly struct GridLength : IEquatable<GridLength>
     public static bool operator ==(GridLength gl1, GridLength gl2)
     {
         return gl1.GridUnitType == gl2.GridUnitType
-            && gl1.Value == gl2.Value;
+            && gl1.Value.Equals(gl2.Value);
     }
 
     /// <summary>
@@ -79,17 +79,17 @@ public readonly struct GridLength : IEquatable<GridLength>
     public static bool operator !=(GridLength gl1, GridLength gl2)
     {
         return gl1.GridUnitType != gl2.GridUnitType
-            || gl1.Value != gl2.Value;
+            || !gl1.Value.Equals(gl2.Value);
     }
 
     /// <summary>
     ///   Compares this instance of GridLength with another object.
     /// </summary>
-    /// <param name="oCompare">Reference to an object for comparison.</param>
+    /// <param name="obj">Reference to an object for comparison.</param>
     /// <returns><c>true</c>if this GridLength instance has the same value and unit type as oCompare.</returns>
-    override public bool Equals(object? oCompare)
+    override public bool Equals(object? obj)
     {
-        if (oCompare is GridLength l)
+        if (obj is GridLength l)
         {
             return this == l;
         }
@@ -102,11 +102,11 @@ public readonly struct GridLength : IEquatable<GridLength>
     /// <summary>
     ///   Compares this instance of GridLength with another instance.
     /// </summary>
-    /// <param name="gridLength">Grid length instance to compare.</param>
+    /// <param name="other">Grid length instance to compare.</param>
     /// <returns><c>true</c>if this GridLength instance has the same value and unit type as gridLength.</returns>
-    public bool Equals(GridLength gridLength)
+    public bool Equals(GridLength other)
     {
-        return this == gridLength;
+        return this == other;
     }
 
     /// <inheritdoc cref="object.GetHashCode"/>

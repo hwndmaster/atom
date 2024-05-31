@@ -22,11 +22,10 @@ public interface IViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 /// </summary>
 public abstract class ViewModelBase : IViewModel
 {
-    private readonly JoinableTaskHelper _joinableTask = new();
     private readonly Dictionary<string, List<string>> _errors = [];
     private readonly Dictionary<string, List<PropertyValidation>> _validationRules = [];
     private ConcurrentDictionary<string, object?>? _propertyBag;
-    private bool _suspendDirtySet = false;
+    private bool _suspendDirtySet;
 
     protected ViewModelBase(bool determineValidationRulesFromAttributes = false)
     {
@@ -85,6 +84,8 @@ public abstract class ViewModelBase : IViewModel
     protected void AddValidationRule<TValidationRule>(TValidationRule validationRule, string? shouldValidatePropertyName = null)
         where TValidationRule : ValidationRule, IPropertyValidationRule
     {
+        Guard.NotNull(validationRule);
+
         AddValidationRule(validationRule.PropertyName, validationRule, shouldValidatePropertyName);
     }
 
@@ -128,6 +129,8 @@ public abstract class ViewModelBase : IViewModel
     /// <param name="validationRule">The validation rule.</param>
     protected void AddValidationRule(string[] propertyNames, ValidationRule validationRule)
     {
+        Guard.NotNull(propertyNames);
+
         foreach (var propertyName in propertyNames)
         {
             AddValidationRule(propertyName, validationRule);
@@ -154,6 +157,8 @@ public abstract class ViewModelBase : IViewModel
 
     protected void InitializeProperties(Action action)
     {
+        Guard.NotNull(action);
+
         _suspendDirtySet = true;
         try
         {
@@ -251,35 +256,26 @@ public abstract class ViewModelBase : IViewModel
     protected void WhenChangedNoDispose(string propertyName, Action handler)
     {
         // It is safe to handle a property changed event within the view model without disposing the subscription.
-
-#pragma warning disable IDISP004 // Don't ignore created IDisposable
+#pragma warning disable CA2000 // Dispose objects before losing scope
         this.WhenChanged(propertyName, handler);
-#pragma warning restore IDISP004 // Don't ignore created IDisposable
+#pragma warning restore CA2000 // Dispose objects before losing scope
     }
 
     protected void WhenAnyChangedNoDispose(string[] propertyNames, Action handler)
     {
         // It is safe to handle a property changed event within the view model without disposing the subscription.
-
-#pragma warning disable IDISP004 // Don't ignore created IDisposable
         this.WhenAnyChanged(propertyNames)
             .Subscribe(x => handler());
-#pragma warning restore IDISP004 // Don't ignore created IDisposable
     }
 
     protected void WhenAnyChangedNoDispose(string[] propertyNames, Func<Task> handler)
     {
         // It is safe to handle a property changed event within the view model without disposing the subscription.
 
-#pragma warning disable IDISP004 // Don't ignore created IDisposable
         this.WhenAnyChanged(propertyNames)
             .Subscribe(_ => {
-                _joinableTask.Factory.Run(async () =>
-                {
-                    await handler();
-                });
+                ViewModelStatic.JoinableTaskFactory.Run(async () => await handler());
             });
-#pragma warning restore IDISP004 // Don't ignore created IDisposable
     }
 
     private void OnErrorsChanged(string propertyName)

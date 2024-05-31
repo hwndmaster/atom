@@ -37,6 +37,8 @@ public sealed class TagItemViewModel : ViewModelBase, ITagItemViewModel
 
     public TagItemViewModel(ITagItemViewModel reference)
     {
+        Guard.NotNull(reference);
+
         Tag = reference.Tag;
         Color = reference.Color;
         AltColor = reference.AltColor;

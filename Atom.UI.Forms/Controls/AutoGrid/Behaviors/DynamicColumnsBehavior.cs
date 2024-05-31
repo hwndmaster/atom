@@ -7,7 +7,6 @@ using ReactiveUI;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 
-// TODO: Cover with unit tests
 internal sealed class DynamicColumnsBehavior : IDisposable
 {
     private readonly Disposer _disposer = new();

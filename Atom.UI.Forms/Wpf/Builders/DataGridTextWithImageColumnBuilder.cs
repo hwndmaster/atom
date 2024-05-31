@@ -10,10 +10,10 @@ internal sealed class DataGridTextWithImageColumnBuilder : DataGridTextColumnBui
 {
     private readonly string? _imageSource;
     private double _imageSize = 16;
-    private bool _hideText = false;
+    private bool _hideText;
     private bool _imageIsPath = true;
-    private string? _imageTooltip = null;
-    private string? _imageVisibilityFlagPath = null;
+    private string? _imageTooltip;
+    private string? _imageVisibilityFlagPath;
 
     internal DataGridTextWithImageColumnBuilder(DataGridColumnBuilder parentBuilder, string imageSource)
         : base(parentBuilder.NotNull())

@@ -27,7 +27,7 @@ public sealed partial class TestFileService
 
         foreach (var dir in _dirs.ToArray())
         {
-            if (dir.Key.StartsWith(key + "\\"))
+            if (dir.Key.StartsWith(key + "\\", StringComparison.OrdinalIgnoreCase))
             {
                 if (!recursive)
                     throw new IOException("Cannot delete the directory, as it isn't empty.");
@@ -36,7 +36,7 @@ public sealed partial class TestFileService
         }
         foreach (var file in _files)
         {
-            if (file.Key.StartsWith(key + "\\"))
+            if (file.Key.StartsWith(key + "\\", StringComparison.OrdinalIgnoreCase))
             {
                 if (!recursive)
                     throw new IOException("Cannot delete the directory, as it isn't empty.");

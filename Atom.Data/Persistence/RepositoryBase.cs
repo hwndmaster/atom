@@ -1,4 +1,3 @@
-using System.Reactive;
 using System.Reactive.Subjects;
 using Genius.Atom.Infrastructure.Entities;
 using Genius.Atom.Infrastructure.Events;
@@ -17,7 +16,6 @@ public interface IRepository<in TEntity>
 public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposable
     where TEntity: EntityBase
 {
-    private readonly Disposer _disposer = new();
     private readonly ReaderWriterLockSlim _initializationLocker = new();
     protected readonly IEventBus _eventBus;
     protected readonly ILogger _logger;
@@ -32,14 +30,12 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
         _eventBus = eventBus;
         _logger = logger;
         _persister = persister;
-
-        _loaded.DisposeWith(_disposer);
-        _initializationLocker.DisposeWith(_disposer);
     }
 
     public void Dispose()
     {
-        _disposer.Dispose();
+        _loaded.Dispose();
+        _initializationLocker.Dispose();
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()

@@ -80,20 +80,20 @@ internal sealed class AutoGridContextBuilder<TViewModel, TParentViewModel>
     where TParentViewModel : IViewModel
 {
     private readonly AutoGridContextBuilderColumns<TViewModel, TParentViewModel> _columnsBuilder;
-    private readonly List<AutoGridBuildColumnContext> _columns = new();
-    private bool _enableVirtualization = false;
-    private bool _makeReadOnly = false;
-    private string? _filterContextScope = null;
+    private readonly List<AutoGridBuildColumnContext> _columns = [];
+    private bool _enableVirtualization;
+    private bool _makeReadOnly;
+    private string? _filterContextScope;
 
     /// <summary>
     ///   A property name in <see cref="TParentViewModel"/>.
     /// </summary>
-    private string? _optionalGroupingSwitchProperty = null;
+    private string? _optionalGroupingSwitchProperty;
 
     /// <summary>
     ///   A property name in <see cref="TViewModel"/>.
     /// </summary>
-    private string? _optionalGroupingValueProperty = null;
+    private string? _optionalGroupingValueProperty;
 
     private IFactory<TViewModel>? _recordFactory;
 

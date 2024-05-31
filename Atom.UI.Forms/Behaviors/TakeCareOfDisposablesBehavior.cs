@@ -16,6 +16,8 @@ public class TakeCareOfDisposablesBehavior : Behavior<FrameworkElement>
     public static void AttachMe<T>(T associatedObject)
         where T : FrameworkElement
     {
+        Guard.NotNull(associatedObject);
+
         associatedObject.Loaded += OnLoaded;
 
         void OnLoaded(object? sender, EventArgs e)
@@ -56,7 +58,7 @@ public class TakeCareOfDisposablesBehavior : Behavior<FrameworkElement>
         var window = Window.GetWindow(AssociatedObject);
         if (window is null)
         {
-            throw new Exception($"The UserControl {AssociatedObject.GetType().Name} is not contained within a Window. The TakeCareOfDisposablesBehavior cannot be used.");
+            throw new InvalidOperationException($"The UserControl {AssociatedObject.GetType().Name} is not contained within a Window. The TakeCareOfDisposablesBehavior cannot be used.");
         }
 
         window.Closing += WindowClosingHandler;

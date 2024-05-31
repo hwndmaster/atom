@@ -41,16 +41,18 @@ public sealed class PropertyValueStringConverter : IValueConverter
         return value;
     }
 
-    public object? ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is null)
             return null;
+
+        Guard.NotNull(targetType);
         if (targetType.IsInstanceOfType(value))
             return value;
 
         try
         {
-            return System.Convert.ChangeType(value, targetType);
+            return System.Convert.ChangeType(value, targetType, CultureInfo.CurrentCulture);
         }
         catch (Exception)
         {

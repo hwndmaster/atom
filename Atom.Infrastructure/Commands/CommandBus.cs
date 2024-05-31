@@ -54,9 +54,7 @@ internal sealed class CommandBus : ICommandBus
         var result = method.Invoke(service, new object[] { command });
         if (result is Task taskResult)
         {
-#pragma warning disable IDISP013 // Await in using
             return taskResult;
-#pragma warning restore IDISP013 // Await in using
         }
 
         throw new InvalidOperationException("Command Handler process has failed due to unknown error.");

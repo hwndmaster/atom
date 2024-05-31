@@ -96,6 +96,25 @@ public static class ObservableExtensions
         });
     }
 
+    /// <summary>
+    ///   Subscribes an element handler to an observable sequence without necessity to dispose the handler.
+    ///   Usually used on Reactive subscriptions, running in View Models over changes in local properties.
+    ///   The main purpose of this method is to satisfy
+    ///   CA2000 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2000)
+    ///   analysis rule.
+    ///   NOTE: Never use it on any other Reactive subscription, running on not-owned properties.
+    /// </summary>
+    /// <param name="source">Observable sequence to subscribe to.</param>
+    /// <param name="onNext">Action to invoke for each element in the observable sequence.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="onNext"/> is <c>null</c>.</exception>
+    public static void SubscribeNoDisposal<T>(this IObservable<T> source, Action<T> onNext)
+    {
+        Guard.NotNull(source);
+        Guard.NotNull(onNext);
+
+        source.Subscribe(value => onNext(value));
+    }
+
     public static IObservable<NotifyCollectionChangedEventArgs> WhenCollectionChanged(this INotifyCollectionChanged collection)
     {
         return Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(

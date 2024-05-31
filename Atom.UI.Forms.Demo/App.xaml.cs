@@ -29,9 +29,7 @@ public partial class App : Application
         Infrastructure.Module.Configure(serviceCollection);
         UI.Forms.Module.Configure(serviceCollection, this, enableSerilog: false);
 
-#pragma warning disable IDISP003 // Dispose previous before re-assigning
         ServiceProvider = serviceCollection.BuildServiceProvider();
-#pragma warning restore IDISP003 // Dispose previous before re-assigning
 
         Infrastructure.Module.Initialize(ServiceProvider);
         UI.Forms.Module.Initialize(ServiceProvider);
