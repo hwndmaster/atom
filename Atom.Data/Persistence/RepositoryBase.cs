@@ -34,8 +34,8 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
 
     public void Dispose()
     {
-        _loaded.Dispose();
-        _initializationLocker.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
@@ -67,6 +67,12 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
     public virtual Task StoreAsync(params TEntity[] entities)
     {
         return StoreInternalAsync(false, entities);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        _loaded.Dispose();
+        _initializationLocker.Dispose();
     }
 
     protected async Task FillUpRelationsAsync()
