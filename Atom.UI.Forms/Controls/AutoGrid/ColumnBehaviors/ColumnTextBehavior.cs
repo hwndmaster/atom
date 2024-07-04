@@ -14,13 +14,20 @@ internal sealed class ColumnTextBehavior : IAutoGridColumnBehavior
             return;
         }
 
+        var propertyTypeClean = Nullable.GetUnderlyingType(context.Property.PropertyType)
+            ?? context.Property.PropertyType;
+
         if (
-            // Case 1:
+            // Case 1: Convertible with valueconverter
             (typeof(bool).IsAssignableFrom(context.Property.PropertyType)
             && context.BuildColumn.ValueConverter?.GetType().BaseType == typeof(MarkupBooleanConverterBase<string>))
 
-            // Case 2:
-            || typeof(string).IsAssignableFrom(context.Property.PropertyType))
+            // Case 2: Atomic types
+            || typeof(string).IsAssignableFrom(propertyTypeClean)
+            || typeof(int).IsAssignableFrom(propertyTypeClean)
+            || typeof(long).IsAssignableFrom(propertyTypeClean)
+            || typeof(DateTime).IsAssignableFrom(propertyTypeClean)
+            )
         {
             var builder = DataGridColumnBuilder.ForValuePath(context.Property.Name)
                 .BasedOnAutoGridColumnContext(context);

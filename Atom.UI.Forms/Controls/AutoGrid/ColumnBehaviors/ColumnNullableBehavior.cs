@@ -6,7 +6,11 @@ internal sealed class ColumnNullableBehavior : IAutoGridColumnBehavior
     {
         if (Nullable.GetUnderlyingType(context.Property.PropertyType) is not null)
         {
-            context.GetBinding().NotNull().TargetNullValue = string.Empty;
+            var binding = context.GetBinding();
+            if (binding is not null)
+            {
+                binding.TargetNullValue = string.Empty;
+            }
         }
     }
 }
