@@ -133,4 +133,5 @@ dotnet_code_quality.dispose_ownership_transfer_at_method_call = true
 dotnet_diagnostic.CA1304.severity = suggestion # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1305.severity = suggestion # CA1305: Specify IFormatProvider
 dotnet_diagnostic.CA1311.severity = suggestion # CA1311: Specify Culture for ToLower and ToUpper
+dotnet_diagnostic.VSTHRD105.severity = none # Avoid method overloads that assume TaskScheduler.Current. Use an overload that accepts a TaskScheduler and specify TaskScheduler.Default (or any other) explicitly
 dotnet_diagnostic.VSTHRD200.severity = none # Use "Async" suffix for async methods

@@ -37,13 +37,15 @@ internal sealed class SynchronousScheduler : IDisposable, ISynchronousScheduler
             if ( _actions.Count == 0 && !_running && _asyncRunning == 0)
             {
                 _running = true;
-                Run(action);
             }
             else
             {
                 _actions.Enqueue(action);
+                return;
             }
         }
+
+        Run(action);
     }
 
     public void Schedule(Func<Task> asyncAction)
