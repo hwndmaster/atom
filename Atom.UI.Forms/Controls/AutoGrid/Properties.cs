@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -43,6 +45,12 @@ public static class Properties
         typeof(bool),
         typeof(Properties));
 
+    public static readonly DependencyProperty SortedColumnsProperty = DependencyProperty.RegisterAttached(
+        "SortedColumns",
+        typeof(ImmutableList<ColumnSortingInfo>),
+        typeof(Properties),
+        new PropertyMetadata(OnSortedColumnsChanged));
+
     public static object GetItemsSource(DependencyObject element)
     {
         Guard.NotNull(element);
@@ -75,6 +83,18 @@ public static class Properties
     internal static void SetBuildContext(DependencyObject element, AutoGridBuildContext? value)
     {
         element.SetValue(BuildContextProperty, value);
+    }
+
+    public static object GetSortedColumns(DependencyObject element)
+    {
+        Guard.NotNull(element);
+        return element.GetValue(SortedColumnsProperty);
+    }
+
+    public static void SetSortedColumns(DependencyObject element, object value)
+    {
+        Guard.NotNull(element);
+        element.SetValue(SortedColumnsProperty, value);
     }
 
     private static void IsEditingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -126,5 +146,32 @@ public static class Properties
 
         AttachingBehavior.FindMeFor(dataGrid)
             .SetupItemsSource(collectionViewSource);
+    }
+
+    private static void OnSortedColumnsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var dataGrid = (DataGrid)d;
+        if (!dataGrid.CanUserSortColumns)
+            return;
+
+        if (AttachingBehavior.FindMeFor(dataGrid).IsSortedColumnsUpdateSuspended)
+        {
+            return;
+        }
+
+        var columnsSortingInfo = e.NewValue as ImmutableList<ColumnSortingInfo>;
+        if (columnsSortingInfo is null)
+            return;
+
+        var itemsSource = dataGrid.GetValue(DataGrid.ItemsSourceProperty);
+        if (itemsSource is not ICollectionView collectionView)
+            return;
+
+        collectionView.SortDescriptions.Clear();
+        foreach (var sortingInfo in columnsSortingInfo)
+        {
+            collectionView.SortDescriptions.Add(new SortDescription(sortingInfo.ColumnName,
+                sortingInfo.SortAsc ? ListSortDirection.Ascending : ListSortDirection.Descending));
+        }
     }
 }

@@ -6,6 +6,7 @@ using Genius.Atom.UI.Forms.Controls.AutoGrid.Behaviors;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.ColumnBehaviors;
 using Genius.Atom.UI.Forms.Wpf;
 using Microsoft.Xaml.Behaviors;
+using System.Collections.Immutable;
 
 namespace Genius.Atom.UI.Forms.Controls.AutoGrid;
 
@@ -90,6 +91,7 @@ public sealed class AttachingBehavior : Behavior<DataGrid>, IDisposable
         EditableBehavior.Attach(AssociatedObject, rowStyle);
 
         AssociatedObject.RowStyle = rowStyle;
+        SetupSortedColumnsDependencyProperty();
     }
 
     private void OnAutoGridBuilderChanged(object? sender, EventArgs e)
@@ -178,4 +180,26 @@ public sealed class AttachingBehavior : Behavior<DataGrid>, IDisposable
 
         return rowStyle;
     }
+
+    private void SetupSortedColumnsDependencyProperty()
+    {
+        var itemsSource = AssociatedObject.GetValue(DataGrid.ItemsSourceProperty);
+        if (itemsSource is not ICollectionView collectionView)
+            return;
+        collectionView.SortDescriptions.WhenCollectionChanged()
+            .Subscribe(_ =>
+            {
+                if (IsSortedColumnsUpdateSuspended)
+                    return;
+                var sortedColumns = collectionView.SortDescriptions
+                    .Select(x => new ColumnSortingInfo(x.PropertyName, x.Direction == ListSortDirection.Ascending))
+                    .ToImmutableList();
+                IsSortedColumnsUpdateSuspended = true;
+                AssociatedObject.SetValue(Properties.SortedColumnsProperty, sortedColumns);
+                IsSortedColumnsUpdateSuspended = false;
+            })
+            .DisposeWith(_disposer);
+    }
+
+    public bool IsSortedColumnsUpdateSuspended { get; private set; }
 }
