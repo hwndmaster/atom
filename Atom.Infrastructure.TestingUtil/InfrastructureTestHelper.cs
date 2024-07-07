@@ -1,4 +1,5 @@
 using AutoFixture.AutoFakeItEasy;
+using Genius.Atom.Infrastructure.TestingUtil.FixtureExtensions;
 
 namespace Genius.Atom.Infrastructure.TestingUtil;
 
@@ -15,6 +16,7 @@ public static class InfrastructureTestHelper
     {
         var fixture = new Fixture();
         fixture.Customize(new AutoFakeItEasyCustomization());
+        fixture.Customizations.Add(new ImmutableListSpecimenBuilder());
         fixture.Behaviors.Add(new OmitOnRecursionBehavior(recursionDepth));
 
         if (useMutableValueTypeGenerator)
