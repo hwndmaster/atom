@@ -3,32 +3,41 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Infrastructure.TestingUtil;
 
-public class TestServiceProvider : IServiceProvider, IDisposable
+public sealed class TestServiceProvider : IServiceProvider, IDisposable
 {
     private readonly ServiceCollection _serviceCollection = new();
     private ServiceProvider? _serviceProvider;
 
-    public void RegisterSingleton<T>()
+    public void AddSingleton<TServiceAndImplementation>(bool isTestImplementation = false)
+        where TServiceAndImplementation : class
     {
-        _serviceProvider?.Dispose();
-        _serviceProvider = null;
-        _serviceCollection.AddSingleton(typeof(T));
+        AddSingleton<TServiceAndImplementation, TServiceAndImplementation>(isTestImplementation);
     }
 
-    public void RegisterSingleton<TService, TImplementation>()
+    public void AddSingleton<TService, TImplementation>(bool isTestImplementation = false)
+        where TService : class
+        where TImplementation : class, TService
     {
-        _serviceProvider?.Dispose();
-        _serviceProvider = null;
-        _serviceCollection.AddSingleton(typeof(TService), typeof(TImplementation));
+        CheckIntegrity();
+
+        if (isTestImplementation)
+        {
+            _serviceCollection.AddSingleton<TImplementation>();
+            _serviceCollection.AddSingleton<TService>((sp) => sp.GetRequiredService<TImplementation>());
+        }
+        else
+        {
+            _serviceCollection.AddSingleton<TService, TImplementation>();
+        }
     }
 
     public void RegisterInstance<T>(T instance)
+        where T : class
     {
         Guard.NotNull(instance);
+        CheckIntegrity();
 
-        _serviceProvider?.Dispose();
-        _serviceProvider = null;
-        _serviceCollection.AddSingleton(typeof(T), instance);
+        _serviceCollection.AddSingleton<T>(instance);
     }
 
     public object? GetService(Type serviceType)
@@ -47,5 +56,13 @@ public class TestServiceProvider : IServiceProvider, IDisposable
     private void EnsureServiceProvider()
     {
         _serviceProvider ??= _serviceCollection.BuildServiceProvider();
+    }
+
+    private void CheckIntegrity()
+    {
+        if (_serviceProvider is not null)
+        {
+            throw new InvalidOperationException("No registrations can be done once any service has been resolved.");
+        }
     }
 }

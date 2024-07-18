@@ -86,7 +86,7 @@ public sealed class JsonPersisterTests : IDisposable
     public void StoreAndLoad_UpgradeVersionScenario()
     {
         // Arrange
-        _serviceProvider.RegisterSingleton<DerivedClassAVersion1To2Upgrader>();
+        _serviceProvider.AddSingleton<DerivedClassAVersion1To2Upgrader>();
         _typeDiscriminators.AddMapping<DerivedClassA>("derived-1", 1);
         _typeDiscriminators.AddMapping<DerivedClassAVersion2, DerivedClassA, DerivedClassAVersion1To2Upgrader>("derived-1", 2);
 
@@ -117,7 +117,7 @@ public sealed class JsonPersisterTests : IDisposable
 
         // Drop the previous type mapping and create another one for next version of the class.
         _typeDiscriminators.RemoveMapping(typeof(ComplexStructure));
-        _serviceProvider.RegisterSingleton<DerivedClassAVersion1To2Upgrader>();
+        _serviceProvider.AddSingleton<DerivedClassAVersion1To2Upgrader>();
         _typeDiscriminators.AddMapping<ComplexStructureWithUpgradedProperty>("complex-1");
         _typeDiscriminators.AddMapping<DerivedClassAVersion2, DerivedClassA, DerivedClassAVersion1To2Upgrader>("derived-1", 2);
 

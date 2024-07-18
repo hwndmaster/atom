@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Reactive.Subjects;
 using Genius.Atom.Infrastructure.Io;
 
@@ -5,15 +6,16 @@ namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
 public sealed class TestFileSystemWatcherFactory : IFileSystemWatcherFactory
 {
+
     public TestFileSystemWatcher? InstanceToReturn { get; set; }
     public TestFileSystemWatcher? RecentlyCreatedInstance { get; private set; }
-    public int InstancesCreated { get; private set; } = 0;
+    public ImmutableArray<TestFileSystemWatcher> InstancesCreated { get; private set; } = [];
 
     public IFileSystemWatcher? Create(string path, string filter = "*.*", bool increaseBuffer = false)
     {
         var instance = InstanceToReturn ?? new TestFileSystemWatcher(path, filter, increaseBuffer);
         RecentlyCreatedInstance = instance;
-        InstancesCreated++;
+        InstancesCreated = InstancesCreated.Add(instance);
         return instance;
     }
 }
