@@ -21,9 +21,9 @@ public interface IUiDispatcher
     /// <summary>
     ///   Executes the specified Func<TResult> asynchronously on the thread that the Dispatcher was created on.
     /// </summary>
-    /// <param name="action">A Func<TResult> delegate to invoke through the dispatcher.</param>
+    /// <param name="asyncFunc">A Func<TResult> delegate to invoke through the dispatcher.</param>
     /// <returns>An operation representing the queued delegate to be invoked.</returns>
-    Task<T> InvokeAsync<T>(Func<T> func);
+    Task InvokeAsync(Func<Task> asyncFunc);
 }
 
 [ExcludeFromCodeCoverage]
@@ -49,12 +49,12 @@ internal sealed class UiDispatcher : IUiDispatcher, IDisposable
         });
     }
 
-    public async Task<T> InvokeAsync<T>(Func<T> func)
+    public async Task InvokeAsync(Func<Task> asyncFunc)
     {
-        return await _joinableTask.Factory.RunAsync(async () =>
+        await _joinableTask.Factory.RunAsync(async () =>
         {
             await _joinableTask.Factory.SwitchToMainThreadAsync();
-            return func();
+            await asyncFunc();
         });
     }
 

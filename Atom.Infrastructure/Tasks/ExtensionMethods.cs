@@ -26,7 +26,7 @@ public static class ExtensionMethods
         {
             try
             {
-                var logger = Module.ServiceProvider.GetService<ILogger>();
+                var logger = Module.ServiceProvider.GetService<ILogger<Task>>();
                 logger?.LogError(ex, "Error occurred while running a task.");
             }
             catch (Exception ex2)
