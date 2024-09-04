@@ -3,15 +3,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Infrastructure.TestingUtil;
 
-public record TestLogRecord(LogLevel LogLevel, string Message, Exception? Exception);
+public record FakeLogRecord(LogLevel LogLevel, string Message, Exception? Exception);
 
-public class TestLogger : ILogger
+public class FakeLogger : ILogger
 {
-    private readonly List<TestLogRecord> _logs = new();
+    private readonly List<FakeLogRecord> _logs = new();
 
-    public TestLogger()
+    public FakeLogger()
     {
-        Logs = new ReadOnlyCollection<TestLogRecord>(_logs);
+        Logs = new ReadOnlyCollection<FakeLogRecord>(_logs);
     }
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
@@ -25,12 +25,12 @@ public class TestLogger : ILogger
     {
         Guard.NotNull(formatter);
 
-        _logs.Add(new TestLogRecord(logLevel, formatter(state, exception), exception));
+        _logs.Add(new FakeLogRecord(logLevel, formatter(state, exception), exception));
     }
 
-    public IReadOnlyCollection<TestLogRecord> Logs { get; }
+    public IReadOnlyCollection<FakeLogRecord> Logs { get; }
 }
 
-public sealed class TestLogger<T> : TestLogger, ILogger<T>
+public sealed class TestLogger<T> : FakeLogger, ILogger<T>
 {
 }

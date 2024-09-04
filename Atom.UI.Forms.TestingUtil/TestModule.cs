@@ -8,7 +8,7 @@ namespace Genius.Atom.UI.Forms.TestingUtil;
 public static class TestModule
 {
     private static bool _isInitialized;
-    private static TestServiceProvider _serviceProvider = new();
+    private static FakeServiceProvider _serviceProvider = new();
 
     public static void Initialize()
     {
@@ -16,7 +16,7 @@ public static class TestModule
             return;
 
         _serviceProvider.AddSingleton<EventBasedLoggerProvider, EventBasedLoggerProvider>();
-        _serviceProvider.AddSingleton<IEventBus, TestEventBus>(isTestImplementation: true);
+        _serviceProvider.AddSingleton<IEventBus, FakeEventBus>(isTestImplementation: true);
         _serviceProvider.AddSingleton<IWpfApplication, TestWpfApplication>(isTestImplementation: true);
         _serviceProvider.RegisterInstance(A.Fake<Microsoft.Extensions.Logging.ILoggerFactory>());
 
@@ -24,5 +24,5 @@ public static class TestModule
         _isInitialized = true;
     }
 
-    public static TestServiceProvider ServiceProvider => _serviceProvider;
+    public static FakeServiceProvider ServiceProvider => _serviceProvider;
 }

@@ -26,9 +26,11 @@ public sealed class PathExistsValidationRule : ValidationRule, IPropertyValidati
             return ValidationResult.ValidResult;
         }
 
+        var stringValue = value.ToString() ?? string.Empty;
+
         var paths = _acceptMultiplePaths
-            ? value.ToString().Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-            : [value.ToString() ?? string.Empty];
+            ? stringValue.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            : [stringValue];
 
         foreach (var path in paths)
         {

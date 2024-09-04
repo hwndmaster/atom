@@ -1,6 +1,6 @@
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
-public sealed partial class TestFileService
+public sealed partial class FakeFileService
 {
     public void CopyFile(string sourceFileName, string destFileName)
         => CopyOrMoveFile(sourceFileName, destFileName, overwrite: false, copy: true);

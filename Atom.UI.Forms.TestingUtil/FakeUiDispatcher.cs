@@ -2,7 +2,7 @@ using Genius.Atom.Infrastructure;
 
 namespace Genius.Atom.UI.Forms.TestingUtil;
 
-public sealed class TestUiDispatcher : IUiDispatcher
+public sealed class FakeUiDispatcher : IUiDispatcher
 {
     public void Invoke(Action action)
     {

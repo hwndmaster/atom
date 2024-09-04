@@ -11,7 +11,7 @@ public sealed class ExtensionMethodsTests
     {
         // Arrange
         var logger = new TestLogger<Task>();
-        using var serviceProvider = new TestServiceProvider();
+        using var serviceProvider = new FakeServiceProvider();
         Module.Initialize(serviceProvider);
         serviceProvider.RegisterInstance<ILogger<Task>>(logger);
         var task = Task.Run(() =>

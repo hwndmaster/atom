@@ -2,7 +2,7 @@ using Genius.Atom.Infrastructure.Tasks;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Tasks;
 
-public sealed class TestSynchronousScheduler : ISynchronousScheduler
+public sealed class FakeSynchronousScheduler : ISynchronousScheduler
 {
     private readonly SynchronousScheduler _origin = new();
 

@@ -8,7 +8,7 @@ namespace Genius.Atom.Data.Tests.Persistence;
 public sealed class JsonPersisterTests : IDisposable
 {
     private readonly Fixture _fixture = new();
-    private readonly TestServiceProvider _serviceProvider = new();
+    private readonly FakeServiceProvider _serviceProvider = new();
     private readonly TypeDiscriminators _typeDiscriminators;
 
     public JsonPersisterTests()
@@ -158,7 +158,7 @@ public sealed class JsonPersisterTests : IDisposable
 
     private JsonPersister CreateSystemUnderTest(params IJsonConverter[] converters)
     {
-        return new(new TestFileService(), _typeDiscriminators, converters);
+        return new(new FakeFileService(), _typeDiscriminators, converters);
     }
 
     private sealed class SimpleClass

@@ -6,7 +6,7 @@ namespace Genius.Atom.Infrastructure.Tests;
 public sealed class TestFileServiceTests
 {
     private readonly IFixture _fixture = InfrastructureTestHelper.CreateFixture();
-    private readonly TestFileService _sut = new();
+    private readonly FakeFileService _sut = new();
 
     [Fact]
     public void CreateFile()

@@ -3,7 +3,7 @@ using Genius.Atom.Infrastructure.Io;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
-public sealed partial class TestFileService : IFileService
+public sealed partial class FakeFileService : IFileService
 {
     public IEnumerable<string> EnumerateDirectories(string path)
         => EnumerateDirectories(path, "*", new EnumerationOptions());

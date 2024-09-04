@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Infrastructure.TestingUtil;
 
-public sealed class TestServiceProvider : IServiceProvider, IDisposable
+public sealed class FakeServiceProvider : IServiceProvider, IDisposable
 {
     private readonly ServiceCollection _serviceCollection = new();
     private ServiceProvider? _serviceProvider;
