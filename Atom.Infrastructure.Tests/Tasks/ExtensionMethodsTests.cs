@@ -10,7 +10,7 @@ public sealed class ExtensionMethodsTests
     public void RunAndForget_HandlesExceptionOccurredInTask()
     {
         // Arrange
-        var logger = new TestLogger<Task>();
+        var logger = new FakeLogger<Task>();
         using var serviceProvider = new FakeServiceProvider();
         Module.Initialize(serviceProvider);
         serviceProvider.RegisterInstance<ILogger<Task>>(logger);

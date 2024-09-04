@@ -31,6 +31,6 @@ public class FakeLogger : ILogger
     public IReadOnlyCollection<FakeLogRecord> Logs { get; }
 }
 
-public sealed class TestLogger<T> : FakeLogger, ILogger<T>
+public sealed class FakeLogger<T> : FakeLogger, ILogger<T>
 {
 }
