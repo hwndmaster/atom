@@ -1,5 +1,4 @@
 using System.Reactive.Linq;
-using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Infrastructure.Io;
 

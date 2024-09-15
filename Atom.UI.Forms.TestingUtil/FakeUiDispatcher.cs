@@ -2,7 +2,7 @@ using Genius.Atom.Infrastructure;
 
 namespace Genius.Atom.UI.Forms.TestingUtil;
 
-public sealed class TestUiDispatcher : IUiDispatcher
+public sealed class FakeUiDispatcher : IUiDispatcher
 {
     public void Invoke(Action action)
     {
@@ -19,10 +19,10 @@ public sealed class TestUiDispatcher : IUiDispatcher
         return Task.CompletedTask;
     }
 
-    public Task<T> InvokeAsync<T>(Func<T> func)
+    public Task InvokeAsync(Func<Task> asyncFunc)
     {
-        Guard.NotNull(func);
+        Guard.NotNull(asyncFunc);
 
-        return Task.FromResult(func());
+        return asyncFunc();
     }
 }

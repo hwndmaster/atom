@@ -1,16 +1,17 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Genius.Atom.UI.Forms.TestingUtil;
+namespace Genius.Atom.Infrastructure.TestingUtil;
 
-public sealed class TestServiceProvider : IServiceProvider, IDisposable
+public sealed class FakeServiceProvider : IServiceProvider, IDisposable
 {
-    private readonly ServiceCollection _serviceCollection;
+    private readonly ServiceCollection _serviceCollection = new();
     private ServiceProvider? _serviceProvider;
 
-    public TestServiceProvider()
+    public void AddSingleton<TServiceAndImplementation>(bool isTestImplementation = false)
+        where TServiceAndImplementation : class
     {
-        _serviceCollection = new ServiceCollection();
+        AddSingleton<TServiceAndImplementation, TServiceAndImplementation>(isTestImplementation);
     }
 
     public void AddSingleton<TService, TImplementation>(bool isTestImplementation = false)
@@ -33,17 +34,10 @@ public sealed class TestServiceProvider : IServiceProvider, IDisposable
     public void RegisterInstance<T>(T instance)
         where T : class
     {
+        Guard.NotNull(instance);
         CheckIntegrity();
 
         _serviceCollection.AddSingleton<T>(instance);
-    }
-
-    private void CheckIntegrity()
-    {
-        if (_serviceProvider is not null)
-        {
-            throw new InvalidOperationException("No registrations can be done once any service has been resolved.");
-        }
     }
 
     public object? GetService(Type serviceType)
@@ -53,14 +47,22 @@ public sealed class TestServiceProvider : IServiceProvider, IDisposable
         return _serviceProvider.GetService(serviceType);
     }
 
+    public void Dispose()
+    {
+        _serviceProvider?.Dispose();
+    }
+
     [MemberNotNull(nameof(_serviceProvider))]
     private void EnsureServiceProvider()
     {
         _serviceProvider ??= _serviceCollection.BuildServiceProvider();
     }
 
-    public void Dispose()
+    private void CheckIntegrity()
     {
-        _serviceProvider?.Dispose();
+        if (_serviceProvider is not null)
+        {
+            throw new InvalidOperationException("No registrations can be done once any service has been resolved.");
+        }
     }
 }

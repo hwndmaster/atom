@@ -39,7 +39,7 @@ dotnet_diagnostic.CA1708.severity = error # CA1708: Identifiers should differ by
 dotnet_diagnostic.CA1711.severity = suggestion # CA1711: Identifiers should not have incorrect suffix
 dotnet_diagnostic.CA1712.severity = error # CA1712: Do not prefix enum values with type name
 dotnet_diagnostic.CA1715.severity = warning # CA1715: Identifiers should have correct prefix
-dotnet_diagnostic.CA1720.severity = warning # CA1720: Identifier contains type name
+dotnet_diagnostic.CA1720.severity = suggestion # CA1720: Identifier contains type name
 dotnet_diagnostic.CA1725.severity = error # CA1725: Parameter names should match base declaration
 dotnet_diagnostic.CA1802.severity = warning # CA1802: Use literals where appropriate
 dotnet_diagnostic.CA1805.severity = warning # CA1805: Do not initialize unnecessarily
@@ -129,7 +129,8 @@ dotnet_code_quality.CA1062.exclude_extension_method_this_parameter = true
 dotnet_code_quality.dispose_ownership_transfer_at_constructor = true
 dotnet_code_quality.dispose_ownership_transfer_at_method_call = true
 
-[**/*Tests.cs]
+[{**/*Tests.cs,**/StepDefinitions/*.cs}]
+dotnet_diagnostic.CA1062.severity = suggestion # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1304.severity = suggestion # CA1304: Specify CultureInfo
 dotnet_diagnostic.CA1305.severity = suggestion # CA1305: Specify IFormatProvider
 dotnet_diagnostic.CA1311.severity = suggestion # CA1311: Specify Culture for ToLower and ToUpper

@@ -4,7 +4,7 @@ using Genius.Atom.Infrastructure.Events;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Events;
 
-public sealed class TestEventBus : IEventBus
+public sealed class FakeEventBus : IEventBus
 {
     private readonly List<IEventMessage> _publishedEvents = new();
     private readonly EventBus _origin = new();

@@ -6,9 +6,17 @@ namespace Genius.Atom.UI.Forms.Validation;
 
 public sealed class PathExistsValidationRule : ValidationRule, IPropertyValidationRule
 {
-    public PathExistsValidationRule(string propertyName)
+    private readonly bool _acceptMultiplePaths;
+
+    /// <summary>
+    ///   Initializes a new instance of <see cref="PathExistsValidationRule"/>.
+    /// </summary>
+    /// <param name="propertyName">The property name to be validated.</param>
+    /// <param name="acceptMultiplePaths">Indicates whether multiple paths separated by comma (,) are supported.</param>
+    public PathExistsValidationRule(string propertyName, bool acceptMultiplePaths = false)
     {
         PropertyName = propertyName;
+        _acceptMultiplePaths = acceptMultiplePaths;
     }
 
     public override ValidationResult Validate(object value, CultureInfo cultureInfo)
@@ -18,9 +26,18 @@ public sealed class PathExistsValidationRule : ValidationRule, IPropertyValidati
             return ValidationResult.ValidResult;
         }
 
-        if (!Path.Exists(value.ToString()))
+        var stringValue = value.ToString() ?? string.Empty;
+
+        var paths = _acceptMultiplePaths
+            ? stringValue.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            : [stringValue];
+
+        foreach (var path in paths)
         {
-            return new ValidationResult(false, $"Path specified in {PropertyName} doesn't exist.");
+            if (!Path.Exists(path))
+            {
+                return new ValidationResult(false, $"Path specified in {PropertyName} doesn't exist.");
+            }
         }
 
         return ValidationResult.ValidResult;

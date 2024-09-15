@@ -1,15 +1,15 @@
 ﻿namespace Genius.Atom.Infrastructure.TestingUtil;
 
-public sealed class TestDateTime : IDateTime
+public sealed class FakeDateTime : IDateTime
 {
     private DateTime _clock;
 
-    public TestDateTime()
+    public FakeDateTime()
     {
         SetClock(DateTime.Now);
     }
 
-    public TestDateTime(DateTime clock)
+    public FakeDateTime(DateTime clock)
     {
         SetClock(clock);
     }

@@ -10,8 +10,8 @@ namespace Genius.Atom.Infrastructure.Tests;
 public sealed class CommandBusTests
 {
     private readonly IServiceProvider _serviceProviderMock;
-    private readonly TestSynchronousScheduler _synchronousScheduler = new();
-    private readonly TestLogger<CommandBus> _logger = new();
+    private readonly FakeSynchronousScheduler _synchronousScheduler = new();
+    private readonly FakeLogger<CommandBus> _logger = new();
     private readonly CommandBus _sut;
 
     public CommandBusTests()

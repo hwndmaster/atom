@@ -8,16 +8,16 @@ public abstract record EntityContext(string FullName, FileSystemDetails GenericD
 public record FileContext(string FullName, byte[] Content, FileDetails Details) : EntityContext(FullName, Details);
 public record DirectoryContext(string FullName, DirectoryDetails Details) : EntityContext(FullName, Details);
 
-public sealed partial class TestFileService : IFileService
+public sealed partial class FakeFileService : IFileService
 {
     private readonly Dictionary<string, FileContext> _files = new();
     private readonly Dictionary<string, DirectoryContext> _dirs = new();
     private readonly IDateTime _dateTime;
     private readonly bool _ignoreCase;
 
-    public TestFileService(IDateTime? dateTime = null, bool ignoreCase = true)
+    public FakeFileService(IDateTime? dateTime = null, bool ignoreCase = true)
     {
-        _dateTime = dateTime ?? new TestDateTime();
+        _dateTime = dateTime ?? new FakeDateTime();
         _ignoreCase = ignoreCase;
     }
 

@@ -1,24 +1,26 @@
+using System.Collections.Immutable;
 using System.Reactive.Subjects;
 using Genius.Atom.Infrastructure.Io;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Io;
 
-public sealed class TestFileSystemWatcherFactory : IFileSystemWatcherFactory
+public sealed class FakeFileSystemWatcherFactory : IFileSystemWatcherFactory
 {
-    public TestFileSystemWatcher? InstanceToReturn { get; set; }
-    public TestFileSystemWatcher? RecentlyCreatedInstance { get; private set; }
-    public int InstancesCreated { get; private set; } = 0;
+
+    public FakeFileSystemWatcher? InstanceToReturn { get; set; }
+    public FakeFileSystemWatcher? RecentlyCreatedInstance { get; private set; }
+    public ImmutableArray<FakeFileSystemWatcher> InstancesCreated { get; private set; } = [];
 
     public IFileSystemWatcher? Create(string path, string filter = "*.*", bool increaseBuffer = false)
     {
-        var instance = InstanceToReturn ?? new TestFileSystemWatcher(path, filter, increaseBuffer);
+        var instance = InstanceToReturn ?? new FakeFileSystemWatcher(path, filter, increaseBuffer);
         RecentlyCreatedInstance = instance;
-        InstancesCreated++;
+        InstancesCreated = InstancesCreated.Add(instance);
         return instance;
     }
 }
 
-public sealed class TestFileSystemWatcher : IFileSystemWatcher
+public sealed class FakeFileSystemWatcher : IFileSystemWatcher
 {
     private readonly Subject<FileSystemEventArgs> _created = new();
     private readonly Subject<FileSystemEventArgs> _changed = new();
@@ -26,7 +28,7 @@ public sealed class TestFileSystemWatcher : IFileSystemWatcher
     private readonly Subject<FileSystemEventArgs> _deleted = new();
     private readonly Subject<ErrorEventArgs> _error = new();
 
-    public TestFileSystemWatcher(string path, string filter, bool increaseBuffer)
+    public FakeFileSystemWatcher(string path, string filter, bool increaseBuffer)
     {
         ListeningPath = path;
         ListeningFilter = filter;

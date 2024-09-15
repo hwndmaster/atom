@@ -3,7 +3,7 @@ using Genius.Atom.Infrastructure.Commands;
 
 namespace Genius.Atom.Infrastructure.TestingUtil.Commands;
 
-public sealed class TestCommandBus : ICommandBus
+public sealed class FakeCommandBus : ICommandBus
 {
     private readonly IFixture _fixture = InfrastructureTestHelper.CreateFixture();
     private readonly List<ICommandMessage> _sentCommands = new();
@@ -24,6 +24,7 @@ public sealed class TestCommandBus : ICommandBus
     public void AssertSingleCommand<T>(Func<T, bool> condition)
         where T : ICommandMessage
     {
+        Assert.NotNull(condition);
         var command = GetSingleCommand<T>();
         Assert.True(condition(command));
     }
@@ -31,6 +32,7 @@ public sealed class TestCommandBus : ICommandBus
     public void AssertSingleCommand<T>(params Action<T>[] actionToAssert)
         where T : ICommandMessage
     {
+        Assert.NotNull(actionToAssert);
         var command = GetSingleCommand<T>();
         foreach (var action in actionToAssert)
         {

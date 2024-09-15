@@ -8,7 +8,7 @@ namespace Genius.Atom.Data.Tests.Persistence;
 public sealed class JsonPersisterTests : IDisposable
 {
     private readonly Fixture _fixture = new();
-    private readonly TestServiceProvider _serviceProvider = new();
+    private readonly FakeServiceProvider _serviceProvider = new();
     private readonly TypeDiscriminators _typeDiscriminators;
 
     public JsonPersisterTests()
@@ -86,7 +86,7 @@ public sealed class JsonPersisterTests : IDisposable
     public void StoreAndLoad_UpgradeVersionScenario()
     {
         // Arrange
-        _serviceProvider.RegisterSingleton<DerivedClassAVersion1To2Upgrader>();
+        _serviceProvider.AddSingleton<DerivedClassAVersion1To2Upgrader>();
         _typeDiscriminators.AddMapping<DerivedClassA>("derived-1", 1);
         _typeDiscriminators.AddMapping<DerivedClassAVersion2, DerivedClassA, DerivedClassAVersion1To2Upgrader>("derived-1", 2);
 
@@ -117,7 +117,7 @@ public sealed class JsonPersisterTests : IDisposable
 
         // Drop the previous type mapping and create another one for next version of the class.
         _typeDiscriminators.RemoveMapping(typeof(ComplexStructure));
-        _serviceProvider.RegisterSingleton<DerivedClassAVersion1To2Upgrader>();
+        _serviceProvider.AddSingleton<DerivedClassAVersion1To2Upgrader>();
         _typeDiscriminators.AddMapping<ComplexStructureWithUpgradedProperty>("complex-1");
         _typeDiscriminators.AddMapping<DerivedClassAVersion2, DerivedClassA, DerivedClassAVersion1To2Upgrader>("derived-1", 2);
 
@@ -158,7 +158,7 @@ public sealed class JsonPersisterTests : IDisposable
 
     private JsonPersister CreateSystemUnderTest(params IJsonConverter[] converters)
     {
-        return new(new TestFileService(), _typeDiscriminators, converters);
+        return new(new FakeFileService(), _typeDiscriminators, converters);
     }
 
     private sealed class SimpleClass
