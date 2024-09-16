@@ -12,6 +12,9 @@ jobs:
   build:
 
     runs-on: windows-latest
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
 
     steps:
     - uses: actions/checkout@v4
@@ -54,5 +57,7 @@ jobs:
       run: dotnet pack Atom.Reporting/Atom.Reporting.csproj --configuration Release
     - name: Pack Reporting.UI
       run: dotnet pack Atom.Reporting.UI/Atom.Reporting.UI.csproj --configuration Release
+    - name: Pack Build
+      run: dotnet pack Atom.Build/Atom.Build.csproj --configuration Release
     - name: Publish packages to GPR
       run: dotnet nuget push **/*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}

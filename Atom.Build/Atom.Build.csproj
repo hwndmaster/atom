@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="*.props" />
+    <None Remove="*.globalconfig" />
+    <None Remove="*.targets" />
+    <None Remove="*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="*.props" PackagePath="build" />
+    <Content Include="*.globalconfig" PackagePath="build" />
+    <Content Include="*.targets" PackagePath="build" />
+    <Content Include="*.cs" PackagePath="build" />
+  </ItemGroup>
+
+</Project>
