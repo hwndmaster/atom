@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="tools\*.ps1" Pack="true" CopyToOutputDirectory="Always" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="*.props" />
     <None Remove="*.globalconfig" />
     <None Remove="*.targets" />
