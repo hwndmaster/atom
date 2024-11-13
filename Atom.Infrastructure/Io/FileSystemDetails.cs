@@ -2,9 +2,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Genius.Atom.Infrastructure.Io;
 
+/// <summary>
+///   Represents the details of a file or directory in the file system.
+/// </summary>
 public abstract class FileSystemDetails
 {
-    protected readonly IFileService _fileService;
+    protected readonly IFileService FileService;
 
     protected FileSystemDetails(string fullPath,
         FileAttributes attributes,
@@ -16,7 +19,7 @@ public abstract class FileSystemDetails
         DateTime lastWriteTimeUtc,
         IFileService fileService)
     {
-        _fileService = fileService.NotNull();
+        FileService = fileService.NotNull();
         FullPath = fullPath.NotNull();
         Attributes = attributes;
         CreationTime = creationTime;

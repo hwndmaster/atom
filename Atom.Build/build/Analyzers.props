@@ -1,0 +1,31 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)CommonAnalyzers.globalconfig" />
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)DotnetDiagnostic.globalconfig" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(IsTestProject)">
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)TestProject.globalconfig" />
+  </ItemGroup>
+
+  <ItemGroup Label="Analyzers">
+     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="all"/>
+     <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all"/>
+     <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="all"/>
+     <PackageReference Include="Genius.Atom.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Include global suppression files -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="$(IsTestProject)">
+    <Compile Include="$(MSBuildThisFileDirectory)TestsGlobalSuppressions.cs" />
+  </ItemGroup>
+
+</Project>

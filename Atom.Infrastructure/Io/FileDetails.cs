@@ -41,14 +41,14 @@ public sealed class FileDetails : FileSystemDetails
         Length = length;
     }
 
-    public override bool Exists => _fileService.FileExists(Name);
+    public override bool Exists => FileService.FileExists(Name);
 
     public override string Name { get; protected set; }
 
     public bool IsReadOnly => Attributes.HasFlag(FileAttributes.ReadOnly);
     public string? DirectoryName { get; private set; }
     public DirectoryDetails? Directory => DirectoryName is not null
-        ? new DirectoryDetails(DirectoryName, new DirectoryInfo(DirectoryName), _fileService)
+        ? new DirectoryDetails(DirectoryName, new DirectoryInfo(DirectoryName), FileService)
         : null;
     public long Length { get; private set; }
 }

@@ -2,16 +2,39 @@ using System.Reactive.Linq;
 
 namespace Genius.Atom.Infrastructure.Io;
 
+/// <summary>
+///   Represents a wrapper for <see cref="FileSystemWatcher"/> which provides observables for file system events.
+///   The component is disposable and should be disposed when it is no longer needed.
+/// </summary>
 public interface IFileSystemWatcher : IDisposable
 {
+    /// <summary>
+    ///   Gets an observable sequence of file system events that are raised when a file or directory is created.
+    /// </summary>
     IObservable<FileSystemEventArgs> Created { get; }
+
+    /// <summary>
+    ///   Gets an observable sequence of file system events that are raised when a file or directory is changed.
+    /// </summary>
     IObservable<FileSystemEventArgs> Changed { get; }
+
+    /// <summary>
+    ///   Gets an observable sequence of file system events that are raised when a file or directory is renamed.
+    /// </summary>
     IObservable<RenamedEventArgs> Renamed { get; }
+
+    /// <summary>
+    ///   Gets an observable sequence of file system events that are raised when a file or directory is deleted.
+    /// </summary>
     IObservable<FileSystemEventArgs> Deleted { get; }
+
+    /// <summary>
+    ///   Gets an observable sequence of file system events that are raised when an error occurs.
+    /// </summary>
     IObservable<ErrorEventArgs> Error { get; }
 }
 
-public sealed class FileSystemWatcherWrapper : IFileSystemWatcher
+internal sealed class FileSystemWatcherWrapper : IFileSystemWatcher
 {
     private readonly FileSystemWatcher _watcher;
 

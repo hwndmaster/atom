@@ -2,8 +2,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Infrastructure.Io;
 
+/// <summary>
+///   Represents a factory for creating instances of <see cref="IFileSystemWatcher"/>.
+/// </summary>
 public interface IFileSystemWatcherFactory
 {
+    /// <summary>
+    ///   Creates a new instance of <see cref="IFileSystemWatcher"/>.
+    ///   If the creation fails, logs the exception and returns null.
+    /// </summary>
+    /// <param name="path">The path to the directory to watch.</param>
+    /// <param name="filter">The filter string used to determine what files are monitored in a directory.</param>
+    /// <param name="increaseBuffer">Whether to increase the internal buffer size of the watcher.</param>
     IFileSystemWatcher? Create(string path, string filter = "*.*", bool increaseBuffer = false);
 }
 

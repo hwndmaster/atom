@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
+    <ToolCommandName>atom-build</ToolCommandName>
+    <Description>A tool package for facilitating configuration and analysis of personal pet projects</Description>
+    <OutputType>Exe</OutputType>
+    <PackAsTool>true</PackAsTool>
+    <IsPackable>true</IsPackable>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="build/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="build/**" PackagePath="build" />
+  </ItemGroup>
+
+</Project>

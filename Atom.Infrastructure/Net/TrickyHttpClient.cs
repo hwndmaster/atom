@@ -5,8 +5,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Infrastructure.Net;
 
+/// <summary>
+///   A client to download content from the web.
+/// </summary>
 public interface ITrickyHttpClient
 {
+    /// <summary>
+    ///   Downloads the content from the specified URL.
+    /// </summary>
+    /// <param name="url">The url to download content from.</param>
+    /// <param name="cancel">The cancellation token to be used for safe download cancellation.</param>
+    /// <returns>The downloaded content.</returns>
     Task<string?> DownloadContentAsync(string url, CancellationToken cancel);
 }
 

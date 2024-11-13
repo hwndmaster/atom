@@ -1,0 +1,32 @@
+﻿<Project>
+
+  <ItemGroup Condition="$(IsTestProject) == false">
+    <InternalsVisibleTo Include="$(RootNamespace).Tests" />
+    <InternalsVisibleTo Include="$(RootNamespace).TestingUtil" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+
+  <ItemGroup Label="TestUsings" Condition="$(IsTestProject) Or $(IsTestingUtilProject)">
+    <Using Include="AutoFixture" />
+    <Using Include="FakeItEasy" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup Label="TestReferences" Condition="$(IsTestProject)">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.analyzers" />
+    <PackageReference Include="xunit.runner.visualstudio">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup Label="TestAndTestingUtilsReferences" Condition="$(IsTestProject) Or $(IsTestingUtilProject)">
+    <PackageReference Include="AutoFixture" />
+    <PackageReference Include="AutoFixture.AutoFakeItEasy" />
+    <PackageReference Include="FakeItEasy" />
+  </ItemGroup>
+  <ItemGroup Label="TestingUtilsReferences" Condition="$(IsTestingUtilProject)">
+    <PackageReference Include="xunit.assert" />
+  </ItemGroup>
+
+</Project>
