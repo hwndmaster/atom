@@ -1,8 +1,10 @@
 using Genius.Atom.Infrastructure.Threading;
-using Microsoft.VisualStudio.Threading;
 
 namespace Genius.Atom.Infrastructure.Tasks;
 
+/// <summary>
+///   A service to schedule actions synchronously.
+/// </summary>
 public interface ISynchronousScheduler
 {
     void Schedule(Action action);

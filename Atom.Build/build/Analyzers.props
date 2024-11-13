@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)CommonAnalyzers.globalconfig" />
-    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)DotnetDotnetDiagnostic.globalconfig" />
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)DotnetDiagnostic.globalconfig" />
   </ItemGroup>
 
   <ItemGroup Condition="$(IsTestProject)">

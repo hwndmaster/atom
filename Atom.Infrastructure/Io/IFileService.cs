@@ -2,6 +2,9 @@ using System.Text;
 
 namespace Genius.Atom.Infrastructure.Io;
 
+/// <summary>
+///   Contains methods for file system operations.
+/// </summary>
 public interface IFileService
 {
     /// <inheritdoc cref="File.Copy(string, string)"/>

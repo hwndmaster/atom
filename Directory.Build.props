@@ -1,20 +1,17 @@
 <Project>
 
   <PropertyGroup>
-    <Version>0.0.42</Version>
+    <Version>0.0.43</Version>
     <Product>Atom</Product>
     <Authors>Dima Kravtsov</Authors>
     <Description>Simple framework for personal pet projects</Description>
     <RepositoryUrl>https://github.com/hwndmaster/atom</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
 
     <RootNamespace>Genius.$(MSBuildProjectName)</RootNamespace>
     <AssemblyName>Genius.$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)Atom.Build\DotnetDotnetDiagnostic.globalconfig" />
-  </ItemGroup>
-
-  <Import Project="./Atom.Build/Common.props"/>
+  <Import Project="./Atom.Build/build/Genius.Atom.Build.props"/>
 
 </Project>

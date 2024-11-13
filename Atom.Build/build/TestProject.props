@@ -1,8 +1,8 @@
 ﻿<Project>
 
   <ItemGroup Condition="$(IsTestProject) == false">
-    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
-    <InternalsVisibleTo Include="$(AssemblyName).TestingUtil" />
+    <InternalsVisibleTo Include="$(RootNamespace).Tests" />
+    <InternalsVisibleTo Include="$(RootNamespace).TestingUtil" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 

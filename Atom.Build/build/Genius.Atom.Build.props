@@ -8,10 +8,14 @@
     <!-- To avoid builder creating non-english resource folders -->
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
     <IsUIProject>False</IsUIProject>
     <IsUIProject Condition="$(MSBuildProjectName.Contains('.UI.Forms')) Or $(MSBuildProjectName.EndsWith('.UI'))">True</IsUIProject>
     <IsTestProject>False</IsTestProject>
     <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">True</IsTestProject>
+    <IsUITestProject>False</IsUITestProject>
+    <IsUITestProject Condition="$(MSBuildProjectName.EndsWith('.UI.Tests'))">True</IsUITestProject>
     <IsTestingUtilProject>False</IsTestingUtilProject>
     <IsTestingUtilProject Condition="$(MSBuildProjectName.EndsWith('.TestingUtil'))">True</IsTestingUtilProject>
   </PropertyGroup>
@@ -19,7 +23,7 @@
   <PropertyGroup Condition="!$(IsUIProject)">
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition="$(IsUIProject)">
+  <PropertyGroup Condition="$(IsUIProject) Or $(IsUITestProject)">
     <TargetFramework>net8.0-windows10.0.19041</TargetFramework>
   </PropertyGroup>
 
