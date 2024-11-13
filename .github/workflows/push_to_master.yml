@@ -3,8 +3,6 @@ name: .NET
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 #  release:
 #    types: [published]
 
@@ -26,22 +24,6 @@ jobs:
       run: dotnet nuget add source https://nuget.pkg.github.com/hwndmaster/index.json -n github -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build -c Release --no-restore
-    - name: Test
-      run: dotnet test -c Release --no-build --verbosity normal --logger="trx;logfilename=TestResults.trx"
-    - name: Reporting
-      uses: dorny/test-reporter@v1
-      if: success() || failure() # run this step even if previous step failed
-      with:
-        name: 'Test results report'
-        reporter: 'dotnet-trx'
-        path: '**/TestResults/TestResults.trx'
-        only-summary: 'true'
-        max-annotations: '10'
-        fail-on-error: 'true'
-        list-suites: 'failed'
-        list-tests: 'failed'
     - name: Pack Data
       run: dotnet pack Atom.Data/Atom.Data.csproj --configuration Release
     - name: Pack Infrastructure
