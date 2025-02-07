@@ -7,6 +7,10 @@
     <!-- Temporarily adding these two lines, 'coz WPF cannot handle it yet -->
     <AssemblyName>Genius.Atom.UI.Forms</AssemblyName>
     <RootNamespace>Genius.Atom.UI.Forms</RootNamespace>
+
+    <!-- Feature toggle to avoid errors MC4003, MC3074, MC3050 -->
+    <!-- Ref: https://github.com/dotnet/wpf/issues/5576 -->
+    <IncludePackageReferencesDuringMarkupCompilation>False</IncludePackageReferencesDuringMarkupCompilation>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

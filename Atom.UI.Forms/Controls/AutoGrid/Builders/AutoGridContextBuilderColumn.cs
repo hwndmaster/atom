@@ -158,6 +158,13 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
     protected abstract TBuilder BuilderInstance { get; }
     protected PropertyDescriptor PropertyDescriptor { get; }
 
-    [GeneratedRegex("[A-Z]")]
-    private static partial Regex DisplayNameRegex();
+    // TODO: Temporarily having error CS8795 after upgrading to .NET9:
+    // "Partial method '...' must have an implementation part because it has accessibility modifiers."
+    // Note: Same issues described here but not resolved:
+    // - https://github.com/dotnet/roslyn/issues/69522
+    // - https://github.com/dotnet/roslyn/issues/73964
+    //[GeneratedRegex("[A-Z]")]
+    //private static partial Regex DisplayNameRegex();
+    private static Regex _displayNameRegex = new("[A-Z]", RegexOptions.Compiled);
+    private static Regex DisplayNameRegex() => _displayNameRegex;
 }

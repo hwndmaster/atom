@@ -77,7 +77,7 @@ internal sealed class TypeDiscriminators : ITypeDiscriminatorsInternal
         where TVersionUpgrader : IDataVersionUpgrader<TPreviousVersion, T>
     {
         var previousVersionType = typeof(TPreviousVersion);
-        if (!_discriminatorsByTypeName.TryGetValue(previousVersionType.FullName.NotNull(), out var previousVersionRecord))
+        if (!_discriminatorsByTypeName.TryGetValue(previousVersionType.FullName.NotNull(), out var _))
         {
             throw new InvalidOperationException($"The discriminator for type '{previousVersionType.FullName}' is not registered.");
         }

@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/Atom.UI.Forms.Demo/bin/Debug/net8.0-windows10.0.19041/Genius.Atom.UI.Forms.Demo.exe",
+      "program": "${workspaceFolder}/Atom.UI.Forms.Demo/bin/Debug/net9.0-windows10.0.19041/Genius.Atom.UI.Forms.Demo.exe",
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",

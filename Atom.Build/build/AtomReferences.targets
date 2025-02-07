@@ -16,7 +16,7 @@
 
     <ItemGroup>
       <Reference Include="Genius.$(Name)" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path)\bin\Debug\net8.0\Genius.$(Name).dll</HintPath>
+        <HintPath>$(Path)\bin\Debug\net9.0\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
@@ -32,14 +32,14 @@
 
     <ItemGroup>
       <Reference Include="Genius.$(Name)" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path)\bin\Debug\net8.0\Genius.$(Name).dll</HintPath>
+        <HintPath>$(Path)\bin\Debug\net9.0\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
       <Reference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path).TestingUtil\bin\Debug\net8.0\Genius.$(Name).TestingUtil.dll</HintPath>
+        <HintPath>$(Path).TestingUtil\bin\Debug\net9.0\Genius.$(Name).TestingUtil.dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>

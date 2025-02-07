@@ -115,7 +115,7 @@ public class TreeViewMultiSelectBehavior : Behavior<TreeView>
     /// <summary>
     ///   Is called when the a tree item is unselected.
     /// </summary>
-    private void OnTreeViewItemUnselected(object sender, RoutedEventArgs e)
+    private static void OnTreeViewItemUnselected(object sender, RoutedEventArgs e)
     {
         if ((Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == ModifierKeys.None)
         {
