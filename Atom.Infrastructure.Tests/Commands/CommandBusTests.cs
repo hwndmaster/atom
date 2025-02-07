@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Infrastructure.Tests;
 
-public sealed class CommandBusTests
+public sealed class CommandBusTests : IDisposable
 {
     private readonly IServiceProvider _serviceProviderMock;
     private readonly FakeSynchronousScheduler _synchronousScheduler = new();
@@ -24,6 +24,12 @@ public sealed class CommandBusTests
             .Returns(serviceScopeMock);
 
         _sut = new CommandBus(serviceScopeFactoryMock, _synchronousScheduler, _logger);
+    }
+
+    public void Dispose()
+    {
+        _sut.Dispose();
+        _synchronousScheduler.Dispose();
     }
 
     [Fact]
@@ -85,7 +91,7 @@ public sealed class CommandBusTests
     public async Task SendAsync_WhenConcurrentMessagesArriving_InvokesThemSynchronously()
     {
         // Arrange
-        const int tasksToRun = 5;
+        const int TasksToRun = 5;
         var locker = new object();
         var handlerType = typeof(ICommandHandler<DummyCommand>);
         List<DummyHandler> dummyHandlers = [];
@@ -95,7 +101,7 @@ public sealed class CommandBusTests
                 DummyHandler handler;
                 lock (locker)
                 {
-                    var delayTime = 5 + (tasksToRun - dummyHandlers.Count) * 5;
+                    var delayTime = 5 + (TasksToRun - dummyHandlers.Count) * 5;
                     handler = new DummyHandler(shouldThrowException: false, delayTime);
                     dummyHandlers.Add(handler);
                 }
@@ -103,23 +109,41 @@ public sealed class CommandBusTests
             });
 
         // Act
-        for (var i = 0; i < tasksToRun; i++)
+        for (var i = 0; i < TasksToRun; i++)
             Task.Factory.StartNew(() => _sut.SendAsync(new DummyCommand())).RunAndForget();
 
-        while (dummyHandlers.Count != tasksToRun
+        while (dummyHandlers.Count != TasksToRun
             || !dummyHandlers.TrueForAll(x => x.ExecutionCompleted))
         {
             await Task.Delay(5);
         }
 
         // Verify
-        Assert.Equal(tasksToRun, dummyHandlers.Count);
+        Assert.Equal(TasksToRun, dummyHandlers.Count);
         Assert.True(dummyHandlers.TrueForAll(x => x.ExecutionCompleted));
         var handlersOrdered = dummyHandlers.OrderBy(x => x.TimeStarted).ToArray();
         for (var i = 1; i < handlersOrdered.Length; i++)
         {
             Assert.True(handlersOrdered[i - 1].TimeFinished <= handlersOrdered[i].TimeStarted);
         }
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenDisposed_ThrowsObjectDisposedException()
+    {
+        // Arrange
+        var handlerType = typeof(ICommandHandler<DummyCommand>);
+        DummyHandler? dummyHandler = null;
+        A.CallTo(() => _serviceProviderMock.GetService(handlerType))
+            .ReturnsLazily(() => dummyHandler = new DummyHandler(shouldThrowException: false));
+
+        // Act
+        _sut.Dispose();
+
+        // Verify
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => _sut.SendAsync(new DummyCommand()));
+        Assert.NotNull(dummyHandler);
+        Assert.False(dummyHandler.ExecutionCompleted);
     }
 
     class DummyCommand : ICommandMessage

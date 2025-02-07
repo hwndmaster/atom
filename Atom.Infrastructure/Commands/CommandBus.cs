@@ -16,7 +16,7 @@ public interface ICommandBus
 /// <summary>
 /// A simple implementation of a command bus
 /// </summary>
-internal sealed class CommandBus : ICommandBus
+internal sealed class CommandBus : ICommandBus, IDisposable
 {
     private static readonly ConcurrentDictionary<Type, MethodInfo> _handlersMethodCache = new();
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -56,6 +56,11 @@ internal sealed class CommandBus : ICommandBus
         {
             try
             {
+                if (IsDisposed)
+                {
+                    return;
+                }
+
                 var result = method.Invoke(commandHandler, [command]);
                 if (result is Task taskResult)
                 {
@@ -69,8 +74,10 @@ internal sealed class CommandBus : ICommandBus
                     handlerType.FullName,
                     JsonSerializer.Serialize<object>(command, new JsonSerializerOptions() { MaxDepth = 10 }));
             }
-
-            autoResetEvent.Set();
+            finally
+            {
+                autoResetEvent.Set();
+            }
         });
 
         autoResetEvent.WaitOne();
@@ -78,6 +85,11 @@ internal sealed class CommandBus : ICommandBus
         if (commandInvocationResult is not null)
         {
             return commandInvocationResult;
+        }
+
+        if (IsDisposed)
+        {
+            throw new ObjectDisposedException(nameof(CommandBus));
         }
 
         throw new InvalidOperationException("Command Handler process has failed due to an unexpected error. Check logs for details.");
@@ -92,4 +104,11 @@ internal sealed class CommandBus : ICommandBus
                 .First(x => x.Name == "ProcessAsync" && x.GetParameters()[0].ParameterType == key);
         });
     }
+
+    public void Dispose()
+    {
+        IsDisposed = true;
+    }
+
+    public bool IsDisposed { get; private set; }
 }

@@ -11,15 +11,18 @@ namespace Genius.Atom.UI.Forms;
 // NOTE: The delay and suspension notifications functionality has originally been taken from:
 //       https://github.com/ENikS/DelayedObservableCollection/blob/master/DelayedObservableCollection/DelayedObservableCollection.cs
 
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
+// It is safe to suppress CA1001 because the monitor has no important resources.
 public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionChanged, INotifyPropertyChanged
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
 {
-    private const string _countString = "Count";
+    private const string CountString = "Count";
 
     /// <summary>
     ///   This must agree with Binding.IndexerName. It is declared separately
     ///   here so as to avoid a dependency on PresentationFramework.dll.
     /// </summary>
-    private const string _indexerName = "Item[]";
+    private const string IndexerName = "Item[]";
 
     private readonly ReentryMonitor _monitor = new();
 
@@ -28,8 +31,8 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
     /// </summary>
     private bool _disableReentry;
 
-    private Action FireCountAndIndexerChanged = delegate { };
-    private Action FireIndexerChanged = delegate { };
+    private Action _fireCountAndIndexerChanged = delegate { };
+    private Action _fireIndexerChanged = delegate { };
 
     /// <inheritdoc cref="INotifyPropertyChanged.PropertyChanged" />
     protected event PropertyChangedEventHandler? PropertyChanged;
@@ -66,9 +69,14 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
         }
     }
 
-    protected DelayedObservableCollection(IList<T> list, bool onlyPropogate)
+    /// <summary>
+    /// This ctor is only used from the generic implementation of `DelayedObservableCollection`.
+    /// The <paramref name="onlyPropagate"/> parameter is used to distinguish between the two ctors.
+    /// </summary>
+    protected DelayedObservableCollection(IList<T> list, bool onlyPropagate)
         : base(list)
     {
+        Debug.Assert(onlyPropagate);
     }
 
     /// <summary>
@@ -99,14 +107,14 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
         {
             if (PropertyChanged is null)
             {
-                FireCountAndIndexerChanged = delegate
+                _fireCountAndIndexerChanged = delegate
                 {
-                    OnPropertyChanged(new PropertyChangedEventArgs(_countString));
-                    OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
+                    OnPropertyChanged(new PropertyChangedEventArgs(CountString));
+                    OnPropertyChanged(new PropertyChangedEventArgs(IndexerName));
                 };
-                FireIndexerChanged = delegate
+                _fireIndexerChanged = delegate
                 {
-                    OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
+                    OnPropertyChanged(new PropertyChangedEventArgs(IndexerName));
                 };
             }
 
@@ -118,8 +126,8 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
 
             if (PropertyChanged is null)
             {
-                FireCountAndIndexerChanged = delegate { };
-                FireIndexerChanged = delegate { };
+                _fireCountAndIndexerChanged = delegate { };
+                _fireIndexerChanged = delegate { };
             }
         }
     }
@@ -153,7 +161,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
         base.RemoveItem(oldIndex);
         base.InsertItem(newIndex, removedItem);
 
-        FireIndexerChanged();
+        _fireIndexerChanged();
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, removedItem, newIndex, oldIndex));
     }
 
@@ -213,7 +221,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
 
         base.ClearItems();
 
-        FireCountAndIndexerChanged();
+        _fireCountAndIndexerChanged();
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
@@ -228,7 +236,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
 
         base.RemoveItem(index);
 
-        FireCountAndIndexerChanged();
+        _fireCountAndIndexerChanged();
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem, index));
     }
 
@@ -242,7 +250,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
 
         base.InsertItem(index, item);
 
-        FireCountAndIndexerChanged();
+        _fireCountAndIndexerChanged();
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
     }
 
@@ -257,7 +265,7 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
         T originalItem = this[index];
         base.SetItem(index, item);
 
-        FireIndexerChanged();
+        _fireIndexerChanged();
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, originalItem, item, index));
     }
 
@@ -393,9 +401,9 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
                 if (notifyInfo.RootCollection.PropertyChanged is not null)
                 {
                     if (notifyInfo.IsCountChanged)
-                        notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(_countString));
+                        notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(CountString));
 
-                    notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(_indexerName));
+                    notifyInfo.RootCollection.OnPropertyChanged(new PropertyChangedEventArgs(IndexerName));
                 }
 
                 using (notifyInfo.RootCollection.BlockReentrancy())
@@ -471,8 +479,8 @@ public class DelayedObservableCollection<T> : Collection<T>, INotifyCollectionCh
                 return (sender, args) =>
                 {
                     DelayedObservableCollectionSession? wrapper = sender as DelayedObservableCollectionSession;
-                    Debug.Assert(wrapper is not null, "Calling object must be DelayedObservableCollection<T>");
-                    Debug.Assert(wrapper._notifyInfo is not null, "Calling object must be Delayed wrapper.");
+                    Debug.Assert(wrapper is not null);
+                    Debug.Assert(wrapper._notifyInfo is not null);
 
                     // Setup
                     _action = args.Action;

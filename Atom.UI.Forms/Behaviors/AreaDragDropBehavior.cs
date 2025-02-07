@@ -1,7 +1,7 @@
 using System.Windows.Controls;
-using Microsoft.Xaml.Behaviors;
 using Genius.Atom.UI.Forms.Wpf;
 using MahApps.Metro.Controls;
+using Microsoft.Xaml.Behaviors;
 
 namespace Genius.Atom.UI.Forms;
 

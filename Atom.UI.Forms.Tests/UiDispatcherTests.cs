@@ -64,6 +64,6 @@ public sealed class UiDispatcherTests : IDisposable
         });
 
         // Act & Verify
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await task.ConfigureAwait(false));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => task);
     }
 }

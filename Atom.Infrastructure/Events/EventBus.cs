@@ -25,8 +25,8 @@ internal sealed class EventBus : IEventBus
     public EventBus()
     {
         _mainObservable = Observable.FromEventPattern<EventPublishedEventArgs>(
-            x => this.EventAdded += x,
-            x => this.EventAdded -= x)
+            x => EventAdded += x,
+            x => EventAdded -= x)
             .Select(x => x.EventArgs);
     }
 

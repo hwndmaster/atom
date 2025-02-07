@@ -10,8 +10,8 @@ public sealed class DataGridTextColumnBuilderTests
     public void HappyFlowScenario()
     {
         // Arrange
-        const string propertyName = "Foo";
-        var columnBuilder = DataGridColumnBuilder.ForValuePath(propertyName);
+        const string PropertyName = "Foo";
+        var columnBuilder = DataGridColumnBuilder.ForValuePath(PropertyName);
         var sut = new DataGridTextColumnBuilder(columnBuilder);
 
         // Act
@@ -19,8 +19,8 @@ public sealed class DataGridTextColumnBuilderTests
 
         // Verify
         Assert.NotNull(column);
-        Assert.Equal(propertyName, column.Header);
-        Assert.Equal(propertyName, column.SortMemberPath);
+        Assert.Equal(PropertyName, column.Header);
+        Assert.Equal(PropertyName, column.SortMemberPath);
         Assert.NotNull(column.CellTemplate);
         Assert.Equal(typeof(TextBlock), column.CellTemplate.VisualTree.Type);
 
@@ -31,10 +31,10 @@ public sealed class DataGridTextColumnBuilderTests
     public void WithTextHighlighting_HappyFlowScenario()
     {
         // Arrange
-        const string propertyName = "Foo";
+        const string PropertyName = "Foo";
         var hlBinding1 = new Binding("Bar");
         var hlBinding2 = new Binding("Que");
-        var columnBuilder = DataGridColumnBuilder.ForValuePath(propertyName);
+        var columnBuilder = DataGridColumnBuilder.ForValuePath(PropertyName);
         var sut = new DataGridTextColumnBuilder(columnBuilder)
             .WithTextHighlighting([hlBinding1, hlBinding2]);
 
@@ -43,8 +43,8 @@ public sealed class DataGridTextColumnBuilderTests
 
         // Verify
         Assert.NotNull(column);
-        Assert.Equal(propertyName, column.Header);
-        Assert.Equal(propertyName, column.SortMemberPath);
+        Assert.Equal(PropertyName, column.Header);
+        Assert.Equal(PropertyName, column.SortMemberPath);
         Assert.NotNull(column.CellTemplate);
         Assert.Equal(typeof(ContentControl), column.CellTemplate.VisualTree.Type);
 

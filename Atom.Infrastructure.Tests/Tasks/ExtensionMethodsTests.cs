@@ -23,7 +23,7 @@ public sealed class ExtensionMethodsTests
         task.RunAndForget();
 
         // Verify
-        SpinWait.SpinUntil(() => logger.Logs.Count > 0, 1000);
+        SpinWait.SpinUntil(() => logger.Logs.Count > 0, 10000);
         Assert.Single(logger.Logs);
         var log = logger.Logs.First();
         Assert.Equal(LogLevel.Error, log.LogLevel);

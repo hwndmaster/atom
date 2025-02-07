@@ -13,7 +13,7 @@ internal sealed class MemoryStreamWrapper : MemoryStream
     {
         Seek(0, SeekOrigin.Begin);
         var buffer = new byte[Length];
-        Read(buffer, 0, buffer.Length);
+        ReadExactly(buffer, 0, buffer.Length);
         _whenDisposedHandler(buffer);
 
         base.Dispose(disposing);

@@ -4,20 +4,6 @@ namespace Genius.Atom.UI.Forms.TestingUtil;
 
 public static class UiFormsTestHelper
 {
-    /*
-    TODO: Removed due to moving away from Moq.
-    public static void RaisePropertyChanged<T>(Mock<T> container, Expression<Func<T, object>> propertyNameExpr, object? value)
-        where T : class, IViewModel
-    {
-        var propertyName = ExpressionHelpers.GetPropertyName(propertyNameExpr);
-
-        container.Setup(x => x.TryGetPropertyValue(propertyName, out value))
-            .Returns(true);
-
-        container.Raise(x => x.PropertyChanged += null,
-            new PropertyChangedEventArgs(propertyName));
-    }*/
-
     public static void SetupDispatcher()
     {
         var frame = new DispatcherFrame();

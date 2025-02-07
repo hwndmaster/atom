@@ -2,7 +2,6 @@ global using System.Windows;
 global using Genius.Atom.Infrastructure;
 
 using System.Diagnostics.CodeAnalysis;
-using Genius.Atom.Infrastructure.Events;
 using Genius.Atom.Infrastructure.Logging;
 using Genius.Atom.UI.Forms.Controls.AutoGrid.Builders;
 using Genius.Atom.UI.Forms.ViewModels;

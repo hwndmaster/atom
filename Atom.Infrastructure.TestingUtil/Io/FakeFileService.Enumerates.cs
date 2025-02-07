@@ -35,7 +35,7 @@ public sealed partial class FakeFileService : IFileService
             RecurseSubdirectories = searchOption == SearchOption.AllDirectories
         });
 
-    private IEnumerable<EntityContext> EnumerateFilesOrDirectories(IEnumerable<EntityContext> collection, string path, string? searchPattern, EnumerationOptions? options)
+    private IEnumerable<EntityContext> EnumerateFilesOrDirectories(IEnumerable<EntityContext> collection, string path, string? searchPattern, EnumerationOptions options)
     {
         if (options.MaxRecursionDepth is not int.MaxValue or 0)
             throw new NotSupportedException("Custom MaxRecursionDepth values are not supported.");

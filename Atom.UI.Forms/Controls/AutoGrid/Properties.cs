@@ -110,8 +110,8 @@ public static class Properties
         if (presenter is null)
             return;
 
-        const int column = 0;
-        if (presenter.ItemContainerGenerator.ContainerFromIndex(column) is not DataGridCell cell)
+        const int Column = 0;
+        if (presenter.ItemContainerGenerator.ContainerFromIndex(Column) is not DataGridCell cell)
             return;
 
         var grid = row.FindVisualParent<DataGrid>();
