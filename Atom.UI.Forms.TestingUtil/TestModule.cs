@@ -8,8 +8,8 @@ namespace Genius.Atom.UI.Forms.TestingUtil;
 
 public static class TestModule
 {
+    private static readonly FakeServiceProvider _serviceProvider = new();
     private static bool _isInitialized;
-    private static FakeServiceProvider _serviceProvider = new();
 
     public static void Initialize(Action<FakeServiceProvider>? supplementalInitialization = null)
     {
