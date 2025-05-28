@@ -8,7 +8,10 @@ public class TestWpfApplication : IWpfApplication
 
     public TestWpfApplication AddSampleResources<T>(string resourceName, T resource)
     {
-        _resources.Add(resourceName, resource.NotNull());
+        if (!_resources.ContainsKey(resourceName))
+        {
+            _resources.Add(resourceName, resource.NotNull());
+        }
         return this;
     }
 
