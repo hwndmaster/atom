@@ -331,10 +331,10 @@ public abstract class ViewModelBase : IViewModel
 
     private void DetectValidationRules()
     {
-        var allProperties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var allProperties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
         foreach (var prop in allProperties)
         {
-            _validationRules.Add(prop.Name, new List<PropertyValidation>());
+            _validationRules.Add(prop.Name, []);
             foreach (var attr in prop.GetCustomAttributes<ValidationRuleAttribute>())
             {
                 var hasParams = attr.Parameters?.Any() == true;

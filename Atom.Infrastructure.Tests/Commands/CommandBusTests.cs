@@ -115,7 +115,7 @@ public sealed class CommandBusTests : IDisposable
         while (dummyHandlers.Count != TasksToRun
             || !dummyHandlers.TrueForAll(x => x.ExecutionCompleted))
         {
-            await Task.Delay(5);
+            await Task.Delay(5, CancellationToken.None);
         }
 
         // Verify

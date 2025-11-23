@@ -17,7 +17,7 @@ public sealed class ExtensionMethodsTests
         var task = Task.Run(() =>
         {
             throw new InvalidOperationException();
-        });
+        }, CancellationToken.None);
 
         // Act
         task.RunAndForget();
