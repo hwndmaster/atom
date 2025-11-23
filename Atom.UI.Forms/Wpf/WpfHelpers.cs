@@ -140,7 +140,7 @@ public static class WpfHelpers
             else
             {
                 DataGridRow? row = cell.FindVisualParent<DataGridRow>();
-                if (row is not null && !row.IsSelected)
+                if (row is { IsSelected: false })
                 {
                     row.IsSelected = true;
                 }
