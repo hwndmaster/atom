@@ -1,4 +1,4 @@
-namespace Genius.Atom.Data.Persistence;
+namespace Genius.Atom.Data.TypeVersioning;
 
 public interface IDataVersionUpgrader<in TFrom, out TTo>
     where TFrom : class

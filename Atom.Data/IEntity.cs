@@ -1,6 +1,11 @@
-namespace Genius.Atom.Infrastructure.Entities;
+namespace Genius.Atom.Data;
 
-public interface IEntity
+public interface IEntity<TKey, TReference> : IPrimaryId<TKey, TReference>, ITimeStamped
+    where TKey : notnull
+    where TReference : IReference<TKey, TReference>
 {
-    Guid Id { get; }
+    /// <summary>
+    /// Gets the date and time when the entity was created.
+    /// </summary>
+    DateTimeOffset DateCreated { get; }
 }

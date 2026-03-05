@@ -19,6 +19,11 @@ public sealed class FakeDateTime : IDateTime
         _clock = clock;
     }
 
+    public void Advance(TimeSpan timeSpan)
+    {
+        _clock = _clock.Add(timeSpan);
+    }
+
     public DateTime Now => _clock;
     public DateTime NowUtc => _clock.ToUniversalTime();
 

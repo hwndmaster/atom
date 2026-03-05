@@ -26,6 +26,10 @@ jobs:
       run: dotnet restore
     - name: Pack Data
       run: dotnet pack Atom.Data/Atom.Data.csproj --configuration Release
+    - name: Pack Data.Ef
+      run: dotnet pack Atom.Data.Ef/Atom.Data.Ef.csproj --configuration Release
+    - name: Pack Data Generators
+      run: dotnet pack Atom.Data.Generators/Atom.Data.Generators.csproj --configuration Release
     - name: Pack Infrastructure
       run: dotnet pack Atom.Infrastructure/Atom.Infrastructure.csproj --configuration Release
     - name: Pack Infrastructure.TestingUtil

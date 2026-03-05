@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Data\Atom.Data.csproj" />
+    <ProjectReference Include="..\Atom.Infrastructure\Atom.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

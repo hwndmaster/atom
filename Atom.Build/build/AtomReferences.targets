@@ -1,6 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AtomLocation>..\atom\</AtomLocation>
+    <AtomFramework Condition="'$(AtomFramework)' == ''">$(TargetFramework)</AtomFramework>
   </PropertyGroup>
 
   <Target Name="AtomDataReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -16,7 +17,31 @@
 
     <ItemGroup>
       <Reference Include="Genius.$(Name)" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path)\bin\Debug\net9.0\Genius.$(Name).dll</HintPath>
+        <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
+      </Reference>
+      <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+
+      <Reference Include="Genius.$(Name).Generators" Condition="'$(ProjectExists)' == 'true'">
+        <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).Generators.dll</HintPath>
+      </Reference>
+      <PackageReference Include="Genius.$(Name).Generators" Condition="'$(ProjectExists)' != 'true'" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="AtomDataEfReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
+    Condition="'$(ReferenceAtomDataEf)' == 'true'">
+    <PropertyGroup>
+      <Name>Atom.Data.Ef</Name>
+      <Path>$(MSBuildThisFileDirectory)$(AtomLocation)$(Name)</Path>
+      <ProjectExists Condition="Exists('$(Path)')">true</ProjectExists>
+    </PropertyGroup>
+
+    <!-- <Message Text="$(Path)" Importance="High" />
+    <Message Text="ProjectExists: $(ProjectExists)" Importance="High" /> -->
+
+    <ItemGroup>
+      <Reference Include="Genius.$(Name)" Condition="'$(ProjectExists)' == 'true'">
+        <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
@@ -32,14 +57,14 @@
 
     <ItemGroup>
       <Reference Include="Genius.$(Name)" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path)\bin\Debug\net9.0\Genius.$(Name).dll</HintPath>
+        <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
       <Reference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path).TestingUtil\bin\Debug\net9.0\Genius.$(Name).TestingUtil.dll</HintPath>
+        <HintPath>$(Path).TestingUtil\bin\Debug\$(AtomFramework)\Genius.$(Name).TestingUtil.dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>

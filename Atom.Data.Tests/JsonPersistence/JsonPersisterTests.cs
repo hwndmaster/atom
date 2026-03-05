@@ -1,9 +1,10 @@
-using Genius.Atom.Data.Persistence;
+using Genius.Atom.Data.JsonPersistence;
+using Genius.Atom.Data.TypeVersioning;
 using Genius.Atom.Infrastructure.TestingUtil;
 using Genius.Atom.Infrastructure.TestingUtil.Io;
 using Microsoft.Extensions.Logging;
 
-namespace Genius.Atom.Data.Tests.Persistence;
+namespace Genius.Atom.Data.Tests.JsonPersistence;
 
 public sealed class JsonPersisterTests : IDisposable
 {

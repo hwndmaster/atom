@@ -38,8 +38,7 @@ internal sealed class DynamicColumnsBehavior : IDisposable
             Disposer subscriptions = new();
 
             vm.WhenChanged<ViewModelBase, DynamicColumnsViewModel>(dynamicColumnContext.ColumnsPropertyName)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(dynamicColumnsVm =>
+                .SubscribeOnUiThread(dynamicColumnsVm =>
                 {
                     HandleColumnsPropertyChange(dynamicColumnsVm, dynamicColumnContext);
                 }).DisposeWith(subscriptions);

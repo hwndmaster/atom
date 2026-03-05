@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Atom.Data.Ef/Atom.Data.Ef.csproj" />
+  <Project Path="Atom.Data.Generators/Atom.Data.Generators.csproj" />
+  <Project Path="Atom.Data.Tests/Atom.Data.Tests.csproj" />
+  <Project Path="Atom.Data/Atom.Data.csproj" />
+  <Project Path="Atom.Infrastructure.TestingUtil/Atom.Infrastructure.TestingUtil.csproj" />
+  <Project Path="Atom.Infrastructure.Tests/Atom.Infrastructure.Tests.csproj" />
+  <Project Path="Atom.Infrastructure/Atom.Infrastructure.csproj" />
+  <Project Path="Atom.Reporting.UI/Atom.Reporting.UI.csproj" />
+  <Project Path="Atom.Reporting/Atom.Reporting.csproj" />
+  <Project Path="Atom.UI.Forms.Demo/Atom.UI.Forms.Demo.csproj" />
+  <Project Path="Atom.UI.Forms.TestingUtil/Atom.UI.Forms.TestingUtil.csproj" />
+  <Project Path="Atom.UI.Forms.Tests/Atom.UI.Forms.Tests.csproj" />
+  <Project Path="Atom.UI.Forms/Atom.UI.Forms.csproj" />
+</Solution>

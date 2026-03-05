@@ -7,9 +7,9 @@ public static class InfrastructureTestHelper
 {
     public static IDateTime CreateDateTime(DateTime dateTime)
     {
-        var fake = A.Fake<IDateTime>();
-        A.CallTo(() => fake.Now).Returns(dateTime);
-        return fake;
+        var fake = new IDateTimeImposter();
+        fake.Now.Getter().Returns(dateTime);
+        return fake.Instance();
     }
 
     public static Fixture CreateFixture(int recursionDepth = 2, bool useMutableValueTypeGenerator = false)
