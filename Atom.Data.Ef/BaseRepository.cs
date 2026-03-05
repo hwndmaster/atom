@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Genius.Atom.Data.Ef;
 
-internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCreateDto, TUpdateDto>
+public abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCreateDto, TUpdateDto>
     : IRepository<TKey, TReference, TGetDto, TCreateDto, TUpdateDto>
     where TKey : notnull
     where TEntity : EntityBase<TKey, TReference>
