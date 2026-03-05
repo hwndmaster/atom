@@ -1,8 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Genius.Atom.Data.TypeVersioning;
 using Genius.Atom.Infrastructure.Io;
 
-namespace Genius.Atom.Data.Persistence;
+namespace Genius.Atom.Data.JsonPersistence;
 
 public interface IJsonPersister
 {

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Genius.Atom.Data.Persistence;
+namespace Genius.Atom.Data.TypeVersioning;
 
 public interface ITypeDiscriminators
 {

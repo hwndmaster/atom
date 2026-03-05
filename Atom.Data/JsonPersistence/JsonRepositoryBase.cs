@@ -1,35 +1,43 @@
 using System.Reactive.Subjects;
+using Genius.Atom.Data.IdHandlers;
 using Genius.Atom.Infrastructure.Entities;
 using Genius.Atom.Infrastructure.Events;
 using Microsoft.Extensions.Logging;
 
-namespace Genius.Atom.Data.Persistence;
+namespace Genius.Atom.Data.JsonPersistence;
 
-public interface IRepository<in TEntity>
-    where TEntity: EntityBase
+public interface IJsonRepository<in TKey, in TReference, in TEntity>
+    where TKey : notnull
+    where TReference : IReference<TKey, TReference>
+    where TEntity : EntityBase<TKey, TReference>
 {
-    Task DeleteAsync(Guid entityId);
+    Task DeleteAsync(TReference entityId);
     Task OverwriteAsync(params TEntity[] entities);
     Task StoreAsync(params TEntity[] entities);
 }
 
-public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposable
-    where TEntity: EntityBase
+public abstract class JsonRepositoryBase<TKey, TReference, TEntity>
+    : IJsonRepository<TKey, TReference, TEntity>, IDisposable
+    where TKey : notnull
+    where TReference : IReference<TKey, TReference>
+    where TEntity: EntityBase<TKey, TReference>
 {
     private readonly ReaderWriterLockSlim _initializationLocker = new();
-    protected readonly IEventBus _eventBus;
-    protected readonly ILogger _logger;
-    protected readonly IJsonPersister _persister;
-    protected readonly Subject<IReadOnlyList<TEntity>> _loaded = new();
+    private readonly IEventBus _eventBus;
+    private readonly Subject<IReadOnlyList<TEntity>> _loaded = new();
+    private readonly IJsonPersister _persister;
+    private readonly IIdHandler<TKey> _idHandler;
+    protected readonly ILogger Logger;
 
     private List<TEntity>? _entities;
     private readonly string FILENAME = @$".\Data\{typeof(TEntity).Name}.json";
 
-    protected RepositoryBase(IEventBus eventBus, IJsonPersister persister, ILogger logger)
+    protected JsonRepositoryBase(IEventBus eventBus, IJsonPersister persister, IIdHandler<TKey> idHandler, ILogger logger)
     {
         _eventBus = eventBus;
-        _logger = logger;
         _persister = persister;
+        _idHandler = idHandler;
+        Logger = logger;
     }
 
     public void Dispose()
@@ -45,14 +53,14 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
         return _entities.NotNull();
     }
 
-    public virtual async Task<TEntity?> FindByIdAsync(Guid entityId)
+    public virtual async Task<TEntity?> FindByIdAsync(TReference entityId)
     {
         await EnsureInitializationAsync();
 
-        return _entities.NotNull().Find(x => x.Id == entityId);
+        return _entities.NotNull().Find(x => x.Id.Equals(entityId));
     }
 
-    public virtual async Task DeleteAsync(Guid entityId)
+    public virtual async Task DeleteAsync(TReference entityId)
     {
         await EnsureInitializationAsync();
 
@@ -104,14 +112,14 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
         _loaded.OnNext(_entities.AsReadOnly());
     }
 
-    private void DeleteInternal(Guid entityId, string fileName)
+    private void DeleteInternal(TReference entityId, string fileName)
     {
         Guard.NotNull(_entities);
 
-        var entity = _entities.Find(x => x.Id == entityId);
+        var entity = _entities.Find(x => x.Id.Equals(entityId));
         if (entity is null)
         {
-            _logger.LogWarning("Cannot find entity '{EntityId}' to delete", entityId);
+            Logger.LogWarning("Cannot find entity '{EntityId}' to delete", entityId);
             return;
         }
 
@@ -119,7 +127,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
 
         _persister.Store(fileName, _entities);
 
-        _eventBus.Publish(new EntitiesAffectedEvent(typeof(TEntity), EntityAffectedEventType.Deleted, entityId));
+        _eventBus.Publish(new EntitiesAffectedEvent<TReference>(typeof(TEntity), EntityAffectedEventType.Deleted, entityId));
     }
 
     private async Task StoreInternalAsync(bool overwrite, params TEntity[] entities)
@@ -131,24 +139,24 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
 
         await EnsureInitializationAsync();
 
-        var addedEntities = new List<Guid>();
-        var updatedEntities = new List<Guid>();
+        var addedEntities = new List<TReference>();
+        var updatedEntities = new List<TReference>();
 
         foreach (var entity in entities)
         {
-            if (entity.Id == Guid.Empty)
+            if (entity.Id.IsDefault())
             {
-                entity.SetId(Guid.NewGuid());
+                entity.SetId(TReference.Create(_idHandler.GenerateId()));
             }
 
             await FillUpRelationsAsync(entity);
 
-            var index = _entities!.FindIndex(x => x.Id == entity.Id);
+            var index = _entities!.FindIndex(x => x.Id.Equals(entity.Id));
             if (index == -1)
             {
                 addedEntities.Add(entity.Id);
                 _entities.Add(entity);
-                _logger.LogTrace("New entity '{Entity}' with id '{EntityId}' added", entity, entity.Id);
+                Logger.LogTrace("New entity '{Entity}' with id '{EntityId}' added", entity, entity.Id);
             }
             else
             {
@@ -157,7 +165,7 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
             }
         }
 
-        Guid[]? deletedEntities = Array.Empty<Guid>();
+        TReference[]? deletedEntities = Array.Empty<TReference>();
         if (overwrite)
         {
             var allEntitiesId = entities.Select(x => x.Id).ToHashSet();
@@ -170,11 +178,11 @@ public abstract class RepositoryBase<TEntity> : IRepository<TEntity>, IDisposabl
 
         if (addedEntities.Any() || updatedEntities.Any() || deletedEntities.Any())
         {
-            _eventBus.Publish(new EntitiesAffectedEvent(typeof(TEntity), addedEntities,
+            _eventBus.Publish(new EntitiesAffectedEvent<TReference>(typeof(TEntity), addedEntities,
                 updatedEntities, deletedEntities));
         }
 
-        _logger.LogInformation("Entities of type {TypeName} updated.", typeof(TEntity).Name);
+        Logger.LogInformation("Entities of type {TypeName} updated.", typeof(TEntity).Name);
     }
 
     protected IObservable<IReadOnlyList<TEntity>> Loaded => _loaded;

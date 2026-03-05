@@ -1,4 +1,4 @@
-namespace Genius.Atom.Data.Persistence;
+namespace Genius.Atom.Data.TypeVersioning;
 
 internal sealed class DataVersionUpgraderProxy
 {

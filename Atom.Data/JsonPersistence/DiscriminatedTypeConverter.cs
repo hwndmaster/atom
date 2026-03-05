@@ -1,7 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Genius.Atom.Data.TypeVersioning;
 
-namespace Genius.Atom.Data.Persistence;
+namespace Genius.Atom.Data.JsonPersistence;
 
 internal sealed class DiscriminatedTypeConverterFactory : JsonConverterFactory
 {
