@@ -1,6 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AtomLocation>..\atom\</AtomLocation>
+    <AtomLocation Condition="'$(AtomLocation)' == ''">..\atom\</AtomLocation>
+    <AtomGeneratorsFramework>netstandard2.0</AtomGeneratorsFramework>
     <AtomFramework Condition="'$(AtomFramework)' == ''">$(TargetFramework)</AtomFramework>
   </PropertyGroup>
 
@@ -21,10 +22,14 @@
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
 
-      <Reference Include="Genius.$(Name).Generators" Condition="'$(ProjectExists)' == 'true'">
-        <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).Generators.dll</HintPath>
-      </Reference>
-      <PackageReference Include="Genius.$(Name).Generators" Condition="'$(ProjectExists)' != 'true'" />
+      <!-- Register generator + all its dependencies as Analyzers so Roslyn's isolated load context can resolve them -->
+      <Analyzer Include="$(Path).Generators\bin\Debug\$(AtomGeneratorsFramework)\*.dll"
+        Condition="'$(ProjectExists)' == 'true'" />
+      <PackageReference Include="Genius.$(Name).Generators" Condition="'$(ProjectExists)' != 'true'"
+        OutputItemType="Analyzer"
+        ReferenceOutputAssembly="false" />
+
+      <Using Include="Genius.Atom.Data" />
     </ItemGroup>
   </Target>
 
@@ -44,6 +49,8 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+
+      <Using Include="Genius.Atom.Data.Ef" />
     </ItemGroup>
   </Target>
 
