@@ -9,7 +9,7 @@
     <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)DotnetDiagnostic.globalconfig" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(IsTestProject)">
+  <ItemGroup Condition="$(IsTestProject) == 'True'">
     <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)TestProject.globalconfig" />
   </ItemGroup>
 
@@ -24,7 +24,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
   </ItemGroup>
-  <ItemGroup Condition="$(IsTestProject)">
+  <ItemGroup Condition="$(IsTestProject) == 'True'">
     <Compile Include="$(MSBuildThisFileDirectory)TestsGlobalSuppressions.cs" />
   </ItemGroup>
 

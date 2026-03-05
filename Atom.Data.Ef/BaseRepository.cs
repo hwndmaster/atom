@@ -24,11 +24,10 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
     {
         bool hasContext = context is not null;
         context ??= _dbContextProvider.GetDbContext();
-        await using var dbContext = context;
 
         try
         {
-            return await dbContext.Set<TEntity>()
+            return await context.Set<TEntity>()
                 .Where(IdEquals(id))
                 .Select(ProjectToGetDto())
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false)
@@ -38,7 +37,7 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
         {
             if (!hasContext)
             {
-                await dbContext.DisposeAsync().ConfigureAwait(false);
+                await context.DisposeAsync().ConfigureAwait(false);
             }
         }
     }
@@ -47,11 +46,10 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
     {
         bool hasContext = context is not null;
         context ??= _dbContextProvider.GetDbContext();
-        await using var dbContext = context;
 
         try
         {
-            return await dbContext.Set<TEntity>()
+            return await context.Set<TEntity>()
             .Select(ProjectToGetDto())
             .ToArrayAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -59,7 +57,7 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
         {
             if (!hasContext)
             {
-                await dbContext.DisposeAsync().ConfigureAwait(false);
+                await context.DisposeAsync().ConfigureAwait(false);
             }
         }
     }
@@ -68,20 +66,19 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
     {
         bool hasContext = context is not null;
         context ??= _dbContextProvider.GetDbContext();
-        await using var dbContext = context;
 
         try
         {
-            var entity = MapCreateDto(createDto, dbContext);
+            var entity = MapCreateDto(createDto, context);
             var date = TruncateToSeconds(_dateTime.NowUtc);
             entity = entity with {
                 DateCreated = entity.DateCreated == DateTimeOffset.MinValue ? date : entity.DateCreated,
                 LastModified = entity.LastModified == DateTimeOffset.MinValue ? date : entity.LastModified
             };
-            dbContext.Set<TEntity>().Add(entity);
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            context.Set<TEntity>().Add(entity);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-            await AfterCreateAsync(createDto, entity, dbContext, cancellationToken);
+            await AfterCreateAsync(createDto, entity, context, cancellationToken);
 
             return new CreatedEntityDto<TKey, TReference>(entity.Id, entity.LastModified);
         }
@@ -89,7 +86,7 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
         {
             if (!hasContext)
             {
-                await dbContext.DisposeAsync().ConfigureAwait(false);
+                await context.DisposeAsync().ConfigureAwait(false);
             }
         }
     }
@@ -100,11 +97,10 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
 
         bool hasContext = context is not null;
         context ??= _dbContextProvider.GetDbContext();
-        await using var dbContext = context;
 
         try
         {
-            var existingEntity = await dbContext.Set<TEntity>()
+            var existingEntity = await context.Set<TEntity>()
                 .FirstOrDefaultAsync(IdEquals(updateDto.Id), cancellationToken).ConfigureAwait(false);
 
             if (existingEntity is null)
@@ -117,16 +113,16 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
                 throw new InvalidOperationException($"Entity with ID {updateDto.Id} has a version conflict.");
             }
 
-            var updatedEntity = MapUpdateDto(updateDto, existingEntity, dbContext);
+            var updatedEntity = MapUpdateDto(updateDto, existingEntity, context);
 
             // Update the time stamp which also represents the version
             updatedEntity = updatedEntity with { LastModified = TruncateToSeconds(_dateTime.NowUtc) };
 
-            dbContext.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
+            context.Entry(existingEntity).CurrentValues.SetValues(updatedEntity);
 
-            await AfterUpdateAsync(updateDto, updatedEntity, dbContext, cancellationToken);
+            await AfterUpdateAsync(updateDto, updatedEntity, context, cancellationToken);
 
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             return new UpdatedEntityDto<TKey, TReference>(updatedEntity.Id, updatedEntity.LastModified);
         }
@@ -134,7 +130,7 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
         {
             if (!hasContext)
             {
-                await dbContext.DisposeAsync().ConfigureAwait(false);
+                await context.DisposeAsync().ConfigureAwait(false);
             }
         }
     }
@@ -143,10 +139,10 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
     {
         bool hasContext = context is not null;
         context ??= _dbContextProvider.GetDbContext();
-        await using var dbContext = context;
+
         try
         {
-            var entity = await dbContext.Set<TEntity>()
+            var entity = await context.Set<TEntity>()
                 .FirstOrDefaultAsync(IdEquals(id), cancellationToken).ConfigureAwait(false);
 
             if (entity is null)
@@ -154,14 +150,14 @@ internal abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCrea
                 throw new InvalidOperationException($"Entity with ID '{id}' not found.");
             }
 
-            dbContext.Set<TEntity>().Remove(entity);
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            context.Set<TEntity>().Remove(entity);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
         {
             if (!hasContext)
             {
-                await dbContext.DisposeAsync().ConfigureAwait(false);
+                await context.DisposeAsync().ConfigureAwait(false);
             }
         }
     }

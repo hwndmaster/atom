@@ -6,8 +6,13 @@ public sealed class IntIdHandler : IIdHandler<int>
 
     public int GenerateId()
     {
-        var timestamp = (int)(DateTimeOffset.UtcNow.Ticks % int.MaxValue);
-        var guidHash = Guid.NewGuid().GetHashCode();
-        return timestamp ^ guidHash;
+        int id;
+        do
+        {
+            var timestamp = (int)(DateTimeOffset.UtcNow.Ticks % int.MaxValue);
+            var guidHash = Guid.NewGuid().GetHashCode();
+            id = timestamp ^ guidHash;
+        } while (id == 0);
+        return id;
     }
 }
