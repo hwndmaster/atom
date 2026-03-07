@@ -1,4 +1,4 @@
-namespace Genius.Atom.Infrastructure.Entities;
+namespace Genius.Atom.Infrastructure.Events.Entities;
 
 public enum EntityAffectedEventType
 {

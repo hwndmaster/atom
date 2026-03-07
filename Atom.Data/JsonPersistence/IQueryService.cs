@@ -1,4 +1,4 @@
-namespace Genius.Atom.Infrastructure.Entities;
+namespace Genius.Atom.Data.JsonPersistence;
 
 public interface IQueryService<TEntityDto>
 {

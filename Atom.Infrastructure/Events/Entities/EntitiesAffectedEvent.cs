@@ -1,6 +1,4 @@
-using Genius.Atom.Infrastructure.Events;
-
-namespace Genius.Atom.Infrastructure.Entities;
+namespace Genius.Atom.Infrastructure.Events.Entities;
 
 public sealed class EntitiesAffectedEvent<TEntityKey> : IEventMessage
     where TEntityKey : notnull
@@ -9,11 +7,11 @@ public sealed class EntitiesAffectedEvent<TEntityKey> : IEventMessage
         IEnumerable<(TEntityKey, Type)>? entitiesUpdated,
         IEnumerable<(TEntityKey, Type)>? entitiesDeleted)
     {
-        Added = entitiesAdded is null ? new Dictionary<TEntityKey, Type>()
+        Added = entitiesAdded is null ? []
             : entitiesAdded.ToDictionary(x => x.Item1, x => x.Item2);
-        Updated = entitiesUpdated is null ? new Dictionary<TEntityKey, Type>()
+        Updated = entitiesUpdated is null ? []
             : entitiesUpdated.ToDictionary(x => x.Item1, x => x.Item2);
-        Deleted = entitiesDeleted is null ? new Dictionary<TEntityKey, Type>()
+        Deleted = entitiesDeleted is null ? []
             : entitiesDeleted.ToDictionary(x => x.Item1, x => x.Item2);
         TypesAffected = new HashSet<Type>();
 
@@ -31,11 +29,11 @@ public sealed class EntitiesAffectedEvent<TEntityKey> : IEventMessage
     {
         Guard.NotNull(entityType);
 
-        Added = entityAddedIds is null ? new Dictionary<TEntityKey, Type>()
+        Added = entityAddedIds is null ? []
             : entityAddedIds.ToDictionary(x => x, _ => entityType);
-        Updated = entityUpdatedIds is null ? new Dictionary<TEntityKey, Type>()
+        Updated = entityUpdatedIds is null ? []
             : entityUpdatedIds.ToDictionary(x => x, _ => entityType);
-        Deleted = entityDeletedIds is null ? new Dictionary<TEntityKey, Type>()
+        Deleted = entityDeletedIds is null ? []
             : entityDeletedIds.ToDictionary(x => x, _ => entityType);
         TypesAffected = new HashSet<Type>(new[] { entityType });
     }

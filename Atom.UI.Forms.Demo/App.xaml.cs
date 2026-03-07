@@ -27,7 +27,7 @@ public partial class App : Application
         serviceCollection.AddTransient<SampleDataAutoGridBuilder>();
 
         Infrastructure.Module.Configure(serviceCollection);
-        UI.Forms.Module.Configure(serviceCollection, this, enableSerilog: false);
+        UI.Forms.Module.Configure(serviceCollection, this);
 
         ServiceProvider = serviceCollection.BuildServiceProvider();
 

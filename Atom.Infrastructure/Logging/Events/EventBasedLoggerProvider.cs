@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Genius.Atom.Infrastructure.Events;
 using Microsoft.Extensions.Logging;
 
-namespace Genius.Atom.Infrastructure.Logging;
+namespace Genius.Atom.Infrastructure.Logging.Events;
 
 public sealed class EventBasedLoggerProvider : ILoggerProvider
 {

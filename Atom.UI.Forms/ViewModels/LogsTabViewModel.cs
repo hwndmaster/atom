@@ -1,6 +1,6 @@
 using System.Reactive.Disposables;
 using Genius.Atom.Infrastructure.Events;
-using Genius.Atom.Infrastructure.Logging;
+using Genius.Atom.Infrastructure.Logging.Events;
 using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.UI.Forms.ViewModels;
