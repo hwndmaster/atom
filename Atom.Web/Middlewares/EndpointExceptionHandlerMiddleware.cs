@@ -7,12 +7,12 @@ namespace Genius.Atom.Web.Middlewares;
 /// <summary>
 /// Component that catches unhandled exception thrown later in the pipeline and returns it as a 409 Conflict response.
 /// </summary>
-internal sealed class EndpointExceptionHandlerMiddleware
+internal sealed class InvalidOperationExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<EndpointExceptionHandlerMiddleware> _logger;
+    private readonly ILogger<InvalidOperationExceptionHandlerMiddleware> _logger;
 
-    public EndpointExceptionHandlerMiddleware(RequestDelegate next, ILogger<EndpointExceptionHandlerMiddleware> logger)
+    public InvalidOperationExceptionHandlerMiddleware(RequestDelegate next, ILogger<InvalidOperationExceptionHandlerMiddleware> logger)
     {
         _next = next ?? throw new ArgumentNullException(nameof(next));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -37,7 +37,7 @@ internal sealed class EndpointExceptionHandlerMiddleware
             // Use detailed message only for InvalidOperationException, otherwise generic server error.
             string message = ex is InvalidOperationException
                 ? ex.Message
-                : "A server error occurred, check with administrator.";
+                : "A server error occurred. Check the logs for more details.";
             string payload = JsonSerializer.Serialize(message);
             await context.Response.WriteAsync(payload).ConfigureAwait(false);
         }

@@ -48,6 +48,11 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
             return BadRequest(preAddResult.ErrorMessage ?? "Pre-add checks failed.");
         }
 
+        if (preAddResult.UpdatedRequest is not null)
+        {
+            createRequest = preAddResult.UpdatedRequest;
+        }
+
         CreatedEntityDto<TKey, TReference> createdEntity = await Repository.CreateAsync(createRequest, cancellationToken: cancellationToken).ConfigureAwait(false);
         await PostAddAsync(createRequest, createdEntity.EntityId, cancellationToken).ConfigureAwait(false);
         return createdEntity;
@@ -71,6 +76,11 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
         if (!preUpdateResult.Success)
         {
             return BadRequest(preUpdateResult.ErrorMessage ?? "Pre-update checks failed.");
+        }
+
+        if (preUpdateResult.UpdatedRequest is not null)
+        {
+            updateRequest = preUpdateResult.UpdatedRequest;
         }
 
         var updatedEntity = await Repository.UpdateAsync(updateRequest, cancellationToken: cancellationToken).ConfigureAwait(false);

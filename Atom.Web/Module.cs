@@ -42,6 +42,6 @@ public static class Module
             app.MapOpenApi();
         }
 
-        app.UseMiddleware<EndpointExceptionHandlerMiddleware>();
+        app.UseMiddleware<InvalidOperationExceptionHandlerMiddleware>();
     }
 }

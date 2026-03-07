@@ -18,7 +18,8 @@ internal static class ValidationResultExtensions
         return new ValidationProblemDetails(
             validationResults
                 .Where(x => x.ErrorMessage is not null)
-                .ToLookup(x => x.MemberNames.First(), x => x.ErrorMessage!)
+                .SelectMany(x => x.MemberNames.Select(member => new { member, x.ErrorMessage }))
+                .ToLookup(x => x.member ?? string.Empty, x => x.ErrorMessage!)
                 .ToDictionary(x => x.Key, x => x.ToArray()));
     }
 }

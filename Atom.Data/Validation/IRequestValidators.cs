@@ -25,7 +25,7 @@ public interface IRequestValidators
     /// <param name="request">The request object to validate.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>
-    ///   An <see cref="ImmutableArray{T}"/> of <see cref="ValidationResult"/> objects representing the
+    ///   An asynchronous enumerable of <see cref="ValidationResult"/> objects representing the
     ///   validation results. The collection will be empty if the request is valid.
     /// </returns>
     IAsyncEnumerable<ValidationResult> ValidateAsync<TRequest>(TRequest request, CancellationToken cancellationToken = default);

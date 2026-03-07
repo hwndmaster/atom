@@ -76,7 +76,9 @@
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
-    <Using Include="Genius.Atom.Infrastructure" />
+    <ItemGroup>
+      <Using Include="Genius.Atom.Infrastructure" />
+    </ItemGroup>
   </Target>
 
   <Target Name="AtomUiFormsReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -123,6 +125,8 @@
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
-    <Using Include="Genius.Atom.Web" />
+    <ItemGroup>
+      <Using Include="Genius.Atom.Web" />
+    </ItemGroup>
   </Target>
 </Project>
