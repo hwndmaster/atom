@@ -7,12 +7,19 @@ namespace Genius.Atom.Infrastructure.Logging;
 
 public static class LoggingModule
 {
-    public static void Configure(IServiceCollection services, IConfiguration? configuration = null)
+    public static void Configure(IServiceCollection services, IConfiguration? configuration = null, bool includeSerilog = true)
     {
         services.AddTransient<EventBasedLoggerProvider>();
-        services.AddLogging(x => x.AddSerilog(dispose: true));
 
-        ConfigureSerilog(configuration);
+        if (includeSerilog)
+        {
+            services.AddLogging(x => x.AddSerilog(dispose: true));
+            ConfigureSerilog(configuration);
+        }
+        else
+        {
+            services.AddLogging();
+        }
     }
 
     public static void ConfigureSerilog(IConfiguration? configuration = null)

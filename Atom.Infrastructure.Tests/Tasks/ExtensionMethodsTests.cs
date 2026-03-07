@@ -12,8 +12,8 @@ public sealed class ExtensionMethodsTests
         // Arrange
         var logger = new FakeLogger<Task>();
         using var serviceProvider = new FakeServiceProvider();
-        Module.Initialize(serviceProvider);
         serviceProvider.RegisterInstance<ILogger<Task>>(logger);
+        Module.Initialize(serviceProvider);
         var task = Task.Run(() =>
         {
             throw new InvalidOperationException();
