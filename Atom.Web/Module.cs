@@ -11,7 +11,10 @@ namespace Genius.Atom.Web;
 [ExcludeFromCodeCoverage]
 public static class Module
 {
-    public static void Configure(WebApplicationBuilder builder, Microsoft.AspNetCore.Mvc.ApiVersion defaultApiVersion)
+    public static void Configure(WebApplicationBuilder builder,
+        Microsoft.AspNetCore.Mvc.ApiVersion defaultApiVersion,
+        Action<Microsoft.AspNetCore.Mvc.MvcOptions>? configureMvcOptions = null,
+        Action<System.Text.Json.JsonSerializerOptions>? configureJsonOptions = null)
     {
         Guard.NotNull(builder);
 
@@ -30,7 +33,18 @@ public static class Module
             options.SubstituteApiVersionInUrl = true;
         });
 
-        builder.Services.Configure<JsonOptions>(options => JsonSetup.SetupJsonOptions(options.SerializerOptions));
+        builder.Services
+            .AddControllers(configureMvcOptions)
+            .AddJsonOptions(options =>
+            {
+                JsonSetup.SetupJsonOptions(options.JsonSerializerOptions);
+                configureJsonOptions?.Invoke(options.JsonSerializerOptions);
+            });
+        builder.Services.Configure<JsonOptions>(options =>
+        {
+            JsonSetup.SetupJsonOptions(options.SerializerOptions);
+            configureJsonOptions?.Invoke(options.SerializerOptions);
+        });
     }
 
     public static void Initialize(WebApplication app)

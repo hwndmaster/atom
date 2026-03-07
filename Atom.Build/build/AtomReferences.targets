@@ -5,6 +5,22 @@
     <AtomFramework Condition="'$(AtomFramework)' == ''">$(TargetFramework)</AtomFramework>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(ReferenceAtomData)' == 'true'">
+    <Using Include="Genius.Atom.Data" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ReferenceAtomDataEf)' == 'true'">
+    <Using Include="Genius.Atom.Data.Ef" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ReferenceAtomInfrastructure)' == 'true'">
+    <Using Include="Genius.Atom.Infrastructure" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ReferenceAtomWeb)' == 'true'">
+    <Using Include="Genius.Atom.Web" />
+  </ItemGroup>
+
   <Target Name="AtomDataReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
     Condition="'$(ReferenceAtomData)' == 'true'">
     <PropertyGroup>
@@ -28,9 +44,8 @@
       <PackageReference Include="Genius.$(Name).Generators" Condition="'$(ProjectExists)' != 'true'"
         OutputItemType="Analyzer"
         ReferenceOutputAssembly="false" />
-
-      <Using Include="Genius.Atom.Data" />
     </ItemGroup>
+
   </Target>
 
   <Target Name="AtomDataEfReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -49,9 +64,8 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
-
-      <Using Include="Genius.Atom.Data.Ef" />
     </ItemGroup>
+
   </Target>
 
   <Target Name="AtomInfrastructureReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -76,9 +90,6 @@
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Using Include="Genius.Atom.Infrastructure" />
-    </ItemGroup>
   </Target>
 
   <Target Name="AtomUiFormsReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -125,8 +136,5 @@
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Using Include="Genius.Atom.Web" />
-    </ItemGroup>
   </Target>
 </Project>
