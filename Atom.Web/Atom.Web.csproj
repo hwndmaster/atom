@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Use FrameworkReference for ASP.NET Core shared framework -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
+    <!-- Keep only NuGet packages not included in the shared framework -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Data\Atom.Data.csproj" />
+    <ProjectReference Include="..\Atom.Data.Ef\Atom.Data.Ef.csproj" />
+    <ProjectReference Include="..\Atom.Infrastructure\Atom.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Genius.Atom.Infrastructure" />
+  </ItemGroup>
+
+</Project>

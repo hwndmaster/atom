@@ -8,7 +8,6 @@ using Genius.Atom.UI.Forms.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace Genius.Atom.UI.Forms;
 
@@ -18,11 +17,11 @@ public static class Module
     private static IServiceProvider? _serviceProvider;
     internal static IServiceProvider ServiceProvider => _serviceProvider!;
 
-    public static IConfiguration Configure(IServiceCollection services, Application application, bool enableSerilog = true)
+    public static IConfiguration Configure(IServiceCollection services, Application application)
     {
         var config = LoadConfiguration(services);
 
-        ConfigureLogging(services, config, enableSerilog);
+        LoggingModule.ConfigureSerilog(config);
 
         // View Models:
         services.AddTransient<ILogsTabViewModel, LogsTabViewModel>();
@@ -47,11 +46,6 @@ public static class Module
     public static void Initialize(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider.NotNull(message: "Call Genius.Atom.UI.Forms.Module.Initialize(serviceProvider) in your application initialization.");
-
-        serviceProvider
-            .GetService<Microsoft.Extensions.Logging.ILoggerFactory>()
-            .NotNull()
-            .AddProvider(serviceProvider.GetRequiredService<EventBasedLoggerProvider>());
     }
 
     private static IConfiguration LoadConfiguration(IServiceCollection serviceCollection)
@@ -62,26 +56,5 @@ public static class Module
         IConfiguration config = builder.Build();
         serviceCollection.AddSingleton<IConfiguration>(config);
         return config;
-    }
-
-    private static void ConfigureLogging(IServiceCollection services, IConfiguration configuration, bool enableSerilog)
-    {
-        if (enableSerilog)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .Enrich.WithThreadId()
-                .Enrich.WithComputed("SourceContextName", "Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)")
-                .CreateLogger();
-        }
-
-        // Framework:
-        services.AddLogging(x =>
-        {
-            if (enableSerilog)
-            {
-                x.AddSerilog();
-            }
-        });
     }
 }

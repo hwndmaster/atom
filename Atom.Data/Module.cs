@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using Genius.Atom.Data.IdHandlers;
 using Genius.Atom.Data.JsonPersistence;
 using Genius.Atom.Data.TypeVersioning;
+using Genius.Atom.Data.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Data;
@@ -28,6 +29,9 @@ public static class Module
         services.AddSingleton<TypeDiscriminators>();
         services.AddSingleton<ITypeDiscriminators>(x => x.GetRequiredService<TypeDiscriminators>());
         services.AddSingleton<ITypeDiscriminatorsInternal>(x => x.GetRequiredService<TypeDiscriminators>());
+
+        // Misc
+        services.AddSingleton<IRequestValidators, RequestValidators>();
     }
 
     public static void Initialize(IServiceProvider serviceProvider)

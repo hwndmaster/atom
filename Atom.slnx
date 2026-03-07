@@ -17,4 +17,5 @@
   <Project Path="Atom.UI.Forms.TestingUtil/Atom.UI.Forms.TestingUtil.csproj" />
   <Project Path="Atom.UI.Forms.Tests/Atom.UI.Forms.Tests.csproj" />
   <Project Path="Atom.UI.Forms/Atom.UI.Forms.csproj" />
+  <Project Path="Atom.Web/Atom.Web.csproj" />
 </Solution>

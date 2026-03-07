@@ -1,4 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using Genius.Atom.Infrastructure.Events;
+using Genius.Atom.Infrastructure.Logging;
+using Genius.Atom.Infrastructure.TestingUtil.Events;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Infrastructure.TestingUtil;
@@ -7,6 +10,12 @@ public sealed class FakeServiceProvider : IServiceProvider, IDisposable
 {
     private readonly ServiceCollection _serviceCollection = new();
     private ServiceProvider? _serviceProvider;
+
+    public FakeServiceProvider()
+    {
+        AddSingleton<IEventBus, FakeEventBus>(isTestImplementation: true);
+        LoggingModule.Configure(_serviceCollection, includeSerilog: false);
+    }
 
     public void AddSingleton<TServiceAndImplementation>(bool isTestImplementation = false)
         where TServiceAndImplementation : class
@@ -55,7 +64,13 @@ public sealed class FakeServiceProvider : IServiceProvider, IDisposable
     [MemberNotNull(nameof(_serviceProvider))]
     private void EnsureServiceProvider()
     {
-        _serviceProvider ??= _serviceCollection.BuildServiceProvider();
+        if (_serviceProvider is null)
+        {
+            lock (_serviceCollection)
+            {
+                _serviceProvider ??= _serviceCollection.BuildServiceProvider();
+            }
+        }
     }
 
     private void CheckIntegrity()

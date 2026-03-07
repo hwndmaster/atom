@@ -76,6 +76,9 @@
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Using Include="Genius.Atom.Infrastructure" />
+    </ItemGroup>
   </Target>
 
   <Target Name="AtomUiFormsReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -105,5 +108,25 @@
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
+  </Target>
+
+  <Target Name="AtomWebReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
+    Condition="'$(ReferenceAtomWeb)' == 'true'">
+    <PropertyGroup>
+      <Name>Atom.Web</Name>
+      <Path>$(MSBuildThisFileDirectory)$(AtomLocation)$(Name)</Path>
+      <ProjectExists Condition="Exists('$(Path)')">true</ProjectExists>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="Genius.$(Name)" Condition="'$(ProjectExists)' == 'true'">
+        <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
+      </Reference>
+      <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Using Include="Genius.Atom.Web" />
+    </ItemGroup>
   </Target>
 </Project>

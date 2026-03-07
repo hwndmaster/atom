@@ -11,5 +11,8 @@
     ],
     "dotnet-test-explorer.autoWatch": true,
     "editor.tabSize": 4,
-    "dotnet.defaultSolution": "Atom.sln"
+    "dotnet.defaultSolution": "Atom.sln",
+    "cSpell.words": [
+        "Serilog"
+    ]
 }

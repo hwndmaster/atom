@@ -1,7 +1,7 @@
 using System.Reactive.Subjects;
 using Genius.Atom.Data.IdHandlers;
-using Genius.Atom.Infrastructure.Entities;
 using Genius.Atom.Infrastructure.Events;
+using Genius.Atom.Infrastructure.Events.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Genius.Atom.Data.JsonPersistence;

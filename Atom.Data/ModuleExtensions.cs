@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Genius.Atom.Data.JsonPersistence;
-using Genius.Atom.Infrastructure.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Genius.Atom.Data;
