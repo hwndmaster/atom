@@ -1,17 +1,15 @@
+using System.Collections.Concurrent;
 using Genius.Atom.Infrastructure;
 
 namespace Genius.Atom.UI.Forms.TestingUtil;
 
 public class TestWpfApplication : IWpfApplication
 {
-    private readonly Dictionary<string, object> _resources = [];
+    private readonly ConcurrentDictionary<string, object> _resources = [];
 
     public TestWpfApplication AddSampleResources<T>(string resourceName, T resource)
     {
-        if (!_resources.ContainsKey(resourceName))
-        {
-            _resources.Add(resourceName, resource.NotNull());
-        }
+        _resources.TryAdd(resourceName, resource.NotNull());
         return this;
     }
 

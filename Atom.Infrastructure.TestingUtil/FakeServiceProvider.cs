@@ -13,7 +13,7 @@ public sealed class FakeServiceProvider : IServiceProvider, IDisposable
 
     public FakeServiceProvider()
     {
-        _serviceCollection.AddSingleton<IEventBus, FakeEventBus>();
+        AddSingleton<IEventBus, FakeEventBus>(isTestImplementation: true);
         LoggingModule.Configure(_serviceCollection, includeSerilog: false);
     }
 
@@ -64,7 +64,13 @@ public sealed class FakeServiceProvider : IServiceProvider, IDisposable
     [MemberNotNull(nameof(_serviceProvider))]
     private void EnsureServiceProvider()
     {
-        _serviceProvider ??= _serviceCollection.BuildServiceProvider();
+        if (_serviceProvider is null)
+        {
+            lock (_serviceCollection)
+            {
+                _serviceProvider ??= _serviceCollection.BuildServiceProvider();
+            }
+        }
     }
 
     private void CheckIntegrity()

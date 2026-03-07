@@ -8,6 +8,7 @@ namespace Genius.Atom.UI.Forms.TestingUtil;
 
 public static class TestModule
 {
+    private static readonly object _lock = new();
     private static readonly FakeServiceProvider _serviceProvider = new();
     private static bool _isInitialized;
 
@@ -16,17 +17,22 @@ public static class TestModule
         if (_isInitialized)
             return;
 
-        _serviceProvider.AddSingleton<EventBasedLoggerProvider, EventBasedLoggerProvider>();
-        _serviceProvider.AddSingleton<IEventBus, FakeEventBus>(isTestImplementation: true);
-        _serviceProvider.AddSingleton<IWpfApplication, TestWpfApplication>(isTestImplementation: true);
-        _serviceProvider.RegisterInstance(A.Fake<Microsoft.Extensions.Logging.ILoggerFactory>());
-        _serviceProvider.RegisterInstance(new JoinableTaskHelper());
+        lock (_lock)
+        {
+            if (_isInitialized)
+                return;
 
-        if (supplementalInitialization is not null)
-            supplementalInitialization(_serviceProvider);
+            _serviceProvider.AddSingleton<EventBasedLoggerProvider, EventBasedLoggerProvider>();
+            _serviceProvider.AddSingleton<IWpfApplication, TestWpfApplication>(isTestImplementation: true);
+            _serviceProvider.RegisterInstance(A.Fake<Microsoft.Extensions.Logging.ILoggerFactory>());
+            _serviceProvider.RegisterInstance(new JoinableTaskHelper());
 
-        Module.Initialize(_serviceProvider);
-        _isInitialized = true;
+            if (supplementalInitialization is not null)
+                supplementalInitialization(_serviceProvider);
+
+            Module.Initialize(_serviceProvider);
+            _isInitialized = true;
+        }
     }
 
     public static FakeServiceProvider ServiceProvider => _serviceProvider;
