@@ -6,6 +6,7 @@ namespace Genius.Atom.Data.Ef.TestingUtil;
 public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto, TUpdateDto, TRepository, TDbContext>
     where TKey : notnull
     where TReference : IReference<TKey, TReference>
+    where TGetDto : IPrimaryId<TKey, TReference>, ITimeStamped
     where TUpdateDto : IPrimaryId<TKey, TReference>, ITimeStamped
     where TRepository : IRepository<TKey, TReference, TGetDto, TCreateDto, TUpdateDto>
     where TDbContext : DbContext
@@ -13,6 +14,7 @@ public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto,
     private readonly Lazy<TRepository> _repository;
     private readonly DatabaseContext<TDbContext> _databaseContext;
     private readonly DbContextOptions<TDbContext> _dbOptions;
+    private int _index;
 
     protected FakeDateTime FakeDateTime = new();
     protected TRepository Repository => _repository.Value;
@@ -28,21 +30,45 @@ public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto,
     }
 
     [Fact]
-    public async Task GetAllAsync_ReturnsResults()
+    public async Task GetByIdAsync_ReturnsResult()
     {
+        // Arrange
+        await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+        var created = await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+        await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+
         // Act
-        var result = await Repository.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await Repository.GetByIdAsync(created.EntityId, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
-        Assert.NotEmpty(result);
+        Assert.Equal(created.EntityId, result.Id);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsResults()
+    {
+        // Arrange
+        var created1 = await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+        var created2 = await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+        var created3 = await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+
+        // Act
+        var result = (await Repository.GetAllAsync(cancellationToken: TestContext.Current.CancellationToken)).ToArray();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Length);
+        Assert.Contains(result, r => r.Id.Equals(created1.EntityId));
+        Assert.Contains(result, r => r.Id.Equals(created2.EntityId));
+        Assert.Contains(result, r => r.Id.Equals(created3.EntityId));
     }
 
     [Fact]
     public async Task CreateAsync_ReturnsCreatedEntity()
     {
         // Arrange
-        var createDto = CreateSampleCreateDto();
+        var createDto = CreateSampleCreateDto(_index);
 
         // Act
         var result = await Repository.CreateAsync(createDto, cancellationToken: TestContext.Current.CancellationToken);
@@ -57,8 +83,8 @@ public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto,
     public async Task UpdateAsync_ReturnsUpdatedEntity()
     {
         // Arrange
-        var created = await Repository.CreateAsync(CreateSampleCreateDto(), cancellationToken: TestContext.Current.CancellationToken);
-        var updateDto = CreateSampleUpdateDto(created.EntityId.Id, created.LastModified);
+        var created = await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+        var updateDto = CreateSampleUpdateDto(created.EntityId.Id, created.LastModified, ++_index);
         FakeDateTime.Advance(TimeSpan.FromMinutes(5)); // Ensure LastModified will be different after update
 
         // Act
@@ -74,7 +100,7 @@ public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto,
     public async Task DeleteAsync_CompletesSuccessfully()
     {
         // Arrange
-        var created = await Repository.CreateAsync(CreateSampleCreateDto(), cancellationToken: TestContext.Current.CancellationToken);
+        var created = await Repository.CreateAsync(CreateSampleCreateDto(_index), cancellationToken: TestContext.Current.CancellationToken);
 
         // Act
         var exception = await Record.ExceptionAsync(
@@ -85,6 +111,6 @@ public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto,
     }
 
     protected abstract TRepository CreateRepository(IDatabaseContext databaseContext);
-    protected abstract TCreateDto CreateSampleCreateDto();
-    protected abstract TUpdateDto CreateSampleUpdateDto(TKey id, DateTimeOffset lastModified);
+    protected abstract TCreateDto CreateSampleCreateDto(int index = 0);
+    protected abstract TUpdateDto CreateSampleUpdateDto(TKey id, DateTimeOffset lastModified, int index = 0);
 }
