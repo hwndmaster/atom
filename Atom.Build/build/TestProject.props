@@ -12,7 +12,7 @@
     <Using Include="Imposter.Abstractions" />
     <Using Include="Xunit" />
   </ItemGroup>
-  <ItemGroup Label="TestReferences" Condition="$(IsTestProject) == 'True'">
+  <ItemGroup Label="TestReferences" Condition="$(IsTestProject) == 'True' Or $(IsTestingUtilProject) == 'True'">
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.analyzers" />

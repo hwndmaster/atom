@@ -17,13 +17,18 @@ internal sealed class DateTimeOffsetTicksConverter : JsonConverter<DateTimeOffse
             }
             return new DateTimeOffset(long.Parse(ticks, CultureInfo.InvariantCulture), TimeSpan.Zero);
         }
+        else if (reader.TokenType == JsonTokenType.Number)
+        {
+            var ticks = reader.GetInt64();
+            return new DateTimeOffset(ticks, TimeSpan.Zero);
+        }
 
-        throw new JsonException("Expected string with DateTimeOffset ticks.");
+        throw new JsonException("Expected string or number with DateTimeOffset ticks.");
     }
 
     public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
     {
         Guard.NotNull(writer);
-        writer.WriteStringValue(value.UtcTicks.ToString(CultureInfo.InvariantCulture));
+        writer.WriteNumberValue(value.UtcTicks);
     }
 }

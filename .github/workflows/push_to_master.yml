@@ -28,6 +28,8 @@ jobs:
       run: dotnet pack Atom.Data/Atom.Data.csproj --configuration Release
     - name: Pack Data.Ef
       run: dotnet pack Atom.Data.Ef/Atom.Data.Ef.csproj --configuration Release
+    - name: Pack Data.Ef.TestingUtil
+      run: dotnet pack Atom.Data.Ef.TestingUtil/Atom.Data.Ef.TestingUtil.csproj --configuration Release
     - name: Pack Data Generators
       run: dotnet pack Atom.Data.Generators/Atom.Data.Generators.csproj --configuration Release
     - name: Pack Infrastructure

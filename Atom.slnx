@@ -4,6 +4,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="Atom.Data.Ef.TestingUtil/Atom.Data.Ef.TestingUtil.csproj" />
   <Project Path="Atom.Data.Ef/Atom.Data.Ef.csproj" />
   <Project Path="Atom.Data.Generators/Atom.Data.Generators.csproj" />
   <Project Path="Atom.Data.Tests/Atom.Data.Tests.csproj" />
