@@ -6,9 +6,7 @@ public abstract record EntityBase<TKey, TReference> : IEntity<TKey, TReference>
     where TKey : notnull
     where TReference : IReference<TKey, TReference>
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private TReference _id;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private TReference _id = TReference.Create(default!);
 
     internal void SetId(TReference id) => _id = id;
 

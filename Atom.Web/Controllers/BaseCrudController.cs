@@ -22,6 +22,18 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
 
     protected TRepository Repository { get; }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<TData>> Get([FromRoute] TReference id, CancellationToken cancellationToken)
+    {
+        var entity = await Repository.GetByIdAsync(id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        return entity;
+    }
+
     [HttpGet]
     public async Task<IEnumerable<TData>> GetAll(CancellationToken cancellationToken)
     {

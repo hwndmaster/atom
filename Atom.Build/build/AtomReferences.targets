@@ -66,6 +66,13 @@
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
+    <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
+      <Reference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' == 'true'">
+        <HintPath>$(Path).TestingUtil\bin\Debug\$(AtomFramework)\Genius.$(Name).TestingUtil.dll</HintPath>
+      </Reference>
+      <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
+    </ItemGroup>
+
   </Target>
 
   <Target Name="AtomInfrastructureReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
