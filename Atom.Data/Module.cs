@@ -31,7 +31,7 @@ public static class Module
         services.AddSingleton<ITypeDiscriminatorsInternal>(x => x.GetRequiredService<TypeDiscriminators>());
 
         // Misc
-        services.AddSingleton<IRequestValidators, RequestValidators>();
+        services.AddScoped<IRequestValidators, RequestValidators>();
     }
 
     public static void Initialize(IServiceProvider serviceProvider)

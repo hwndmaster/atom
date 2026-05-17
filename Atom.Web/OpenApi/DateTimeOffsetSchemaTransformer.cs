@@ -16,11 +16,20 @@ public sealed class DateTimeOffsetSchemaTransformer : IOpenApiSchemaTransformer
         Guard.NotNull(context);
         Guard.NotNull(schema);
 
-        var type = Nullable.GetUnderlyingType(context.JsonTypeInfo.Type) ?? context.JsonTypeInfo.Type;
+        var underlyingType = Nullable.GetUnderlyingType(context.JsonTypeInfo.Type);
+        var type = underlyingType ?? context.JsonTypeInfo.Type;
         if (type == typeof(DateTimeOffset))
         {
-            schema.Type = JsonSchemaType.Integer;
             schema.Format = "int64";
+
+            if (underlyingType is not null) // Nullable<DateTimeOffset>
+            {
+                schema.Type = JsonSchemaType.Integer | JsonSchemaType.Null;
+            }
+            else
+            {
+                schema.Type = JsonSchemaType.Integer;
+            }
         }
 
         return Task.CompletedTask;

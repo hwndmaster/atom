@@ -88,6 +88,9 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+
+      <!-- 3rd-party dependencies from Atom.Infrastructure -->
+      <_AtomInfrastructureThirdPartyDependencies Include="$(Path)\bin\Debug\$(AtomFramework)\*.dll" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
@@ -97,6 +100,7 @@
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
+    <Copy SourceFiles="@(_AtomInfrastructureThirdPartyDependencies)" DestinationFolder="$(TargetDir)\" />
   </Target>
 
   <Target Name="AtomUiFormsReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
