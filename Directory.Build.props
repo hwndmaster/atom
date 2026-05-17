@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <Version>0.1.7</Version>
+    <Version>0.1.8</Version>
     <Product>Atom</Product>
     <Authors>Dima Kravtsov</Authors>
     <Description>Simple framework for personal pet projects</Description>
@@ -13,5 +13,9 @@
   </PropertyGroup>
 
   <Import Project="./Atom.Build/build/Genius.Atom.Build.props"/>
+
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.TestingUtil'))">
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
 </Project>
