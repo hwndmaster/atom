@@ -12,15 +12,18 @@ public static class Randomizer
     public static int RandomInt(int from, int to)
         => _rnd.Next(from, to);
 
-    [return: MaybeNull]
-    public static T TakeRandom<T>(this IList<T>? list)
+    extension<T>(IList<T>? list)
     {
-        if (list is null)
+        [return: MaybeNull]
+        public T TakeRandom()
         {
-            return default;
+            if (list is null)
+            {
+                return default;
+            }
+            if (list.Count == 0)
+                return default;
+            return list[_rnd.Next(0, list.Count - 1)];
         }
-        if (list.Count == 0)
-            return default;
-        return list[_rnd.Next(0, list.Count - 1)];
     }
 }

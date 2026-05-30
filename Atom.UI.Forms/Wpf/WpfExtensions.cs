@@ -6,57 +6,63 @@ using System.Windows.Media;
 namespace Genius.Atom.UI.Forms.Wpf;
 
 [ExcludeFromCodeCoverage]
-public static class WpfExtensions
+public static class WpfVisualChildrenExtensions
 {
-    public static IEnumerable<T> FindVisualChildren<T>(this DependencyObject dependencyObject) where T : DependencyObject
+    extension(DependencyObject dependencyObject)
     {
-        if (dependencyObject is null)
-            yield break;
-
-        if (dependencyObject is T t)
-            yield return t;
-
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
+        public IEnumerable<T> FindVisualChildren<T>() where T : DependencyObject
         {
-            DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
-            foreach (T childOfChild in FindVisualChildren<T>(child))
-            {
-                yield return childOfChild;
-            }
-        }
+            if (dependencyObject is null)
+                yield break;
 
-        /*if (dependencyObject is ContentPresenter contentPresenter)
-        {
-            if (contentPresenter.Content is DependencyObject contentDependencyObject)
+            if (dependencyObject is T t)
+                yield return t;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
             {
-                foreach (T childOfChild in FindVisualChildren<T>(contentDependencyObject))
+                DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
+                foreach (T childOfChild in child.FindVisualChildren<T>())
                 {
                     yield return childOfChild;
                 }
             }
-        }*/
-    }
-
-    public static T? FindVisualParent<T>(this UIElement element) where T : UIElement
-    {
-        UIElement? parent = element;
-        while (parent is not null)
-        {
-            if (parent is T correctlyTyped)
-            {
-                return correctlyTyped;
-            }
-
-            parent = VisualTreeHelper.GetParent(parent) as UIElement;
         }
-        return null;
     }
+}
 
-    public static IObservable<Unit> WhenLoadedOneTime(this FrameworkElement frameworkElement)
+[ExcludeFromCodeCoverage]
+public static class WpfVisualParentExtensions
+{
+    extension(UIElement element)
     {
-        return Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
-            h => frameworkElement.Loaded += h, h => frameworkElement.Loaded -= h)
-            .Take(1)
-            .Select(x => Unit.Default);
+        public T? FindVisualParent<T>() where T : UIElement
+        {
+            UIElement? parent = element;
+            while (parent is not null)
+            {
+                if (parent is T correctlyTyped)
+                {
+                    return correctlyTyped;
+                }
+
+                parent = VisualTreeHelper.GetParent(parent) as UIElement;
+            }
+            return null;
+        }
+    }
+}
+
+[ExcludeFromCodeCoverage]
+public static class WpfFrameworkElementExtensions
+{
+    extension(FrameworkElement frameworkElement)
+    {
+        public IObservable<Unit> WhenLoadedOneTime()
+        {
+            return Observable.FromEventPattern<RoutedEventHandler, RoutedEventArgs>(
+                h => frameworkElement.Loaded += h, h => frameworkElement.Loaded -= h)
+                .Take(1)
+                .Select(x => Unit.Default);
+        }
     }
 }

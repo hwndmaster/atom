@@ -29,11 +29,13 @@ public interface IAutoGridContextBuilderColumn<TBuilder, TViewModel, TParentView
     TBuilder WithVisibility(Expression<Func<TParentViewModel, bool>> visibilityProperty);
 }
 
-internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>
+internal abstract class AutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>
     : IAutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>,
         IHasBuildColumnContext
     where TBuilder : IAutoGridContextBuilderColumn<TBuilder, TVIewModel, TParentViewModel>
 {
+    private static readonly Regex _displayNameRegex = new("[A-Z]", RegexOptions.Compiled);
+
     private string? _displayName;
     protected bool _autoWidth;
     protected bool _isReadOnly;
@@ -117,7 +119,7 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
     protected string DetermineDisplayName()
     {
         return _displayName
-            ?? DisplayNameRegex().Replace(PropertyDescriptor.Name, " $0");
+            ?? _displayNameRegex.Replace(PropertyDescriptor.Name, " $0");
     }
 
     protected IValueConverter? DetermineValueConverter(string? displayFormat)
@@ -157,14 +159,4 @@ internal abstract partial class AutoGridContextBuilderColumn<TBuilder, TVIewMode
 
     protected abstract TBuilder BuilderInstance { get; }
     protected PropertyDescriptor PropertyDescriptor { get; }
-
-    // TODO: Temporarily having error CS8795 after upgrading to .NET9:
-    // "Partial method '...' must have an implementation part because it has accessibility modifiers."
-    // Note: Same issues described here but not resolved:
-    // - https://github.com/dotnet/roslyn/issues/69522
-    // - https://github.com/dotnet/roslyn/issues/73964
-    //[GeneratedRegex("[A-Z]")]
-    //private static partial Regex DisplayNameRegex();
-    private static Regex _displayNameRegex = new("[A-Z]", RegexOptions.Compiled);
-    private static Regex DisplayNameRegex() => _displayNameRegex;
 }
