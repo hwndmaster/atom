@@ -40,6 +40,18 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
         return await Repository.GetAllAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
+    [HttpPost("by-ids")]
+    public async Task<ActionResult<IEnumerable<TData>>> GetByIds([FromBody] IEnumerable<TReference> ids, CancellationToken cancellationToken)
+    {
+        if (ids is null)
+        {
+            return BadRequest("The request message cannot be null.");
+        }
+
+        var entities = await Repository.GetByIdsAsync(ids, cancellationToken: cancellationToken).ConfigureAwait(false);
+        return entities.ToArray();
+    }
+
     [HttpPost]
     public async Task<ActionResult<CreatedEntityDto<TKey, TReference>>> Create([FromBody] TCreateRequest createRequest, CancellationToken cancellationToken)
     {
