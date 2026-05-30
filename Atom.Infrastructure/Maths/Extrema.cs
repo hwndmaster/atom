@@ -24,54 +24,56 @@ public record ExtremaWithCount<T>(T Minimum, T Maximum, int Count) : Extrema<T>(
 
 public static class ExtremaExtensions
 {
-    public static Extrema<TSource> Extrema<TSource>(this IEnumerable<TSource> source)
+    extension<TSource>(IEnumerable<TSource> source)
         where TSource : struct, IComparable<TSource>
     {
-        Guard.NotNull(source);
-
-        TSource? min = null, max = null;
-        foreach (var item in source)
+        public Extrema<TSource> Extrema()
         {
-            if (min is null || min.Value.CompareTo(item) > 0)
+            Guard.NotNull(source);
+
+            TSource? min = null, max = null;
+            foreach (var item in source)
             {
-                min = item;
+                if (min is null || min.Value.CompareTo(item) > 0)
+                {
+                    min = item;
+                }
+                if (max is null || max.Value.CompareTo(item) < 0)
+                {
+                    max = item;
+                }
             }
-            if (max is null || max.Value.CompareTo(item) < 0)
+
+            if (min is null || max is null)
             {
-                max = item;
+                throw new InvalidOperationException("Source contains no elements");
             }
+
+            return new Extrema<TSource>(min.Value, max.Value);
         }
 
-        if (min is null || max is null)
+        public ExtremaWithCount<TSource> ExtremaAndCount()
         {
-            throw new InvalidOperationException("Source contains no elements");
+            Guard.NotNull(source);
+
+            int count = 0;
+            TSource? min = null, max = null;
+            foreach (var item in source)
+            {
+                if (min is null || min.Value.CompareTo(item) > 0)
+                    min = item;
+                if (max is null || max.Value.CompareTo(item) < 0)
+                    max = item;
+
+                count++;
+            }
+
+            if (min is null || max is null)
+            {
+                throw new InvalidOperationException("Source contains no elements");
+            }
+
+            return new ExtremaWithCount<TSource>(min.Value, max.Value, count);
         }
-
-        return new Extrema<TSource>(min.Value, max.Value);
-    }
-
-    public static ExtremaWithCount<TSource> ExtremaAndCount<TSource>(this IEnumerable<TSource> source)
-        where TSource : struct, IComparable<TSource>
-    {
-        Guard.NotNull(source);
-
-        int count = 0;
-        TSource? min = null, max = null;
-        foreach (var item in source)
-        {
-            if (min is null || min.Value.CompareTo(item) > 0)
-                min = item;
-            if (max is null || max.Value.CompareTo(item) < 0)
-                max = item;
-
-            count++;
-        }
-
-        if (min is null || max is null)
-        {
-            throw new InvalidOperationException("Source contains no elements");
-        }
-
-        return new ExtremaWithCount<TSource>(min.Value, max.Value, count);
     }
 }
