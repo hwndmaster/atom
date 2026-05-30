@@ -48,6 +48,8 @@ jobs:
       run: dotnet pack Atom.Build/Atom.Build.csproj --configuration Release
     - name: Pack Web
       run: dotnet pack Atom.Web/Atom.Web.csproj --configuration Release
+    - name: Pack Web.Telemetry
+      run: dotnet pack Atom.Web.Telemetry/Atom.Web.Telemetry.csproj --configuration Release
     - name: Publish packages to GPR
       run: dotnet nuget push **/*.nupkg --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/hwndmaster/index.json
       env:
