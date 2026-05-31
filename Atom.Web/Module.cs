@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Genius.Atom.Data.JsonConverters;
+using Genius.Atom.Web.OpenApi;
 using Genius.Atom.Web.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Json;
@@ -18,7 +19,12 @@ public static class Module
     {
         Guard.NotNull(builder);
 
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi(options =>
+        {
+            options.AddSchemaTransformer<DateTimeOffsetSchemaTransformer>();
+            options.AddOperationTransformer<ReferenceParameterTransformer>();
+            options.AddOperationTransformer<ByIdsArrayItemsOperationTransformer>();
+        });
 
         // Add API Versioning
         builder.Services.AddApiVersioning(options =>
