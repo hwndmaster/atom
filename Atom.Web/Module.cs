@@ -22,6 +22,7 @@ public static class Module
         builder.Services.AddOpenApi(options =>
         {
             options.AddSchemaTransformer<DateTimeOffsetSchemaTransformer>();
+            options.AddSchemaTransformer<ReferenceArrayItemsSchemaTransformer>();
             options.AddOperationTransformer<ReferenceParameterTransformer>();
             options.AddOperationTransformer<ByIdsArrayItemsOperationTransformer>();
         });
