@@ -97,6 +97,25 @@ public abstract class BaseRepositoryTests<TKey, TReference, TGetDto, TCreateDto,
     }
 
     [Fact]
+    public async Task UpdateAsync_WhenVersionConflicts_ThrowsEntityVersionConflictException()
+    {
+        // Arrange
+        var created = await Repository.CreateAsync(CreateSampleCreateDto(++_index), cancellationToken: TestContext.Current.CancellationToken);
+        var staleLastModified = created.LastModified.AddSeconds(-1);
+        var updateDto = CreateSampleUpdateDto(created.EntityId.Id, staleLastModified, ++_index);
+
+        // Act
+        var exception = await Record.ExceptionAsync(
+            () => Repository.UpdateAsync(updateDto, cancellationToken: TestContext.Current.CancellationToken));
+
+        // Assert
+        var conflict = Assert.IsType<EntityVersionConflictException>(exception);
+        Assert.Equal((object)created.EntityId.Id, conflict.Id);
+        Assert.Equal(created.LastModified, conflict.StoredLastModified);
+        Assert.Equal(staleLastModified, conflict.AttemptedLastModified);
+    }
+
+    [Fact]
     public async Task DeleteAsync_CompletesSuccessfully()
     {
         // Arrange

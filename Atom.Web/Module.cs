@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Genius.Atom.Data.JsonConverters;
+using Genius.Atom.Web.Filters;
 using Genius.Atom.Web.OpenApi;
 using Genius.Atom.Web.Middlewares;
 using Microsoft.AspNetCore.Builder;
@@ -41,7 +42,13 @@ public static class Module
         });
 
         builder.Services
-            .AddControllers(configureMvcOptions)
+            .AddControllers(options =>
+            {
+                // Turn the optimistic-concurrency EntityVersionConflictException into a descriptive
+                // HTTP 409 for every controller.
+                options.Filters.Add<VersionConflictExceptionFilter>();
+                configureMvcOptions?.Invoke(options);
+            })
             .AddJsonOptions(options =>
             {
                 JsonSetup.SetupJsonOptions(options.JsonSerializerOptions);

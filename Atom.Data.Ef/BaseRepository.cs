@@ -99,7 +99,11 @@ public abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCreate
 
         if (existingEntity.LastModified != updateDto.LastModified)
         {
-            throw new InvalidOperationException($"Entity with ID {updateDto.Id} has a version conflict.");
+            throw new EntityVersionConflictException(
+                typeof(TEntity).Name,
+                updateDto.Id.Id,
+                existingEntity.LastModified,
+                updateDto.LastModified);
         }
 
         var updatedEntity = MapUpdateDto(updateDto, existingEntity);
