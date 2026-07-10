@@ -3,6 +3,15 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <FrameworkPackageVersion>10.0.9</FrameworkPackageVersion>
+    <!-- Single source of truth for the Roslyn version: the Atom source
+         generators are compiled against Microsoft.CodeAnalysis at this
+         version, and every consumer's compiler is pinned to the same
+         version via Microsoft.Net.Compilers.Toolset (see Analyzers.props).
+         A consumer compiler OLDER than the generator's Roslyn reference
+         does not fail the analyzer load - it silently skips the generator
+         (warning CS9057) and the build then breaks on missing generated
+         members. Keeping both on one property makes that skew impossible. -->
+    <RoslynCompilerVersion>5.6.0</RoslynCompilerVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +51,7 @@
     <PackageVersion Include="Imposter" Version="0.1.9" />
 
     <!-- Code analyzers -->
+    <PackageVersion Include="Microsoft.Net.Compilers.Toolset" Version="$(RoslynCompilerVersion)" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="18.7.23" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.15.0" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.29.0.143774" />

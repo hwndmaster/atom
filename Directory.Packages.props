@@ -23,9 +23,10 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.16.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.14.0-beta.1" />
 
-    <!-- Source Generators -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.6.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.6.0" />
+    <!-- Source Generators — must stay in lockstep with the compiler pin;
+         see RoslynCompilerVersion in Atom.Build/build/PackageVersions.props -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynCompilerVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynCompilerVersion)" />
     <PackageVersion Include="Scriban" Version="7.2.5" />
 
     <!-- Misc -->

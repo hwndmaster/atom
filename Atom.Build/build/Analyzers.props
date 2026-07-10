@@ -14,6 +14,11 @@
   </ItemGroup>
 
   <ItemGroup Label="Analyzers">
+     <!-- Pin the compiler to the Roslyn version the Atom source generators
+          are built against ($(RoslynCompilerVersion) in PackageVersions.props).
+          Without this, an SDK with an older compiler silently skips the
+          generators (CS9057) and the build fails on missing generated code. -->
+     <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
      <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="all"/>
      <PackageReference Include="Roslynator.Analyzers" PrivateAssets="all"/>
      <PackageReference Include="SonarAnalyzer.CSharp" PrivateAssets="all"/>
