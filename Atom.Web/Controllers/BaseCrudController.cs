@@ -1,6 +1,8 @@
 using Genius.Atom.Data;
 using Genius.Atom.Data.Ef;
 using Genius.Atom.Data.Validation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Genius.Atom.Web.Controllers;
@@ -23,15 +25,15 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
     protected TRepository Repository { get; }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<TData>> Get([FromRoute] TReference id, CancellationToken cancellationToken)
+    public async Task<Results<Ok<TData>, NotFound>> Get([FromRoute] TReference id, CancellationToken cancellationToken)
     {
         var entity = await Repository.GetByIdAsync(id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (entity is null)
         {
-            return NotFound();
+            return TypedResults.NotFound();
         }
 
-        return entity;
+        return TypedResults.Ok(entity);
     }
 
     [HttpGet]
@@ -41,35 +43,35 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
     }
 
     [HttpPost("by-ids")]
-    public async Task<ActionResult<IEnumerable<TData>>> GetByIds([FromBody] IEnumerable<TReference> ids, CancellationToken cancellationToken)
+    public async Task<Results<Ok<TData[]>, BadRequest<string>>> GetByIds([FromBody] IEnumerable<TReference> ids, CancellationToken cancellationToken)
     {
         if (ids is null)
         {
-            return BadRequest("The request message cannot be null.");
+            return TypedResults.BadRequest("The request message cannot be null.");
         }
 
         var entities = await Repository.GetByIdsAsync(ids, cancellationToken: cancellationToken).ConfigureAwait(false);
-        return entities.ToArray();
+        return TypedResults.Ok(entities.ToArray());
     }
 
     [HttpPost]
-    public async Task<ActionResult<CreatedEntityDto<TKey, TReference>>> Create([FromBody] TCreateRequest createRequest, CancellationToken cancellationToken)
+    public async Task<Results<Ok<CreatedEntityDto<TKey, TReference>>, BadRequest<string>, ValidationProblem>> Create([FromBody] TCreateRequest createRequest, CancellationToken cancellationToken)
     {
         if (createRequest is null)
         {
-            return BadRequest("The request message cannot be null.");
+            return TypedResults.BadRequest("The request message cannot be null.");
         }
 
         var validationResults = await _requestValidators.ValidateAsync(createRequest, cancellationToken).ToArrayAsync(cancellationToken);
         if (validationResults.Length > 0)
         {
-            return ValidationProblem(validationResults.ToValidationProblem());
+            return validationResults.ToValidationProblem();
         }
 
         var preAddResult = await PreAddAsync(createRequest, cancellationToken).ConfigureAwait(false);
         if (!preAddResult.Success)
         {
-            return BadRequest(preAddResult.ErrorMessage ?? "Pre-add checks failed.");
+            return TypedResults.BadRequest(preAddResult.ErrorMessage ?? "Pre-add checks failed.");
         }
 
         if (preAddResult.UpdatedRequest is not null)
@@ -79,27 +81,27 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
 
         CreatedEntityDto<TKey, TReference> createdEntity = await Repository.CreateAsync(createRequest, cancellationToken: cancellationToken).ConfigureAwait(false);
         await PostAddAsync(createRequest, createdEntity.EntityId, cancellationToken).ConfigureAwait(false);
-        return createdEntity;
+        return TypedResults.Ok(createdEntity);
     }
 
     [HttpPut]
-    public async Task<ActionResult<UpdatedEntityDto<TKey, TReference>>> Update([FromBody] TUpdateRequest updateRequest, CancellationToken cancellationToken)
+    public async Task<Results<Ok<UpdatedEntityDto<TKey, TReference>>, BadRequest<string>, ValidationProblem>> Update([FromBody] TUpdateRequest updateRequest, CancellationToken cancellationToken)
     {
         if (updateRequest is null)
         {
-            return BadRequest("The request message cannot be null.");
+            return TypedResults.BadRequest("The request message cannot be null.");
         }
 
         var validationResults = await _requestValidators.ValidateAsync(updateRequest, cancellationToken).ToArrayAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (validationResults.Length > 0)
         {
-            return ValidationProblem(validationResults.ToValidationProblem());
+            return validationResults.ToValidationProblem();
         }
 
         var preUpdateResult = await PreUpdateAsync(updateRequest, cancellationToken).ConfigureAwait(false);
         if (!preUpdateResult.Success)
         {
-            return BadRequest(preUpdateResult.ErrorMessage ?? "Pre-update checks failed.");
+            return TypedResults.BadRequest(preUpdateResult.ErrorMessage ?? "Pre-update checks failed.");
         }
 
         if (preUpdateResult.UpdatedRequest is not null)
@@ -111,14 +113,14 @@ public abstract class BaseCrudController<TKey, TReference, TData, TRepository, T
 
         await PostUpdateAsync(updateRequest, cancellationToken).ConfigureAwait(false);
 
-        return Ok(updatedEntity);
+        return TypedResults.Ok(updatedEntity);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete([FromRoute] TReference id, CancellationToken cancellationToken)
+    public async Task<Ok> Delete([FromRoute] TReference id, CancellationToken cancellationToken)
     {
         await Repository.DeleteAsync(id, cancellationToken: cancellationToken).ConfigureAwait(false);
-        return Ok();
+        return TypedResults.Ok();
     }
 
     /// <summary>

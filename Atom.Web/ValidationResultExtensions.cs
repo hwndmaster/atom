@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Genius.Atom.Web;
 
@@ -11,12 +12,13 @@ internal static class ValidationResultExtensions
     extension(IEnumerable<ValidationResult> validationResults)
     {
         /// <summary>
-        /// Converts a collection of <see cref="ValidationResult"/> instances into a <see cref="ValidationProblemDetails"/> response payload.
+        /// Converts a collection of <see cref="ValidationResult"/> instances into a <see cref="ValidationProblem"/> response
+        /// containing the validation errors grouped by member name.
         /// </summary>
-        /// <returns>A <see cref="ValidationProblemDetails"/> containing the validation errors grouped by member name.</returns>
-        public ValidationProblemDetails ToValidationProblem()
+        /// <returns>A <see cref="ValidationProblem"/> result producing an HTTP 400 with the validation errors.</returns>
+        public ValidationProblem ToValidationProblem()
         {
-            return new ValidationProblemDetails(
+            return TypedResults.ValidationProblem(
                 validationResults
                     .Where(x => x.ErrorMessage is not null)
                     .SelectMany(x => x.MemberNames.Select(member => new { member, x.ErrorMessage }))

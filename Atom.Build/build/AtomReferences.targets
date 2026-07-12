@@ -88,9 +88,6 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
-
-      <!-- 3rd-party dependencies from Atom.Infrastructure -->
-      <_AtomInfrastructureThirdPartyDependencies Include="$(Path)\bin\Debug\$(AtomFramework)\*.dll" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
@@ -100,7 +97,6 @@
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(_AtomInfrastructureThirdPartyDependencies)" DestinationFolder="$(TargetDir)\" />
   </Target>
 
   <Target Name="AtomUiFormsReference" BeforeTargets="PrepareProjectReferences;CollectPackageReferences"
@@ -116,12 +112,7 @@
         <HintPath>$(Path)\bin\Debug\$(UiTargetFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
-
-      <!-- 3rd-party dependencies from Atom.UI.Forms -->
-      <_AtomUiFormsThirdPartyDependencies Include="$(Path)\bin\Debug\$(UiTargetFramework)\*.dll" />
     </ItemGroup>
-
-    <Copy SourceFiles="@(_AtomUiFormsThirdPartyDependencies)" DestinationFolder="$(TargetDir)\" />
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
       <Reference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' == 'true'">
@@ -147,5 +138,23 @@
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
     </ItemGroup>
 
+  </Target>
+
+  <!-- Copies the locally built Atom assemblies and their 3rd-party dependencies into the output
+       folder AFTER the standard build copy. A transitive Genius.Atom.* NuGet package (pinned to an
+       older AtomPackageVersion) can otherwise place a stale copy of e.g. Genius.Atom.Infrastructure
+       into the output, which then fails to load next to locally built assemblies of a newer version.
+       Running after CopyFilesToOutputDirectory ensures the locally built DLLs always win. -->
+  <Target Name="AtomCopyLocalDependencies" AfterTargets="CopyFilesToOutputDirectory">
+    <ItemGroup>
+      <_AtomLocalDependencyDlls Include="$(MSBuildThisFileDirectory)$(AtomLocation)Atom.Infrastructure\bin\Debug\$(AtomFramework)\*.dll"
+        Condition="'$(ReferenceAtomInfrastructure)' == 'true' And Exists('$(MSBuildThisFileDirectory)$(AtomLocation)Atom.Infrastructure')" />
+      <_AtomLocalDependencyDlls Include="$(MSBuildThisFileDirectory)$(AtomLocation)Atom.Data.Ef\bin\Debug\$(AtomFramework)\*.dll"
+        Condition="'$(ReferenceAtomDataEf)' == 'true' And Exists('$(MSBuildThisFileDirectory)$(AtomLocation)Atom.Data.Ef')" />
+      <_AtomLocalDependencyDlls Include="$(MSBuildThisFileDirectory)$(AtomLocation)Atom.UI.Forms\bin\Debug\$(UiTargetFramework)\*.dll"
+        Condition="'$(ReferenceAtomUiForms)' == 'true' And Exists('$(MSBuildThisFileDirectory)$(AtomLocation)Atom.UI.Forms')" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_AtomLocalDependencyDlls)" DestinationFolder="$(TargetDir)\" SkipUnchangedFiles="true" />
   </Target>
 </Project>

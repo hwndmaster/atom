@@ -8,9 +8,10 @@ namespace Genius.Atom.Data.Ef;
 /// </summary>
 public static class DatabaseContextRegistration
 {
-    public static void Register<TDbContext>(IServiceCollection services)
+    public static DatabaseContextRegistrationBuilder<TDbContext> Register<TDbContext>(IServiceCollection services)
         where TDbContext : DbContext
     {
         services.AddScoped<IDatabaseContext, DatabaseContext<TDbContext>>();
+        return new DatabaseContextRegistrationBuilder<TDbContext>(services);
     }
 }

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atom.Data.Ef\Atom.Data.Ef.csproj" />
+    <ProjectReference Include="..\Atom.Infrastructure.TestingUtil\Atom.Infrastructure.TestingUtil.csproj" />
+  </ItemGroup>
+
+</Project>

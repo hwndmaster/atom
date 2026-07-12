@@ -2,10 +2,16 @@
 
   <PropertyGroup>
     <PackageId>$(AssemblyName)</PackageId>
+    <!-- Place package dependencies in the output folder, so that they can be copied
+         to consumers referencing the locally built DLLs (see AtomReferences.targets). -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
   </ItemGroup>
 
   <ItemGroup>

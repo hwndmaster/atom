@@ -19,6 +19,7 @@
     <PackageVersion Include="System.Reactive" Version="6.1.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(FrameworkPackageVersion)"/>
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="18.7.23" />
@@ -33,6 +34,7 @@
 
     <!-- Entity Framework -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(FrameworkPackageVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(FrameworkPackageVersion)" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="$(FrameworkPackageVersion)" />
