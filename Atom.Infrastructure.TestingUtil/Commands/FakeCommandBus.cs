@@ -18,7 +18,7 @@ public sealed class FakeCommandBus : ICommandBus
     public void AssertNoCommandsButOfType<T>()
         where T : ICommandMessage
     {
-        Assert.False(_sentCommands.Any(x => x is not T));
+        Assert.DoesNotContain(_sentCommands, x => x is not T);
     }
 
     public void AssertSingleCommand<T>(Func<T, bool> condition)

@@ -10,8 +10,15 @@ namespace Genius.Atom.Data;
 /// exception handling that treats repository failures as invalid operations; callers that need the
 /// structured details (entity name, id, versions) can catch this specific type instead.
 /// </remarks>
+#pragma warning disable CA1032 // Implement standard exception constructors: Not relevant to this type of exception.
+#pragma warning disable RCS1194 // Implement exception constructors: Not relevant to this type of exception.
+
 public sealed class EntityVersionConflictException : InvalidOperationException
 {
+
+#pragma warning restore RCS1194 // Implement exception constructors
+#pragma warning restore CA1032 // Implement standard exception constructors
+
     public EntityVersionConflictException(
         string entityName,
         object id,

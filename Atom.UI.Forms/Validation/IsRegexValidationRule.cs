@@ -22,7 +22,8 @@ public sealed class IsRegexValidationRule : ValidationRule, IPropertyValidationR
         {
             try
             {
-                Regex.Match("", stringValue);
+                // The input parameter doesn't matter, as we're trying to validate the regular expression itself.
+                Regex.Match("", stringValue, RegexOptions.None, TimeSpan.FromSeconds(10));
             }
             catch (ArgumentException)
             {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <FrameworkPackageVersion>10.0.9</FrameworkPackageVersion>
+    <FrameworkPackageVersion>10.0.11</FrameworkPackageVersion>
     <!-- Single source of truth for the Roslyn version: the Atom source
          generators are compiled against Microsoft.CodeAnalysis at this
          version, and every consumer's compiler is pinned to the same
@@ -49,7 +49,10 @@
     <PackageVersion Include="Xunit.StaFact" Version="3.0.13" />
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
     <PackageVersion Include="AutoFixture.AutoFakeItEasy" Version="4.18.1" />
-    <PackageVersion Include="FakeItEasy" Version="9.0.1" />
+    <!-- Capped below 9.0.0: AutoFixture.AutoFakeItEasy 4.18.1 (the latest stable)
+         declares FakeItEasy [4.9.0, 9.0.0). FakeItEasy 9 can be picked up once
+         AutoFixture 5 leaves prerelease. -->
+    <PackageVersion Include="FakeItEasy" Version="8.3.0" />
     <PackageVersion Include="Imposter" Version="0.1.9" />
 
     <!-- Code analyzers -->

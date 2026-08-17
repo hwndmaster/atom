@@ -155,7 +155,7 @@ internal class DataGridTextColumnBuilder : DataGridColumnBuilder
 #pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception
             try
             {
-                regex = new Regex(pattern, RegexOptions.IgnoreCase);
+                regex = new Regex(pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(10));
             }
             catch (Exception)
             {

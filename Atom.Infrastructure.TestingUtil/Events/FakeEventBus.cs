@@ -65,7 +65,7 @@ public sealed class FakeEventBus : IEventBus
     public void AssertNoEventsButOfType<T>()
         where T : IEventMessage
     {
-        Assert.False(_publishedEvents.Any(x => x is not T));
+        Assert.DoesNotContain(_publishedEvents, x => x is not T);
     }
 
     public T GetSingleEvent<T>()

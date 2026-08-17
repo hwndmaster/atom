@@ -77,7 +77,7 @@ public abstract class BaseRepository<TEntity, TKey, TReference, TGetDto, TCreate
             DateCreated = entity.DateCreated == DateTimeOffset.MinValue ? date : entity.DateCreated,
             LastModified = entity.LastModified == DateTimeOffset.MinValue ? date : entity.LastModified
         };
-        _databaseContext.Set<TEntity>().Add(entity);
+        await _databaseContext.Set<TEntity>().AddAsync(entity, cancellationToken);
         await _databaseContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         await AfterCreateAsync(createDto, entity, cancellationToken).ConfigureAwait(false);

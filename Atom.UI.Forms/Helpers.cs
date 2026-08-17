@@ -5,7 +5,8 @@ namespace Genius.Atom.UI.Forms;
 
 internal static class Helpers
 {
-    private static readonly Regex _captionFromPropertyNameRegex = new("(?<=[^$])([A-Z])", RegexOptions.Compiled);
+    private static readonly Regex CaptionFromPropertyNameRegex = new(
+        "(?<=[^$])([A-Z])", RegexOptions.Compiled, TimeSpan.FromSeconds(10));
 
     public static Type GetListItemType(object value)
     {
@@ -23,6 +24,6 @@ internal static class Helpers
 
     public static string MakeCaptionFromPropertyName(string propertyName)
     {
-        return _captionFromPropertyNameRegex.Replace(propertyName, " $1");
+        return CaptionFromPropertyNameRegex.Replace(propertyName, " $1");
     }
 }

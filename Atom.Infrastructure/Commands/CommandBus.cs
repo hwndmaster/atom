@@ -18,7 +18,8 @@ public interface ICommandBus
 /// </summary>
 internal sealed class CommandBus : ICommandBus, IDisposable
 {
-    private static readonly ConcurrentDictionary<Type, MethodInfo> _handlersMethodCache = new();
+    private static readonly Lazy<JsonSerializerOptions> ObjectLogJsonOptions = new(() => new JsonSerializerOptions() { MaxDepth = 10 });
+    private static readonly ConcurrentDictionary<Type, MethodInfo> HandlersMethodCache = new();
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ISynchronousScheduler _synchronousScheduler;
     private readonly ILogger<CommandBus> _logger;
@@ -72,7 +73,7 @@ internal sealed class CommandBus : ICommandBus, IDisposable
             {
                 _logger.LogError(ex, "Command execution failed. HandlerType: '{0}', Command:\r\n{1}",
                     handlerType.FullName,
-                    JsonSerializer.Serialize<object>(command, new JsonSerializerOptions() { MaxDepth = 10 }));
+                    JsonSerializer.Serialize<object>(command, ObjectLogJsonOptions.Value));
             }
             finally
             {
@@ -98,7 +99,7 @@ internal sealed class CommandBus : ICommandBus, IDisposable
     private static MethodInfo FindProcessMethod(ICommandMessage command, object commandHandler)
     {
         var commandType = command.GetType();
-        return _handlersMethodCache.GetOrAdd(commandType, key =>
+        return HandlersMethodCache.GetOrAdd(commandType, key =>
         {
             return commandHandler.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .First(x => x.Name == "ProcessAsync" && x.GetParameters()[0].ParameterType == key);

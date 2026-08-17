@@ -43,7 +43,7 @@ internal sealed class DatabaseContext<TDbContext> : IDatabaseContext
     {
         if (_dbContext == null)
         {
-            _dbContext = (TDbContext)Activator.CreateInstance(typeof(TDbContext), _options)
+            _dbContext = Activator.CreateInstance(typeof(TDbContext), _options) as TDbContext
                 ?? throw new InvalidOperationException($"Failed to create an instance of {typeof(TDbContext).Name}.");
         }
     }

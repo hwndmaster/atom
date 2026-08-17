@@ -13,7 +13,7 @@
     <IsUIProject>False</IsUIProject>
     <IsUIProject Condition="$(MSBuildProjectName.Contains('.UI.Forms')) Or $(MSBuildProjectName.EndsWith('.UI'))">True</IsUIProject>
     <IsTestProject>False</IsTestProject>
-    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests'))">True</IsTestProject>
+    <IsTestProject Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.IntegrationTests'))">True</IsTestProject>
     <IsUITestProject>False</IsUITestProject>
     <IsUITestProject Condition="$(MSBuildProjectName.EndsWith('.UI.Tests'))">True</IsUITestProject>
     <IsTestingUtilProject>False</IsTestingUtilProject>

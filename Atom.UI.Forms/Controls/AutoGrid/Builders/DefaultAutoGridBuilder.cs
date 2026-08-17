@@ -34,7 +34,7 @@ internal sealed class DefaultAutoGridBuilder
     private static AutoGridBuildColumnContext CreateColumnContext(PropertyDescriptor property)
     {
         var displayName = property.Attributes.OfType<TitleAttribute>().FirstOrDefault()?.Title
-            ?? Regex.Replace(property.DisplayName, "[A-Z]", " $0");
+            ?? Regex.Replace(property.DisplayName, "[A-Z]", " $0", RegexOptions.None, TimeSpan.FromSeconds(10));
 
         if (AutoGridBuilderHelpers.IsCommandColumn(property))
         {
