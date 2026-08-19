@@ -2,42 +2,19 @@
 
 <Import Project="$(MSBuildThisFileDirectory)/Atom.Build/build/PackageVersions.props"/>
 
+  <!-- Only versions that never reach a consumer belong here; everything a shipped Atom package
+       depends on lives in Atom.Build/build/PackageVersions.props so consumers inherit it.
+       Re-declaring an inherited version would shadow it (NU1506). -->
   <ItemGroup>
-    <!-- Microsoft common dependencies -->
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(FrameworkPackageVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(FrameworkPackageVersion)" />
-
-    <!-- Microsoft ASP.NET Core dependencies -->
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(FrameworkPackageVersion)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.7.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.7.0" />
-
-    <!-- OpenTelemetry dependencies -->
-    <PackageVersion Include="OpenTelemetry" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.14.0-beta.1" />
-
     <!-- Source Generators — must stay in lockstep with the compiler pin;
-         see RoslynCompilerVersion in Atom.Build/build/PackageVersions.props -->
+         see RoslynCompilerVersion in Atom.Build/build/PackageVersions.props.
+         Referenced with PrivateAssets="all", so they stay out of the Atom.Data.Generators package. -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynCompilerVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynCompilerVersion)" />
     <PackageVersion Include="Scriban" Version="7.2.5" />
 
-    <!-- Misc -->
+    <!-- Misc — used by Atom.UI.Forms.Demo only -->
     <PackageVersion Include="Humanizer.Core" Version="3.0.10" />
-    <PackageVersion Include="Serilog.Enrichers.Thread" Version="4.0.0" />
-    <PackageVersion Include="Serilog.Expressions" Version="5.0.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.1" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
 </Project>
