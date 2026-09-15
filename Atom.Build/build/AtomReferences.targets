@@ -37,6 +37,8 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll"
+        Condition="'$(ProjectExists)' == 'true'" />
 
       <!-- Register generator + all its dependencies as Analyzers so Roslyn's isolated load context can resolve them -->
       <Analyzer Include="$(Path).Generators\bin\Debug\$(AtomGeneratorsFramework)\*.dll"
@@ -64,6 +66,8 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
@@ -71,6 +75,8 @@
         <HintPath>$(Path).TestingUtil\bin\Debug\$(AtomFramework)\Genius.$(Name).TestingUtil.dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path).TestingUtil\bin\Debug\$(AtomFramework)\Genius.$(Name).TestingUtil.dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
   </Target>
@@ -88,6 +94,8 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
@@ -95,6 +103,8 @@
         <HintPath>$(Path).TestingUtil\bin\Debug\$(AtomFramework)\Genius.$(Name).TestingUtil.dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path).TestingUtil\bin\Debug\$(AtomFramework)\Genius.$(Name).TestingUtil.dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
   </Target>
@@ -112,6 +122,8 @@
         <HintPath>$(Path)\bin\Debug\$(UiTargetFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path)\bin\Debug\$(UiTargetFramework)\Genius.$(Name).dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
     <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) Or $(MSBuildProjectName.EndsWith('.TestingUtil'))">
@@ -119,6 +131,8 @@
         <HintPath>$(Path).TestingUtil\bin\Debug\$(UiTargetFramework)\Genius.$(Name).TestingUtil.dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name).TestingUtil" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path).TestingUtil\bin\Debug\$(UiTargetFramework)\Genius.$(Name).TestingUtil.dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
   </Target>
@@ -136,6 +150,8 @@
         <HintPath>$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll</HintPath>
       </Reference>
       <PackageReference Include="Genius.$(Name)" Condition="'$(ProjectExists)' != 'true'" />
+      <_AtomLocalReferencedAssembly Include="$(Path)\bin\Debug\$(AtomFramework)\Genius.$(Name).dll"
+        Condition="'$(ProjectExists)' == 'true'" />
     </ItemGroup>
 
   </Target>
@@ -157,4 +173,40 @@
 
     <Copy SourceFiles="@(_AtomLocalDependencyDlls)" DestinationFolder="$(TargetDir)\" SkipUnchangedFiles="true" />
   </Target>
+
+  <!-- Fails the build when the local Atom checkout was built at a version other than the one the
+       consumer pins in $(AtomPackageVersion). Two failure modes this prevents, both of which used
+       to surface only at run time (or not at all):
+        * A Genius.Atom.* NuGet package that IS pinned to $(AtomPackageVersion) - directly or as a
+          transitive dependency - binds to that exact assembly version, while AtomCopyLocalDependencies
+          above drops the differently-versioned local build into the output on top of it. The app then
+          dies with a FileNotFoundException for an assembly that is sitting right there.
+        * Every Atom reference resolves locally and the versions are internally consistent, so the
+          build and the app both work - silently against stale Atom code the consumer did not pin.
+       Usually the fix is to rebuild the Atom checkout after a version bump. Set
+       AtomSkipLocalVersionCheck=true to opt out while intentionally working against an unreleased
+       Atom version. -->
+  <Target Name="AtomValidateLocalAssemblyVersions"
+    BeforeTargets="CoreCompile;AtomCopyLocalDependencies"
+    DependsOnTargets="AtomDataReference;AtomDataEfReference;AtomInfrastructureReference;AtomUiFormsReference;AtomWebReference"
+    Condition="'$(AtomSkipLocalVersionCheck)' != 'true' And '$(AtomPackageVersion)' != '' And '@(_AtomLocalReferencedAssembly)' != ''">
+
+    <PropertyGroup>
+      <!-- Assembly versions carry no prerelease label, so compare against the version core only. -->
+      <_AtomExpectedAssemblyVersion>$(AtomPackageVersion.Split('-')[0])</_AtomExpectedAssemblyVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_AtomLocalReferencedAssemblyPresent Include="@(_AtomLocalReferencedAssembly)" Condition="Exists('%(Identity)')" />
+    </ItemGroup>
+
+    <GetAssemblyIdentity AssemblyFiles="@(_AtomLocalReferencedAssemblyPresent)" ContinueOnError="true">
+      <Output TaskParameter="Assemblies" ItemName="_AtomLocalAssemblyIdentity" />
+    </GetAssemblyIdentity>
+
+    <Error Condition="!$([MSBuild]::VersionEquals('%(_AtomLocalAssemblyIdentity.Version)', '$(_AtomExpectedAssemblyVersion)'))"
+      Text="The local Atom build of '%(_AtomLocalAssemblyIdentity.Name)' is version %(_AtomLocalAssemblyIdentity.Version), but this repository pins AtomPackageVersion=$(AtomPackageVersion). Rebuild the Atom checkout at '$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)$(AtomLocation)'))', or align AtomPackageVersion with it. Set AtomSkipLocalVersionCheck=true to bypass." />
+
+  </Target>
+
 </Project>

@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <Version>0.2.10</Version>
+    <Version>0.2.11</Version>
     <Product>Atom</Product>
     <Authors>Dima Kravtsov</Authors>
     <Description>Simple framework for personal pet projects</Description>

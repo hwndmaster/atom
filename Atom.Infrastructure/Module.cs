@@ -20,8 +20,23 @@ public static class Module
     internal static IServiceProvider ServiceProvider
         => _serviceProvider ?? throw new InvalidOperationException("Call Genius.Atom.Infrastructure.Module.Initialize(serviceProvider) in your application initialization.");
 
-    public static void Configure(IServiceCollection services, IConfiguration? configuration = null)
+    /// <summary>
+    /// Registers Atom's infrastructure services.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">Application configuration, used among other things to read the Serilog section.</param>
+    /// <param name="configureOptions">
+    /// Opt-in behaviour. Every default matches how Atom behaved before the options existed, so omitting
+    /// this changes nothing for an application that already works.
+    /// </param>
+    public static void Configure(IServiceCollection services, IConfiguration? configuration = null,
+        Action<AtomInfrastructureOptions>? configureOptions = null)
     {
+        Guard.NotNull(services);
+
+        AtomInfrastructureOptions options = new();
+        configureOptions?.Invoke(options);
+
         services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         services.AddSingleton(typeof(IFactory<>), typeof(ServiceFactory<>));
         services.AddSingleton<IDateTime, SystemDateTime>();
@@ -33,7 +48,7 @@ public static class Module
         services.AddSingleton<IEventBus, EventBus>();
 
         // Logging
-        LoggingModule.Configure(services, configuration);
+        LoggingModule.Configure(services, configuration, mode: options.LoggingMode);
 
         // Net
         services.AddSingleton<ITrickyHttpClient, TrickyHttpClient>();
