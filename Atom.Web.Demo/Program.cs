@@ -30,4 +30,10 @@ Genius.Atom.Web.Module.Initialize(app);
 app.MapAtomWebTelemetryEndpoints();
 app.MapControllers();
 
+// One line per request is written automatically (AtomWebObservabilityOptions.EnableRequestSummaryLogging);
+// this adds the configuration summary, with whatever the application wants to report about itself.
+app.LogAtomStartupSummary(summary => summary
+    .AddFile("Database", Path.Combine(app.Environment.ContentRootPath, "Data", "Demo.db"))
+    .Add("Demo setting", "example value"));
+
 await app.RunAsync().ConfigureAwait(false);
